@@ -23,7 +23,7 @@ def view_applications(request):
         applications = t_core.list_applications()
     except:
         raise
-    return {'applications': applications, 'perpage': perpage, 'offset': offset }
+    return {'applications': applications, 'perpage': perpage, 'offset': offset, 'total': len(applications)}
 
 @view_config(route_name='artifacts', renderer='templates/artifacts.pt')
 def view_artifacts(request):
