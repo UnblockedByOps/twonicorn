@@ -13,6 +13,7 @@ requires = [
     'pyramid_chameleon',
     'pyramid_debugtoolbar',
     'waitress',
+    'twonicorn-web-lib',
     ]
 
 setup(name='twonicorn-web',
