@@ -1,6 +1,8 @@
 from pyramid.view import view_config
 import TwonicornWebLib
 
+t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf')
+t_facts = TwonicornWebLib.tFacter()
 
 @view_config(route_name='home', renderer='templates/home.pt')
 def view_home(request):
@@ -17,16 +19,16 @@ def view_applications(request):
         pass
 
     try:
-        dq = DBSession.query(Detection)
-        dq = dq.order_by(Detection.detected.desc())
-        dets = dq.limit(perpage).offset(offset)
-        total = dq.count()
-        log.debug(pprint.pformat(dets))
-    except DBAPIError, e:
-        return Response(conn_err_msg, content_type='text/plain', status_int=500)
-    return {'dets': dets, 'perpage': perpage, 'offset': offset, 'total': total }
 
-    return {'project': 'twonicorn-ui'}
+       applications = t_core.get_application_deploys
+    return {'applications': applications, 'perpage': perpage, 'offset': offset }
+
+#        dq = DBSession.query(Detection)
+#        dq = dq.order_by(Detection.detected.desc())
+#        dets = dq.limit(perpage).offset(offset)
+#        total = dq.count()
+#    return {'dets': dets, 'perpage': perpage, 'offset': offset, 'total': total }
+
 
 @view_config(route_name='artifacts', renderer='templates/artifacts.pt')
 def view_artifacts(request):
