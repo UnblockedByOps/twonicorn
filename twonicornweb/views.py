@@ -1,5 +1,5 @@
 from pyramid.view import view_config
-import twonicorn-web-lib
+import TwonicornWebLib
 
 
 @view_config(route_name='home', renderer='templates/home.pt')
