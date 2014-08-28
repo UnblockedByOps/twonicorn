@@ -20,9 +20,9 @@ def view_applications(request):
         pass
 
     try:
-        applications = t_core.get_application_deploys()
+        applications = t_core.list_applications()
     except:
-        pass
+        raise
     return {'applications': applications, 'perpage': perpage, 'offset': offset }
 
 @view_config(route_name='artifacts', renderer='templates/artifacts.pt')
