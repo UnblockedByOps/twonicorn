@@ -15,9 +15,9 @@ requires = [
     'waitress',
     ]
 
-setup(name='twonicorn-ui',
+setup(name='twonicorn-web',
       version='0.0',
-      description='twonicorn-ui',
+      description='twonicorn-web',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
@@ -28,15 +28,15 @@ setup(name='twonicorn-ui',
       author='Aaron Bandt',
       author_email='aaron.bandt@citygridmedia.com',
       url='',
-      keywords='Twonicorn web ui',
+      keywords='Twonicorn web api/ui',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
       tests_require=requires,
-      test_suite="twonicornui",
+      test_suite="twonicornweb",
       entry_points="""\
       [paste.app_factory]
-      main = twonicornui:main
+      main = twonicornweb:main
       """,
       )
