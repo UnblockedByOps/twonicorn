@@ -1,0 +1,29 @@
+<html>
+  <head><title>TUI: Twonicorn Web UI</title>
+    <link href="static/tc.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+
+
+    <h1>Twonicorn Web UI</h1>
+
+    <img src="static/logo.jpg">
+
+    <p>
+    <span>What should we put on this page?</span>
+    </p>
+
+    <p>
+    <a href="/applications">Applications</a>
+    </p>
+
+    <p>
+    <a href="/artifacts">Artifacts</a>
+    </p>
+
+    <p>
+    <a href="/promote">Promote</a>
+    </p>
+
+  </body>
+</html>

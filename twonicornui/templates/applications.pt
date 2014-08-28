@@ -1,0 +1,49 @@
+<html>
+  <head><title>TUI: Applications</title>
+    <link href="static/tc.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+
+    [ <a href="/">HOME</a> ]
+    [ <a href="/artifacts">ARTIFACTS</a> ]
+    [ <a href="/promote">PROMOTE</a> ]
+    [ APPLICATIONS ]
+
+    <h1>Applications</h1>
+
+    <p>
+       This page should display paginated list of applications
+    </p>
+
+    <span tal:condition="offset &gt; 0">
+       <a tal:attributes="href '?start=%d' % (offset-perpage)">&lt;&lt;</a>
+    </span>
+    <span tal:condition="offset == 0">
+       &lt;&lt;
+    </span>
+
+    <span tal:condition="(offset+perpage) &lt; total">
+       <a tal:attributes="href '?start=%d' % (offset+perpage)">&gt;&gt;</a>
+    </span>
+    <span tal:condition="(offset+perpage) &gt;= total">
+       &gt;&gt;
+    </span>
+
+    <table tal:condition="applications" border="1">
+      <tr>
+        <th>Application ID</th>
+        <th>Node group</th>
+        <th>Created</th>
+        <th>Artifacts</th>
+      </tr>
+      <tr tal:repeat="item applications">
+        <td tal:content="item.application_id">1</td>
+        <td tal:content="item.nodegroup">tct</td>
+        <td tal:content="item.created">1975-09-28 00:00:00</td>
+        <td><a href="artifacts?application_id=1"
+               tal:attributes="href '/artifacts?application_id=%d' % item.application_id"
+               tal:content="item.nodegroup">Artifacts Link</a></td>
+      </tr>
+    </table>
+  </body>
+</html>
