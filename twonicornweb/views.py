@@ -1,6 +1,7 @@
 from pyramid.view import view_config
 import TwonicornWebLib
 
+
 t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf')
 t_facts = TwonicornWebLib.tFacter()
 
@@ -19,16 +20,10 @@ def view_applications(request):
         pass
 
     try:
-
-       applications = t_core.get_application_deploys
+        applications = t_core.get_application_deploys()
+    except:
+        pass
     return {'applications': applications, 'perpage': perpage, 'offset': offset }
-
-#        dq = DBSession.query(Detection)
-#        dq = dq.order_by(Detection.detected.desc())
-#        dets = dq.limit(perpage).offset(offset)
-#        total = dq.count()
-#    return {'dets': dets, 'perpage': perpage, 'offset': offset, 'total': total }
-
 
 @view_config(route_name='artifacts', renderer='templates/artifacts.pt')
 def view_artifacts(request):
