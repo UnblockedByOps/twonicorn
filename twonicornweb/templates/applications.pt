@@ -6,7 +6,7 @@
 
     [ <a href="/">HOME</a> ]
     [ APPLICATIONS ]
-    [ <a href="/artifacts">ARTIFACTS</a> ]
+    [ <a href="/deploys">DEPLOYS</a> ]
     [ <a href="/promote">PROMOTE</a> ]
 
     <p>
@@ -25,11 +25,11 @@
         <th>Created</th>
       </tr>
       <tr tal:repeat="item applications">
-        <td><a href="artifacts?application_id=0"
-               tal:attributes="href '/artifacts?application_id=%d' % item[0]"
+        <td><a href="deploys?application_id=0"
+               tal:attributes="href '/deploys?application_id=%d' % item[0]"
                tal:content="item[0]">Artifacts By ID Link</a></td>
-        <td><a href="artifacts?application_id=0"
-               tal:attributes="href '/artifacts?nodegroup=%s' % item[1]"
+        <td><a href="deploys?application_id=0"
+               tal:attributes="href '/deploys?nodegroup=%s' % item[1]"
                tal:content="item[1]">Artifacts By nodegroupLink</a></td>
         <td tal:content="item[2]">1975-09-28 00:00:00</td>
       </tr>

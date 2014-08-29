@@ -21,21 +21,33 @@ def view_applications(request):
 @view_config(route_name='deploys', renderer='templates/deploys.pt')
 def view_deploys(request):
 
-    application_id = int(request.GET['application_id'])
-    nodegroup = int(request.GET['nodegroup'])
+    try:
+        application_id = request.params['application_id']
+    except:
+        application_id = None
+        pass
+
+    try:
+        nodegroup = request.params['nodegroup']
+    except:
+        nodegroup = None
+        pass
+
 
     if application_id:
         try: 
-            deploys = t_core.list_deploys(application_id)
+            deploys = t_core.list_deploys(application_id,nodegroup)
         except:
             raise
-        return {'deploys': deploys, 'total': len(deploys), 'application_id': application_id}
+        print "SHIZZ"
+        print type(deploys)
+        return {'deploys': deploys, 'application_id': application_id}
     elif nodegroup:
         try:
-            deploys = t_core.list_deploys(application_id)
+            deploys = t_core.list_deploys(application_id,nodegroup)
         except:
             raise
-        return {'deploys': deploys, 'total': len(deploys), 'application_id': application_id}
+        return {'deploys': deploys, 'application_id': nodegroup}
     else:
         return {'project': 'twonicorn-ui'}
 

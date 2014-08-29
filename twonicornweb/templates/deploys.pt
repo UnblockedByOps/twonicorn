@@ -1,5 +1,5 @@
 <html>
-  <head><title>TUI: Applications</title>
+  <head><title>TUI: Deploys</title>
     <link href="static/tc.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
@@ -25,9 +25,9 @@
         <th>Created At</th>
       </tr>
       <tr tal:repeat="item deploys">
-        <td tal:content="item[0]">0</td>
-        <td tal:content="item[3]">/app/something</td>
-        <td tal:content="item[4]">1975-09-28 00:00:00</td>
+        <td tal:content="item['deploy_id']">0</td>
+        <td tal:content="item['deploy_path']">/app/something</td>
+        <td tal:content="item['url']">1975-09-28 00:00:00</td>
       </tr>
     </table>
   </body>
