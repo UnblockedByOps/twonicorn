@@ -22,12 +22,27 @@
       <tr>
         <th>Deploy ID</th>
         <th>Deploy Path</th>
-        <th>Created At</th>
+        <th>Revision</th>
+        <th>Repo</th>
+        <th>Repo Type</th>
+        <th>Artifact Type</th>
+        <th>Artifact Assignment ID</th>
+        <th>Artifact Assignment Date</th>
+        <th>URL Location</th>
       </tr>
       <tr tal:repeat="item deploys">
-        <td tal:content="item['deploy_id']">0</td>
-        <td tal:content="item['deploy_path']">/app/something</td>
-        <td tal:content="item['url']">1975-09-28 00:00:00</td>
+        <td tal:content="deploys[item]['deploy_id']">0</td>
+        <td tal:content="deploys[item]['deploy_path']">/app/something</td>
+        <td tal:content="deploys[item]['revision']">12345</td>
+        <td tal:content="deploys[item]['repo']">12345</td>
+        <td tal:content="deploys[item]['repo_type']">12345</td>
+        <td tal:content="deploys[item]['artifact_type']">12345</td>
+        <td tal:content="deploys[item]['artifact_assignment_id']">12345</td>
+        <td tal:content="deploys[item]['artifact_assignment_created']">12345</td>
+        <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
+               title="some description"
+               tal:attributes="href deploys[item]['url_location']; title deploys[item]['url_location']"
+               tal:content="deploys[item]['suffix']">Artifacts By nodegroupLink</a></td>
       </tr>
     </table>
   </body>

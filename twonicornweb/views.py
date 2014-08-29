@@ -39,8 +39,6 @@ def view_deploys(request):
             deploys = t_core.list_deploys(application_id,nodegroup)
         except:
             raise
-        print "SHIZZ"
-        print type(deploys)
         return {'deploys': deploys, 'application_id': application_id}
     elif nodegroup:
         try:
