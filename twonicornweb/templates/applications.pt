@@ -39,7 +39,7 @@
       <tr tal:repeat="item applications">
         <td tal:content="item[0]">1</td>
         <td tal:content="item[1]">tct</td>
-        <td tal:content="item.[2]">1975-09-28 00:00:00</td>
+        <td tal:content="item[2]">1975-09-28 00:00:00</td>
         <td><a href="artifacts?application_id=1"
                tal:attributes="href '/artifacts?application_id=%d' % item[0]"
                tal:content="item[1]">Artifacts Link</a></td>
