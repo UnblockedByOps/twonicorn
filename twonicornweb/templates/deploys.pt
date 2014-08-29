@@ -1,0 +1,34 @@
+<html>
+  <head><title>TUI: Applications</title>
+    <link href="static/tc.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+
+    [ <a href="/">HOME</a> ]
+    [ <a href="/applications">APPLICATIONS</a> ]
+    [ DEPLOYS ]
+    [ <a href="/promote">PROMOTE</a> ]
+
+    <p>
+    <img src="static/logo.jpg">
+
+    <h1>Deploys</h1>
+
+    <p>
+    The following deploys are for application id: <span tal:content="application_id">0</span>
+    </p>
+
+    <table tal:condition="deploys" border="1">
+      <tr>
+        <th>Deploy ID</th>
+        <th>Deploy Path</th>
+        <th>Created At</th>
+      </tr>
+      <tr tal:repeat="item deploys">
+        <td tal:content="item[0]">0</td>
+        <td tal:content="item[3]">/app/something</td>
+        <td tal:content="item[4]">1975-09-28 00:00:00</td>
+      </tr>
+    </table>
+  </body>
+</html>

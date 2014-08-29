@@ -9,7 +9,7 @@ def main(global_config, **settings):
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('home', '/')
     config.add_route('applications', '/applications')
-    config.add_route('artifacts', '/artifacts')
+    config.add_route('deploys', '/deploys')
     config.add_route('promote', '/promote')
     config.scan()
     return config.make_wsgi_app()

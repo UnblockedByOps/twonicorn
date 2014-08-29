@@ -5,9 +5,12 @@
   <body>
 
     [ <a href="/">HOME</a> ]
+    [ APPLICATIONS ]
     [ <a href="/artifacts">ARTIFACTS</a> ]
     [ <a href="/promote">PROMOTE</a> ]
-    [ APPLICATIONS ]
+
+    <p>
+    <img src="static/logo.jpg">
 
     <h1>Applications</h1>
 
@@ -15,34 +18,20 @@
        This page should display paginated list of applications
     </p>
 
-    <span tal:condition="offset &gt; 0">
-       <a tal:attributes="href '?start=%d' % (offset-perpage)">&lt;&lt;</a>
-    </span>
-    <span tal:condition="offset == 0">
-       &lt;&lt;
-    </span>
-
-    <span tal:condition="(offset+perpage) &lt; total">
-       <a tal:attributes="href '?start=%d' % (offset+perpage)">&gt;&gt;</a>
-    </span>
-    <span tal:condition="(offset+perpage) &gt;= total">
-       &gt;&gt;
-    </span>
-
     <table tal:condition="applications" border="1">
       <tr>
         <th>Application ID</th>
         <th>Node group</th>
         <th>Created</th>
-        <th>Artifacts</th>
       </tr>
       <tr tal:repeat="item applications">
-        <td tal:content="item[0]">1</td>
-        <td tal:content="item[1]">tct</td>
-        <td tal:content="item[2]">1975-09-28 00:00:00</td>
-        <td><a href="artifacts?application_id=1"
+        <td><a href="artifacts?application_id=0"
                tal:attributes="href '/artifacts?application_id=%d' % item[0]"
-               tal:content="item[1]">Artifacts Link</a></td>
+               tal:content="item[0]">Artifacts By ID Link</a></td>
+        <td><a href="artifacts?application_id=0"
+               tal:attributes="href '/artifacts?nodegroup=%s' % item[1]"
+               tal:content="item[1]">Artifacts By nodegroupLink</a></td>
+        <td tal:content="item[2]">1975-09-28 00:00:00</td>
       </tr>
     </table>
   </body>
