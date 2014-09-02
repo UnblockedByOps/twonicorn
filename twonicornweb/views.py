@@ -2,7 +2,7 @@ from pyramid.view import view_config
 import TwonicornWebLib
 
 
-t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf')
+t_core = TwonicornWebLib.Core('conf/twonicorn.conf')
 t_facts = TwonicornWebLib.tFacter()
 
 @view_config(route_name='home', renderer='templates/home.pt')
