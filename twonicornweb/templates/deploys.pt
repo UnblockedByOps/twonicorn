@@ -14,11 +14,14 @@
 
     <h1>Deploys</h1>
 
-    <p>
+    <p tal:condition="application_id">
     The following deploys are for application id: <span tal:content="application_id">0</span>
     </p>
+    <p tal:condition="nodegroup">
+    The following deploys are for node group: <span tal:content="nodegroup">tct</span>
+    </p>
 
-    <table tal:condition="deploys" border="1">
+    <table border="1">
       <tr>
         <th>Deploy ID</th>
         <th>Deploy Path</th>
@@ -30,8 +33,8 @@
         <th>Artifact Assignment Date</th>
         <th>URL Location</th>
       </tr>
-      <tr>
-        <td colspan="0">DEV</td>
+      <tr tal:condition="deploys_dev">
+        <td colspan="9" bgcolor="#ffc8f2"><b>DEV</b></td>
       </tr>
       <tr tal:repeat="item deploys_dev">
         <td tal:content="deploys_dev[item]['deploy_id']">0</td>
@@ -47,8 +50,8 @@
                tal:attributes="href deploys_dev[item]['url_location']; title deploys_dev[item]['url_location']"
                tal:content="deploys_dev[item]['suffix']">Artifacts By nodegroupLink</a></td>
       </tr>
-      <tr>
-        <td colspan="0">QAT</td>
+      <tr tal:condition="deploys_qat">
+        <td colspan="9" bgcolor="#fff284"><b>QAT</b></td>
       </tr>
       <tr tal:repeat="item deploys_qat">
         <td tal:content="deploys_qat[item]['deploy_id']">0</td>
@@ -64,8 +67,8 @@
                tal:attributes="href deploys_qat[item]['url_location']; title deploys_qat[item]['url_location']"
                tal:content="deploys_qat[item]['suffix']">Artifacts By nodegroupLink</a></td>
       </tr>
-      <tr>
-        <td colspan="0">PRD</td>
+      <tr tal:condition="deploys_prd">
+        <td colspan="9" bgcolor="#CAFEB8"><b>PRD</b></td>
       </tr>
       <tr tal:repeat="item deploys_prd">
         <td tal:content="deploys_prd[item]['deploy_id']">0</td>
