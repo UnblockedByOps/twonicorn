@@ -41,7 +41,7 @@ def view_deploys(request):
             deploys_prd = t_core.list_deploys('prd',application_id,nodegroup)
         except:
             raise
-        return {'deploys_dev': deploys_dev, 'deploys_qat': deploys_qat,'deploys_prd': deploys_prd,'application_id': application_id}
+        return {'deploys_dev': deploys_dev, 'deploys_qat': deploys_qat,'deploys_prd': deploys_prd, 'application_id': application_id, 'nodegroup': nodegroup}
     elif nodegroup:
         try:
             deploys_dev = t_core.list_deploys('dev',application_id,nodegroup)
@@ -49,7 +49,7 @@ def view_deploys(request):
             deploys_prd = t_core.list_deploys('prd',application_id,nodegroup)
         except:
             raise
-        return {'deploys_dev': deploys_dev, 'deploys_qat': deploys_qat,'deploys_prd': deploys_prd,'application_id': application_id}
+        return {'deploys_dev': deploys_dev, 'deploys_qat': deploys_qat,'deploys_prd': deploys_prd, 'application_id': application_id, 'nodegroup': nodegroup}
     else:
         return {'project': 'twonicorn-ui'}
 
