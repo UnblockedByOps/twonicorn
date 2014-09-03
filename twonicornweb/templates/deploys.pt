@@ -12,77 +12,117 @@
     <p>
     <img src="static/logo.jpg">
 
-    <h1>Deploys</h1>
-
     <p tal:condition="application_id">
-    The following deploys are for application id: <span tal:content="application_id">0</span>
+    The following deploys are for application id: <br><h2 tal:content="application_id">0</h2><hr>
     </p>
     <p tal:condition="nodegroup">
-    The following deploys are for node group: <span tal:content="nodegroup">tct</span>
+    The following deploys are for node group: <br><h2 tal:content="nodegroup">tct</h2><hr>
     </p>
 
-    <table border="1">
+    <table border="1" tal:condition="(application_id or nodegroup)">
       <tr>
-        <th>Deploy ID</th>
         <th>Deploy Path</th>
         <th>Revision</th>
         <th>Repo</th>
-        <th>Repo Type</th>
         <th>Artifact Type</th>
-        <th>Artifact Assignment ID</th>
-        <th>Artifact Assignment Date</th>
         <th>URL Location</th>
+        <th>Assignment ID</th>
+        <th>Assignment Date</th>
+        <th>History</th>
       </tr>
-      <tr tal:condition="deploys_dev">
-        <td colspan="9" bgcolor="#ffc8f2"><b>DEV</b></td>
-      </tr>
-      <tr tal:repeat="item deploys_dev">
-        <td tal:content="deploys_dev[item]['deploy_id']">0</td>
-        <td tal:content="deploys_dev[item]['deploy_path']">/app/something</td>
-        <td tal:content="deploys_dev[item]['revision']">12345</td>
-        <td tal:content="deploys_dev[item]['repo']">12345</td>
-        <td tal:content="deploys_dev[item]['repo_type']">12345</td>
-        <td tal:content="deploys_dev[item]['artifact_type']">12345</td>
-        <td tal:content="deploys_dev[item]['artifact_assignment_id']">12345</td>
-        <td tal:content="deploys_dev[item]['artifact_assignment_created']">12345</td>
-        <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
-               title="some description"
-               tal:attributes="href deploys_dev[item]['url_location']; title deploys_dev[item]['url_location']"
-               tal:content="deploys_dev[item]['suffix']">Artifacts By nodegroupLink</a></td>
-      </tr>
-      <tr tal:condition="deploys_qat">
-        <td colspan="9" bgcolor="#fff284"><b>QAT</b></td>
-      </tr>
-      <tr tal:repeat="item deploys_qat">
-        <td tal:content="deploys_qat[item]['deploy_id']">0</td>
-        <td tal:content="deploys_qat[item]['deploy_path']">/app/something</td>
-        <td tal:content="deploys_qat[item]['revision']">12345</td>
-        <td tal:content="deploys_qat[item]['repo']">12345</td>
-        <td tal:content="deploys_qat[item]['repo_type']">12345</td>
-        <td tal:content="deploys_qat[item]['artifact_type']">12345</td>
-        <td tal:content="deploys_qat[item]['artifact_assignment_id']">12345</td>
-        <td tal:content="deploys_qat[item]['artifact_assignment_created']">12345</td>
-        <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
-               title="some description"
-               tal:attributes="href deploys_qat[item]['url_location']; title deploys_qat[item]['url_location']"
-               tal:content="deploys_qat[item]['suffix']">Artifacts By nodegroupLink</a></td>
-      </tr>
+
       <tr tal:condition="deploys_prd">
-        <td colspan="9" bgcolor="#CAFEB8"><b>PRD</b></td>
+        <td bgcolor="#CAFEB8" colspan="8"><b>PRD</b></td>
       </tr>
       <tr tal:repeat="item deploys_prd">
-        <td tal:content="deploys_prd[item]['deploy_id']">0</td>
-        <td tal:content="deploys_prd[item]['deploy_path']">/app/something</td>
-        <td tal:content="deploys_prd[item]['revision']">12345</td>
+        <td tal:content="deploys_prd[item]['deploy_path']" tal:attributes="title 'Deploy ID: ' + str(deploys_prd[item]['deploy_id'])">/app/something</td>
+        <td tal:content="deploys_prd[item]['revision'] [:8]">12345</td>
         <td tal:content="deploys_prd[item]['repo']">12345</td>
-        <td tal:content="deploys_prd[item]['repo_type']">12345</td>
         <td tal:content="deploys_prd[item]['artifact_type']">12345</td>
-        <td tal:content="deploys_prd[item]['artifact_assignment_id']">12345</td>
-        <td tal:content="deploys_prd[item]['artifact_assignment_created']">12345</td>
         <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
                title="some description"
                tal:attributes="href deploys_prd[item]['url_location']; title deploys_prd[item]['url_location']"
                tal:content="deploys_prd[item]['suffix']">Artifacts By nodegroupLink</a></td>
+        <td tal:content="deploys_prd[item]['artifact_assignment_id']">12345</td>
+        <td tal:content="deploys_prd[item]['artifact_assignment_created']">12345</td>
+        <td><a href="http://twonicorn.ctgrd.com/deploys?history=true"
+               title="Show History"
+               tal:attributes="href '/deploys?history=true&deploy_id=' + str(deploys_prd[item]['deploy_id']) + '&env=' + deploys_prd[item]['env']; title 'Show history for deploy id: ' + str(deploys_prd[item]['deploy_id'])"
+               tal:content="'Show History'">show history</a></td>
+      </tr>
+      <tr tal:condition="deploys_qat">
+        <td bgcolor="#fff284" colspan="8"><b>QAT</b></td>
+      </tr>
+      <tr tal:repeat="item deploys_qat">
+        <td tal:content="deploys_qat[item]['deploy_path']" tal:attributes="title 'Deploy ID: ' + str(deploys_qat[item]['deploy_id'])">/app/something</td>
+        <td tal:content="deploys_qat[item]['revision'] [:8]">12345</td>
+        <td tal:content="deploys_qat[item]['repo']">12345</td>
+        <td tal:content="deploys_qat[item]['artifact_type']">12345</td>
+        <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
+               title="some description"
+               tal:attributes="href deploys_qat[item]['url_location']; title deploys_qat[item]['url_location']"
+               tal:content="deploys_qat[item]['suffix']">Artifacts By nodegroupLink</a></td>
+        <td tal:content="deploys_qat[item]['artifact_assignment_id']">12345</td>
+        <td tal:content="deploys_qat[item]['artifact_assignment_created']">12345</td>
+        <td><a href="http://twonicorn.ctgrd.com/deploys?history=true"
+               title="Show History"
+               tal:attributes="href '/deploys?history=true&deploy_id=' + str(deploys_qat[item]['deploy_id']) + '&env=' + deploys_qat[item]['env']; title 'Show history for deploy id: ' + str(deploys_qat[item]['deploy_id'])"
+               tal:content="'Show History'">show history</a></td>
+      </tr>
+      <tr tal:condition="deploys_dev">
+        <td bgcolor="#ffc8f2" colspan="8"><b>DEV</b></td>
+      </tr>
+      <tr tal:repeat="item deploys_dev">
+        <td tal:content="deploys_dev[item]['deploy_path']" tal:attributes="title 'Deploy ID: ' + str(deploys_dev[item]['deploy_id'])">/app/something</td>
+        <td tal:content="deploys_dev[item]['revision'] [:8]">12345</td>
+        <td tal:content="deploys_dev[item]['repo']">12345</td>
+        <td tal:content="deploys_dev[item]['artifact_type']">12345</td>
+        <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
+               title="some description"
+               tal:attributes="href deploys_dev[item]['url_location']; title deploys_dev[item]['url_location']"
+               tal:content="deploys_dev[item]['suffix']">Artifacts By nodegroupLink</a></td>
+        <td tal:content="deploys_dev[item]['artifact_assignment_id']">12345</td>
+        <td tal:content="deploys_dev[item]['artifact_assignment_created']">12345</td>
+        <td><a href="http://twonicorn.ctgrd.com/deploys?history=true"
+               title="Show History"
+               tal:attributes="href '/deploys?history=true&deploy_id=' + str(deploys_dev[item]['deploy_id']) + '&env=' + deploys_dev[item]['env']; title 'Show history for deploy id: ' + str(deploys_dev[item]['deploy_id'])"
+               tal:content="'Show History'">show history</a></td>
+      </tr>
+    </table>
+
+    <p tal:condition="history">
+    The following deploys are for node group: <br><h2 tal:content="nodegroup">tct</h2><hr>
+    </p>
+
+    <table border="1" tal:condition="history">
+      <tr>
+        <th>Deploy Path</th>
+        <th>Revision</th>
+        <th>Repo</th>
+        <th>Artifact Type</th>
+        <th>URL Location</th>
+        <th>Artifact ID</th>
+        <th>Assignment ID</th>
+        <th>Assignment Date</th>
+        <th>Promote</th>
+      </tr>
+
+      <tr tal:repeat="item hist_list">
+        <td tal:content="item['deploy_path']" tal:attributes="title 'Deploy ID: ' + str(item['deploy_id'])">/app/something</td>
+        <td tal:content="item['revision'] [:8]">12345</td>
+        <td tal:content="item['repo']">12345</td>
+        <td tal:content="item['artifact_type']">12345</td>
+        <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
+               title="some description"
+               tal:attributes="href item['url_location']; title item['url_location']"
+               tal:content="item['suffix']">Artifacts By nodegroupLink</a></td>
+        <td tal:content="item['artifact_id']">0</td>
+        <td tal:content="item['artifact_assignment_id']">12345</td>
+        <td tal:content="item['artifact_assignment_created']">12345</td>
+        <td><a href="http://twonicorn.ctgrd.com/promote?deploy_id=0&artifact_id=0"
+               title="Promote"
+               tal:attributes="href '/promote?deploy_id=' + str(item['deploy_id']) + 'artifact_id=' + str(item['artifact_id']); title 'Promote to prod: ' + str(item['artifact_id'])"
+               tal:content="'Promote To Prod'">promote to prod</a></td>
       </tr>
     </table>
   </body>

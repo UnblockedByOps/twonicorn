@@ -21,37 +21,57 @@ def view_applications(request):
 @view_config(route_name='deploys', renderer='templates/deploys.pt')
 def view_deploys(request):
 
-    try:
-        application_id = request.params['application_id']
-    except:
-        application_id = None
-        pass
+    params = {'application_id': None,
+              'nodegroup': None,
+              'history': None,
+              'deploy_id': None,
+              'env': None}
+    for p in params:
+        try:
+            params[p] = request.params[p]
+        except:
+            pass
 
-    try:
-        nodegroup = request.params['nodegroup']
-    except:
-        nodegroup = None
-        pass
+    application_id = params['application_id']
+    nodegroup = params['nodegroup']
+    history = params['history']
+    deploy_id = params['deploy_id']
+    env = params['env']
 
+    deploys_dev = None
+    deploys_qat = None
+    deploys_prd = None
 
     if application_id:
         try: 
             deploys_dev = t_core.list_deploys('dev',application_id,nodegroup)
             deploys_qat = t_core.list_deploys('qat',application_id,nodegroup)
             deploys_prd = t_core.list_deploys('prd',application_id,nodegroup)
+            hist_list = None
         except:
             raise
-        return {'deploys_dev': deploys_dev, 'deploys_qat': deploys_qat,'deploys_prd': deploys_prd, 'application_id': application_id, 'nodegroup': nodegroup}
     elif nodegroup:
         try:
             deploys_dev = t_core.list_deploys('dev',application_id,nodegroup)
             deploys_qat = t_core.list_deploys('qat',application_id,nodegroup)
             deploys_prd = t_core.list_deploys('prd',application_id,nodegroup)
+            hist_list = None
         except:
             raise
-        return {'deploys_dev': deploys_dev, 'deploys_qat': deploys_qat,'deploys_prd': deploys_prd, 'application_id': application_id, 'nodegroup': nodegroup}
-    else:
-        return {'project': 'twonicorn-ui'}
+    elif history:
+        try:
+            hist_list = t_core.list_history(env,deploy_id)
+        except:
+            raise
+
+    return {'deploys_dev': deploys_dev,
+            'deploys_qat': deploys_qat,
+            'deploys_prd': deploys_prd,
+            'application_id': application_id,
+            'nodegroup': nodegroup,
+            'history': history,
+            'hist_list': hist_list
+           }
 
 @view_config(route_name='promote', renderer='templates/promote.pt')
 def view_promote(request):
