@@ -7,10 +7,10 @@
     <table class="nav" width="100%">
       <tr class="nav">
         <td class="nav">
-          [ <a href="/">HOME</a> ]
-          [ <a href="/applications">APPLICATIONS</a> ]
-          [ DEPLOYS ]
-          [ <a href="/promote">PROMOTE</a> ]
+          [ <a class="nav" href="/">HOME</a> ]
+          [ <a class="nav" href="/applications">APPLICATIONS</a> ]
+          [ <a class="nav" href="/deploys">DEPLOYS</a> ]
+          [ <a class="nav" href="/promote">PROMOTE</a> ]
         </td>
       </tr>
     </table>
@@ -20,8 +20,19 @@
 
     <p tal:condition="nodegroup">
     <h1>Deployment summary by environment</h1>
-    <h2 tal:content="'Node Group: ' + nodegroup">tct</h2>
-    <h3 tal:content="'Application ID: ' + application_id">tct</h3><hr>
+    <table  class="subh" border="0" tal:condition="nodegroup">
+      <?python
+        bgcolor = '#F9EEFF'
+      ?>
+      <tr class="subh">
+        <td class="subh">Node Group</td>
+        <td class="subh_env" tal:attributes="bgcolor '%s' % bgcolor" tal:content="nodegroup">tct</td>
+      </tr>
+      <tr class="subh">
+        <td class="subh">Application ID</td>
+        <td class="subh_env" tal:attributes="bgcolor '%s' % bgcolor" tal:content="application_id">tct</td>
+      </tr>
+    </table>
     </p>
 
     <table border="1" tal:condition="(application_id or nodegroup)">
@@ -132,9 +143,19 @@
     </table>
 
     <p tal:condition="history">
-    <h1 tal:content="'Deployment history for: ' + env">Deployment history</h1>
+    <table  class="subh" border="0" tal:condition="history">
+      <?python
+        c = {'prd': "#CAFEB8", 'qat': "#fff284", 'dev': "#ffc8f2"}
+        bgcolor = c[env]
+      ?>
+      <tr class="subh">
+        <td class="subh">Deployment History</td>
+        <td class="subh_env" tal:attributes="bgcolor '%s' % bgcolor" tal:content="env">env</td>
+      </tr>
+    </table>
     </p>
 
+    <p>
     <table border="1" tal:condition="history">
       <tr>
         <th>Deploy Path</th>
@@ -179,5 +200,13 @@
       </tr>
       </tbody>
     </table>
+
+
+  <!-- Default Behavior -->
+  <p tal:condition="not: nodegroup">
+    For now you need to select an app from the applications page in order to see deploys.
+  </p>
+
+
   </body>
 </html>
