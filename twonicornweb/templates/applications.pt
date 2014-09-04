@@ -21,7 +21,13 @@
     <h1>Applications</h1>
 
     <p>
-       This page should display paginated list of applications
+      This page should display paginated list of applications
+      <h3>TODO</h3>
+      <ul>
+       <li>search for deployments via nodegroup</li>
+       <li>pagenate results (aka steal Wil's code)</li>
+       <li>Make table sortable by column</li>
+      </ul>
     </p>
 
     <table tal:condition="applications" border="1">
@@ -49,33 +55,3 @@
     </table>
   </body>
 </html>
-
-
-<!--
-    <table border="1" tal:condition="history">
-      <tr>
-        <th>Deploy Path</th>
-        <th>Revision</th>
-        <th>Repo</th>
-        <th>Artifact Type</th>
-        <th>URL Location</th>
-        <th>Artifact ID</th>
-        <th>Assignment ID</th>
-        <th>Assignment Date</th>
-        <th>Promote</th>
-      </tr>
-
-      <tbody tal:repeat="item hist_list">
-      <?python
-
-        c = {'prd': "#CAFEB8", 'qat': "#fff284", 'dev': "#ffc8f2"}
-        bgcolor = '#FFFFFF'
-        if repeat.item.even:
-            bgcolor = c[env]
-
-        if item['repo'] == 'gerrit':
-            r = item['url_location'].rpartition('/')
-            item['url_location'] = r[0] + r[1] + 'git/gitweb.cgi?p=' + r[2] + '.git;a=summary'
-      ?>
-      <tr bgcolor="#D8F0F8" tal:attributes="bgcolor '%s' % bgcolor">
--->

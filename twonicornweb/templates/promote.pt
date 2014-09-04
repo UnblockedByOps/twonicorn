@@ -22,6 +22,11 @@
 
     <p>
     Give us da money, Lebowski! This page should display paginated list of promotions
+    <h3>TODO</h3>
+    <ul>
+     <li>search for candidates via nodegroup, application id, or deploy id</li>
+     <li>Make table sortable by column</li>
+    </ul>
     </p>
 
   </body>

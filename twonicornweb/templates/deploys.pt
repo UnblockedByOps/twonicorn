@@ -26,7 +26,7 @@
       ?>
       <tr class="subh">
         <td class="subh">Node Group</td>
-        <td class="subh_env" tal:attributes="bgcolor '%s' % bgcolor" tal:content="nodegroup">tct</td>
+        <td class="subh_env" tal:attributes="bgcolor '%s' % bgcolor" tal:content="nodegroup.upper()">tct</td>
       </tr>
       <tr class="subh">
         <td class="subh">Application ID</td>
@@ -150,7 +150,7 @@
       ?>
       <tr class="subh">
         <td class="subh">Deployment History</td>
-        <td class="subh_env" tal:attributes="bgcolor '%s' % bgcolor" tal:content="env">env</td>
+        <td class="subh_env" tal:attributes="bgcolor '%s' % bgcolor" tal:content="env.upper()">env</td>
       </tr>
     </table>
     </p>
@@ -201,11 +201,16 @@
       </tbody>
     </table>
 
-
-  <!-- Default Behavior -->
-  <p tal:condition="not: nodegroup">
-    For now you need to select an app from the applications page in order to see deploys.
-  </p>
+    <!-- Default Behavior -->
+    <p tal:condition="not: nodegroup">
+      For now you need to select an app from the applications page in order to see deploys.
+      <h3>TODO</h3>
+      <ul>
+       <li>Search for deployments via nodegroup</li>
+       <li>Make table sortable by column</li>
+       <li>Add "Make current for env" column with link to promote artifact within the env</li>
+      </ul>
+    </p>
 
 
   </body>
