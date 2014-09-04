@@ -41,13 +41,13 @@ def view_deploys(request):
     deploys_dev = None
     deploys_qat = None
     deploys_prd = None
+    hist_list = None
 
     if application_id:
         try: 
             deploys_dev = t_core.list_deploys('dev',application_id,nodegroup)
             deploys_qat = t_core.list_deploys('qat',application_id,nodegroup)
             deploys_prd = t_core.list_deploys('prd',application_id,nodegroup)
-            hist_list = None
         except:
             raise
     elif nodegroup:
@@ -55,7 +55,6 @@ def view_deploys(request):
             deploys_dev = t_core.list_deploys('dev',application_id,nodegroup)
             deploys_qat = t_core.list_deploys('qat',application_id,nodegroup)
             deploys_prd = t_core.list_deploys('prd',application_id,nodegroup)
-            hist_list = None
         except:
             raise
 

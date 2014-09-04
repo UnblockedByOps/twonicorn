@@ -3,11 +3,16 @@
     <link href="static/tc.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
-
-    [ HOME ]
-    [ <a href="/applications">APPLICATIONS</a> ]
-    [ <a href="/deploys">DEPLOYS</a> ]
-    [ <a href="/promote">PROMOTE</a> ]
+    <table class="nav" width="100%">
+      <tr class="nav">
+        <td class="nav">
+          [ HOME ]
+          [ <a href="/applications">APPLICATIONS</a> ]
+          [ <a href="/deploys">DEPLOYS</a> ]
+          [ <a href="/promote">PROMOTE</a> ]
+        </td>
+      </tr>
+    </table>
 
     <p>
     <img src="static/logo.jpg">

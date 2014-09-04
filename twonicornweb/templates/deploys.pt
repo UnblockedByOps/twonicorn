@@ -4,10 +4,16 @@
   </head>
   <body>
 
-    [ <a href="/">HOME</a> ]
-    [ <a href="/applications">APPLICATIONS</a> ]
-    [ DEPLOYS ]
-    [ <a href="/promote">PROMOTE</a> ]
+    <table class="nav" width="100%">
+      <tr class="nav">
+        <td class="nav">
+          [ <a href="/">HOME</a> ]
+          [ <a href="/applications">APPLICATIONS</a> ]
+          [ DEPLOYS ]
+          [ <a href="/promote">PROMOTE</a> ]
+        </td>
+      </tr>
+    </table>
 
     <p>
     <img src="static/logo.jpg">
