@@ -2,7 +2,7 @@ from pyramid.view import view_config
 import TwonicornWebLib
 
 
-t_core = TwonicornWebLib.Core('conf/twonicorn.conf')
+t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf')
 t_facts = TwonicornWebLib.tFacter()
 
 @view_config(route_name='home', renderer='templates/home.pt')
@@ -58,7 +58,8 @@ def view_deploys(request):
             hist_list = None
         except:
             raise
-    elif history:
+
+    if history:
         try:
             hist_list = t_core.list_history(env,deploy_id)
         except:
@@ -70,7 +71,8 @@ def view_deploys(request):
             'application_id': application_id,
             'nodegroup': nodegroup,
             'history': history,
-            'hist_list': hist_list
+            'hist_list': hist_list,
+            'env': env
            }
 
 @view_config(route_name='promote', renderer='templates/promote.pt')

@@ -4,25 +4,17 @@
   </head>
   <body>
 
+    [ HOME ]
+    [ <a href="/applications">APPLICATIONS</a> ]
+    [ <a href="/deploys">DEPLOYS</a> ]
+    [ <a href="/promote">PROMOTE</a> ]
 
-    <h1>Twonicorn Web UI</h1>
-
+    <p>
     <img src="static/logo.jpg">
 
     <p>
+    <h1>Twonicorn Web UI</h1><br>
     <span>What should we put on this page?</span>
-    </p>
-
-    <p>
-    <a href="/applications">Applications</a>
-    </p>
-
-    <p>
-    <a href="/deploys">Deploys</a>
-    </p>
-
-    <p>
-    <a href="/promote">Promote</a>
     </p>
 
   </body>
