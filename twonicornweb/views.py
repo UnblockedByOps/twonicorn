@@ -71,7 +71,8 @@ def view_deploys(request):
             'nodegroup': nodegroup,
             'history': history,
             'hist_list': hist_list,
-            'env': env
+            'env': env,
+            'deploy_id': deploy_id
            }
 
 @view_config(route_name='promote', renderer='templates/promote.pt')

@@ -152,6 +152,10 @@
         <td class="subh">Deployment History</td>
         <td class="subh_env" tal:attributes="bgcolor '%s' % bgcolor" tal:content="env.upper()">env</td>
       </tr>
+      <tr class="subh">
+        <td class="subh">Deploy ID</td>
+        <td class="subh_env" tal:attributes="bgcolor '%s' % bgcolor" tal:content="deploy_id">0</td>
+      </tr>
     </table>
     </p>
 
