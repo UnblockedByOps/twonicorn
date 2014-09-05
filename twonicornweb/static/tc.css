@@ -1,10 +1,13 @@
 @import url(//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700);
+
 body {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 75%;
   font-weight: 300;
   color: #000000;
   background: #ffffff;
 }
+
 h1,
 h2,
 h3,
@@ -14,6 +17,7 @@ h6 {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 300;
 }
+
 p {
   font-weight: 300;
 }
@@ -27,16 +31,46 @@ p {
   font-weight: 700;
 }
 
+a {
+    color: #6A6AFF;
+}
+a:link {
+    text-decoration: none;
+}
+a:visited {
+    color: #9669FE;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+a.nav {
+    color: #ffffff;
+}
+a.nav:link {
+    text-decoration: none;
+}
+a.nav:visited {
+    text-decoration: none;
+}
+a.nav:hover {
+    color: #CEFFFD;
+    text-decoration: underline;
+}
+a.nav:active {
+    color: #CEFFFD;
+}
+
 table {
     border-collapse: collapse;
 }
-
 table, th, td {
     font-size: 1em;
-    border: 1px solid black;
+    border: 1px solid "#CCCCCC";
     padding: 3px 7px 2px 7px;
+    white-space: nowrap;
 }
-
 th {
     font-size: 1.1em;
     text-align: left;
@@ -45,45 +79,6 @@ th {
     background-color: #FF0099;
     color: #ffffff;
 }
-
-a:link {
-    color: #6A6AFF;
-    text-decoration: none;
-}
-
-a:visited {
-    color: #9669FE;
-    text-decoration: none;
-}
-
-a:hover {
-    color: #6A6AFF;
-    text-decoration: underline;
-}
-
-a:active {
-    color: #6A6AFF;
-}
-
-a.nav:link {
-    color: #ffffff;
-    text-decoration: none;
-}
-
-a.nav:visited {
-    color: #ffffff;
-    text-decoration: none;
-}
-
-a.nav:hover {
-    color: #CEFFFD;
-    text-decoration: underline;
-}
-
-a.nav:active {
-    color: #CEFFFD;
-}
-
 table.nav, th.nav, td.nav {
     border: none;
     background-color: #2FAACE;
@@ -98,14 +93,12 @@ table.subh {
     width: 100%;
     border-collapse: collapse;
 }
-
 tr.subh {
     border: none;
     background-color: #2FAACE;
     color: #FFFFFF;
     border-collapse: collapse;
 }
-
 td.subh {
     font-size: 1.2em;
     border: none;
@@ -114,7 +107,6 @@ td.subh {
     white-space: nowrap;
     border-collapse: collapse;
 }
-
 th.subh_env, td.subh_env {
     font-size: 1.1em;
     border: none;

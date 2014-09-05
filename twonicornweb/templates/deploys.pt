@@ -20,22 +20,20 @@
 
     <p tal:condition="nodegroup">
     <h1>Deployment summary by environment</h1>
-    <table  class="subh" border="0" tal:condition="nodegroup">
+
+    </p>
+    <table border="1" tal:condition="(application_id or nodegroup)">
       <?python
         bgcolor = '#F9EEFF'
       ?>
       <tr class="subh">
         <td class="subh">Node Group</td>
-        <td class="subh_env" tal:attributes="bgcolor '%s' % bgcolor" tal:content="nodegroup.upper()">tct</td>
+        <td class="subh_env" colspan="7" tal:attributes="bgcolor '%s' % bgcolor" tal:content="nodegroup.upper()">tct</td>
       </tr>
       <tr class="subh">
         <td class="subh">Application ID</td>
-        <td class="subh_env" tal:attributes="bgcolor '%s' % bgcolor" tal:content="application_id">tct</td>
+        <td class="subh_env" colspan="7" tal:attributes="bgcolor '%s' % bgcolor" tal:content="application_id">tct</td>
       </tr>
-    </table>
-    </p>
-
-    <table border="1" tal:condition="(application_id or nodegroup)">
       <tr>
         <th>Deploy Path</th>
         <th>Revision</th>
@@ -51,11 +49,13 @@
         <td bgcolor="#CAFEB8" colspan="8"><b>PRD</b></td>
       </tr>
       <tr tal:repeat="item deploys_prd">
-        <!-- have to reformat the url for humans if it's gerrit because gitweb is dumb -->
+        <!-- Do some reformatting of the urls to make them useful -->
         <?python
             if deploys_prd[item]['repo'] == 'gerrit':  
                 r = deploys_prd[item]['url_location'].rpartition('/')
                 deploys_prd[item]['url_location'] = r[0] + r[1] + 'git/gitweb.cgi?p=' + r[2] + '.git;a=summary'
+            if deploys_prd[item]['repo'] == 'subversion':  
+                deploys_prd[item]['url_location'] = deploys_prd[item]['url_location'] +  '/' + deploys_prd[item]['env'] + '/?p=' + deploys_prd[item]['revision']
         ?>
         <td tal:content="deploys_prd[item]['deploy_path']" tal:attributes="title 'Deploy ID: ' + str(deploys_prd[item]['deploy_id'])">/app/something</td>
         <td tal:content="deploys_prd[item]['revision'] [:8]">12345</td>
@@ -82,11 +82,13 @@
         <td bgcolor="#fff284" colspan="8"><b>QAT</b></td>
       </tr>
       <tr tal:repeat="item deploys_qat">
-        <!-- have to reformat the url for humans if it's gerrit because gitweb is dumb -->
+        <!-- Do some reformatting of the urls to make them useful -->
         <?python
             if deploys_qat[item]['repo'] == 'gerrit':
                 r = deploys_qat[item]['url_location'].rpartition('/')
                 deploys_qat[item]['url_location'] = r[0] + r[1] + 'git/gitweb.cgi?p=' + r[2] + '.git;a=summary'
+            if deploys_qat[item]['repo'] == 'subversion':
+                deploys_qat[item]['url_location'] = deploys_qat[item]['url_location'] +  '/' + deploys_qat[item]['env'] + '/?p=' + deploys_qat[item]['revision']
         ?>
         <td tal:content="deploys_qat[item]['deploy_path']" tal:attributes="title 'Deploy ID: ' + str(deploys_qat[item]['deploy_id'])">/app/something</td>
         <td tal:content="deploys_qat[item]['revision'] [:8]">12345</td>
@@ -113,11 +115,13 @@
         <td bgcolor="#ffc8f2" colspan="8"><b>DEV</b></td>
       </tr>
       <tr tal:repeat="item deploys_dev">
-        <!-- have to reformat the url for humans if it's gerrit because gitweb is dumb -->
+        <!-- Do some reformatting of the urls to make them useful -->
         <?python
             if deploys_dev[item]['repo'] == 'gerrit':
                 r = deploys_dev[item]['url_location'].rpartition('/')
                 deploys_dev[item]['url_location'] = r[0] + r[1] + 'git/gitweb.cgi?p=' + r[2] + '.git;a=summary'
+            if deploys_dev[item]['repo'] == 'subversion':
+                deploys_dev[item]['url_location'] = deploys_dev[item]['url_location'] + '/' + deploys_dev[item]['env'] + '/?p=' + deploys_dev[item]['revision']
         ?>
         <td tal:content="deploys_dev[item]['deploy_path']" tal:attributes="title 'Deploy ID: ' + str(deploys_dev[item]['deploy_id'])">/app/something</td>
         <td tal:content="deploys_dev[item]['revision'] [:8]">12345</td>
@@ -142,25 +146,20 @@
       </tr>
     </table>
 
-    <p tal:condition="history">
-    <table  class="subh" border="0" tal:condition="history">
+    <p>
+    <table border="1" tal:condition="history">
       <?python
         c = {'prd': "#CAFEB8", 'qat': "#fff284", 'dev': "#ffc8f2"}
         bgcolor = c[env]
       ?>
       <tr class="subh">
         <td class="subh">Deployment History</td>
-        <td class="subh_env" tal:attributes="bgcolor '%s' % bgcolor" tal:content="env.upper()">env</td>
+        <td class="subh_env" colspan="8" tal:attributes="bgcolor '%s' % bgcolor" tal:content="env.upper()">env</td>
       </tr>
       <tr class="subh">
         <td class="subh">Deploy ID</td>
-        <td class="subh_env" tal:attributes="bgcolor '%s' % bgcolor" tal:content="deploy_id">0</td>
+        <td class="subh_env" colspan="8" tal:attributes="bgcolor '%s' % bgcolor" tal:content="deploy_id">0</td>
       </tr>
-    </table>
-    </p>
-
-    <p>
-    <table border="1" tal:condition="history">
       <tr>
         <th>Deploy Path</th>
         <th>Revision</th>
@@ -184,6 +183,8 @@
         if item['repo'] == 'gerrit':
             r = item['url_location'].rpartition('/')
             item['url_location'] = r[0] + r[1] + 'git/gitweb.cgi?p=' + r[2] + '.git;a=summary'
+        if item['repo'] == 'subversion':
+            item['url_location'] = item['url_location'] + '/' + env + '/?p=' + item['revision']
       ?>
       <tr bgcolor="#D8F0F8" tal:attributes="bgcolor '%s' % bgcolor">
         <td tal:content="item['deploy_path']" tal:attributes="title 'Deploy ID: ' + str(item['deploy_id'])">/app/something</td>
@@ -215,7 +216,6 @@
        <li>Add "Make current for env" column with link to promote artifact within the env</li>
       </ul>
     </p>
-
 
   </body>
 </html>
