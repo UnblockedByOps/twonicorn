@@ -11,6 +11,7 @@
           [ <a class="nav" href="/applications">APPLICATIONS</a> ]
           [ <a class="nav" href="/deploys">DEPLOYS</a> ]
           [ <a class="nav" href="/promote">PROMOTE</a> ]
+          [ <a class="nav" href="/help">HELP</a> ]
         </td>
       </tr>
     </table>
@@ -30,19 +31,14 @@
       </ul>
     </p>
 
-    <table tal:condition="applications" border="1">
+    <table tal:condition="applications">
       <tr>
         <th>Application ID</th>
-        <th>Node group</th>
+        <th>Node Group</th>
         <th>Created</th>
       </tr>
       <tbody tal:repeat="item applications">
-      <?python
-        bgcolor = '#FFFFFF'
-        if repeat.item.even:
-            bgcolor = '#F9EEFF'
-      ?>
-      <tr bgcolor="#D8F0F8" tal:attributes="bgcolor '%s' % bgcolor">
+      <tr tal:attributes="class 'subh_app' if repeat.item.even else 'white'">
         <td><a href="deploys?application_id=0"
                tal:attributes="href '/deploys?application_id=%d&nodegroup=%s' % (item[0],item[1])"
                tal:content="item[0]">Artifacts By ID Link</a></td>

@@ -11,6 +11,7 @@
           [ <a class="nav" href="/applications">APPLICATIONS</a> ]
           [ <a class="nav" href="/deploys">DEPLOYS</a> ]
           [ <a class="nav" href="/promote">PROMOTE</a> ]
+          [ <a class="nav" href="/help">HELP</a> ]
         </td>
       </tr>
     </table>

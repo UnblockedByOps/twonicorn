@@ -11,6 +11,7 @@
           [ <a class="nav" href="/applications">APPLICATIONS</a> ]
           [ <a class="nav" href="/deploys">DEPLOYS</a> ]
           [ <a class="nav" href="/promote">PROMOTE</a> ]
+          [ <a class="nav" href="/help">HELP</a> ]
         </td>
       </tr>
     </table>
@@ -19,20 +20,13 @@
     <img src="static/logo.jpg">
 
     <p tal:condition="nodegroup">
-    <h1>Deployment summary by environment</h1>
+    <h1 tal:content="'Deployment summary by env for ' + nodegroup.upper()">Deployment summary by environment</h1>
 
     </p>
-    <table border="1" tal:condition="(application_id or nodegroup)">
-      <?python
-        bgcolor = '#F9EEFF'
-      ?>
+    <table tal:condition="(application_id or nodegroup)">
       <tr class="subh">
         <td class="subh">Node Group</td>
-        <td class="subh_env" colspan="7" tal:attributes="bgcolor '%s' % bgcolor" tal:content="nodegroup.upper()">tct</td>
-      </tr>
-      <tr class="subh">
-        <td class="subh">Application ID</td>
-        <td class="subh_env" colspan="7" tal:attributes="bgcolor '%s' % bgcolor" tal:content="application_id">tct</td>
+        <td class="subh_app" colspan="7" tal:content="nodegroup.upper() + ' (' + application_id + ')'">tct</td>
       </tr>
       <tr>
         <th>Deploy Path</th>
@@ -45,11 +39,11 @@
         <th>History</th>
       </tr>
 
-      <tr tal:condition="deploys_prd">
-        <td bgcolor="#CAFEB8" colspan="8"><b>PRD</b></td>
+      <tr class='prd' tal:condition="deploys_prd">
+        <td colspan="8"><b>PRD</b></td>
       </tr>
       <tr tal:repeat="item deploys_prd">
-        <!-- Do some reformatting of the urls to make them useful -->
+        <!--! Do some reformatting of the urls to make them useful -->
         <?python
             if deploys_prd[item]['repo'] == 'gerrit':  
                 r = deploys_prd[item]['url_location'].rpartition('/')
@@ -78,11 +72,11 @@
                                title 'Show history for deploy id: ' + str(deploys_prd[item]['deploy_id'])"
                tal:content="'Show History'">show history</a></td>
       </tr>
-      <tr tal:condition="deploys_qat">
-        <td bgcolor="#fff284" colspan="8"><b>QAT</b></td>
+      <tr class='qat' tal:condition="deploys_qat">
+        <td colspan="8"><b>QAT</b></td>
       </tr>
       <tr tal:repeat="item deploys_qat">
-        <!-- Do some reformatting of the urls to make them useful -->
+        <!--! Do some reformatting of the urls to make them useful -->
         <?python
             if deploys_qat[item]['repo'] == 'gerrit':
                 r = deploys_qat[item]['url_location'].rpartition('/')
@@ -111,11 +105,11 @@
                                title 'Show history for deploy id: ' + str(deploys_qat[item]['deploy_id'])"
                tal:content="'Show History'">show history</a></td>
       </tr>
-      <tr tal:condition="deploys_dev">
-        <td bgcolor="#ffc8f2" colspan="8"><b>DEV</b></td>
+      <tr class='dev' tal:condition="deploys_dev">
+        <td colspan="8"><b>DEV</b></td>
       </tr>
       <tr tal:repeat="item deploys_dev">
-        <!-- Do some reformatting of the urls to make them useful -->
+        <!--! Do some reformatting of the urls to make them useful -->
         <?python
             if deploys_dev[item]['repo'] == 'gerrit':
                 r = deploys_dev[item]['url_location'].rpartition('/')
@@ -147,18 +141,10 @@
     </table>
 
     <p>
-    <table border="1" tal:condition="history">
-      <?python
-        c = {'prd': "#CAFEB8", 'qat': "#fff284", 'dev': "#ffc8f2"}
-        bgcolor = c[env]
-      ?>
-      <tr class="subh">
+    <table tal:condition="history">
+      <tr>
         <td class="subh">Deployment History</td>
-        <td class="subh_env" colspan="9" tal:attributes="bgcolor '%s' % bgcolor" tal:content="env.upper()">env</td>
-      </tr>
-      <tr class="subh">
-        <td class="subh">Deploy ID</td>
-        <td class="subh_env" colspan="9" tal:attributes="bgcolor '%s' % bgcolor" tal:content="deploy_id">0</td>
+        <td class="env" colspan="9" tal:attributes="class '%s' % env ; title 'Env: ' + env.upper() + ' Deploy ID:' + deploy_id" tal:content="env.upper() + ' (' + deploy_id + ')'">env</td>
       </tr>
       <tr>
         <th>Deploy Path</th>
@@ -173,20 +159,15 @@
       </tr>
 
       <tbody tal:repeat="item hist_list">
+      <!--! Do some reformatting of the urls to make them useful -->
       <?python 
-
-        c = {'prd': "#CAFEB8", 'qat': "#fff284", 'dev': "#ffc8f2"}
-        bgcolor = '#FFFFFF'
-        if repeat.item.even:
-            bgcolor = c[env]
-
         if item['repo'] == 'gerrit':
             r = item['url_location'].rpartition('/')
             item['url_location'] = r[0] + r[1] + 'git/gitweb.cgi?p=' + r[2] + '.git;a=summary'
         if item['repo'] == 'subversion':
             item['url_location'] = item['url_location'] + '/' + env + '/?p=' + item['revision']
       ?>
-      <tr bgcolor="#D8F0F8" tal:attributes="bgcolor '%s' % bgcolor">
+      <tr tal:attributes="class '%s' % env if repeat.item.even else 'white'">
         <td tal:content="item['deploy_path']" tal:attributes="title 'Deploy ID: ' + str(item['deploy_id'])">/app/something</td>
         <td tal:content="item['revision'] [:8]">12345</td>
         <td tal:content="item['repo']">12345</td>
@@ -219,7 +200,7 @@
       </tbody>
     </table>
 
-    <!-- Default Behavior -->
+    <!--! Default Behavior -->
     <p tal:condition="not: nodegroup">
       For now you need to select an app from the applications page in order to see deploys.
       <h3>TODO</h3>
