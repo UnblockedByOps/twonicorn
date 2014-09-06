@@ -154,11 +154,11 @@
       ?>
       <tr class="subh">
         <td class="subh">Deployment History</td>
-        <td class="subh_env" colspan="8" tal:attributes="bgcolor '%s' % bgcolor" tal:content="env.upper()">env</td>
+        <td class="subh_env" colspan="9" tal:attributes="bgcolor '%s' % bgcolor" tal:content="env.upper()">env</td>
       </tr>
       <tr class="subh">
         <td class="subh">Deploy ID</td>
-        <td class="subh_env" colspan="8" tal:attributes="bgcolor '%s' % bgcolor" tal:content="deploy_id">0</td>
+        <td class="subh_env" colspan="9" tal:attributes="bgcolor '%s' % bgcolor" tal:content="deploy_id">0</td>
       </tr>
       <tr>
         <th>Deploy Path</th>
@@ -169,7 +169,7 @@
         <th>Artifact ID</th>
         <th>Assignment ID</th>
         <th>Assignment Date</th>
-        <th>Promote</th>
+        <th colspan="2">Promote</th>
       </tr>
 
       <tbody tal:repeat="item hist_list">
@@ -200,8 +200,21 @@
         <td tal:content="item['artifact_assignment_created']">12345</td>
         <td><a href="http://twonicorn.ctgrd.com/promote?deploy_id=0&artifact_id=0"
                title="Promote"
-               tal:attributes="href '/promote?deploy_id=' + str(item['deploy_id']) + 'artifact_id=' + str(item['artifact_id']); title 'Promote to prod: ' + str(item['artifact_id'])"
-               tal:content="'Promote To Prod'">promote to prod</a></td>
+               tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=%s' %
+                                    (item['deploy_id'],
+                                     item['artifact_id'],
+                                     env
+                                    );
+                               title 'Promote to current: ' + str(item['artifact_id'])"
+               tal:content="'to current'">promote to current</a></td>
+        <td tal:condition="env == 'qat'"><a href="http://twonicorn.ctgrd.com/promote?deploy_id=0&artifact_id=0"
+               title="Promote"
+               tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=prd' %
+                                    (item['deploy_id'],
+                                     item['artifact_id']
+                                    );
+                               title 'Promote to prd: ' + str(item['artifact_id'])"
+               tal:content="'to prd'">promote to prod</a></td>
       </tr>
       </tbody>
     </table>
