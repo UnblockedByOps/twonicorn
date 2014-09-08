@@ -79,3 +79,6 @@ def view_deploys(request):
 def view_promote(request):
     return {'project': 'twonicorn-ui'}
 
+@view_config(route_name='help', renderer='templates/help.pt')
+def view_help(request):
+    return {'project': 'twonicorn-ui'}

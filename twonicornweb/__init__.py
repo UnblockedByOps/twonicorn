@@ -11,5 +11,6 @@ def main(global_config, **settings):
     config.add_route('applications', '/applications')
     config.add_route('deploys', '/deploys')
     config.add_route('promote', '/promote')
+    config.add_route('help', '/help')
     config.scan()
     return config.make_wsgi_app()
