@@ -12,8 +12,10 @@ requires = [
     'pyramid',
     'pyramid_chameleon',
     'pyramid_debugtoolbar',
-    'pyramid_ldap',
     'waitress',
+    'pyramid_ldap',
+    'python-ldap',
+    'ldappool',
     'TwonicornWebLib',
     ]
 
