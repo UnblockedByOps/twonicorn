@@ -16,9 +16,9 @@ requires = [
     'TwonicornWebLib',
     ]
 
-setup(name='twonicorn-web',
+setup(name='TwonicornWeb',
       version='0.0',
-      description='twonicorn-web',
+      description='TwonicornWeb',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
@@ -35,7 +35,7 @@ setup(name='twonicorn-web',
       zip_safe=False,
       install_requires=requires,
       tests_require=requires,
-      test_suite="twonicornweb",
+      test_suite="TwonicornWeb",
       entry_points="""\
       [paste.app_factory]
       main = twonicornweb:main
