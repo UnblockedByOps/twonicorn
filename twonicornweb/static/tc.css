@@ -146,6 +146,11 @@ tr.dev, td.dev {
     text-align: center;
 }
 
+.error {
+    text-align: center;
+    color: #F70000;
+}
+
 form    {
     width: 250px ;
     margin-left: auto ;

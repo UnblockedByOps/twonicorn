@@ -1,21 +1,58 @@
-from pyramid.view import view_config
 import TwonicornWebLib
+from pyramid.view import view_config, forbidden_view_config
+from pyramid.response import Response
+from pyramid.httpexceptions import HTTPFound
+from pyramid.security import remember, forget
+from pyramid_ldap import get_ldap_connector
+import pprint
 
 
 t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf')
 t_facts = TwonicornWebLib.tFacter()
 
-@view_config(route_name='home', renderer='templates/home.pt')
-def view_home(request):
-    return {'project': 'twonicorn-ui'}
+#@view_config(route_name='home', permission='view')
+#def logged_in(request):
+#    return Response('OK')
+
+@view_config(route_name='logout')
+def logout(request):
+    headers = forget(request)
+    return Response('Logged out', headers=headers)
 
 @view_config(route_name='login', renderer='templates/login.pt')
-def view_login(request):
-    return {'error_msg': None, 'login_url': '/login'}
+@forbidden_view_config(renderer='templates/login.pt')
+def login(request):
+    url = request.current_route_url()
+    login = ''
+    password = ''
+    error = ''
 
-@view_config(route_name='logout', renderer='templates/logout.pt')
-def view_logout(request):
-    return {'error_msg': None, 'login_url': '/login'}
+    if 'form.submitted' in request.POST:
+        print "trying to log in"
+        login = request.POST['login']
+        password = request.POST['password']
+        connector = get_ldap_connector(request)
+        data = connector.authenticate(login, password)
+        pprint.pprint(connector)
+        pprint.pprint(data)
+
+        if data is not None:
+            dn = data[0]
+            headers = remember(request, dn)
+            return HTTPFound('/', headers=headers)
+        else:
+            error = 'Invalid credentials'
+
+    return dict(
+        login_url=url,
+        login=login,
+        password=password,
+        error=error,
+        )
+
+@view_config(route_name='home', permission='view', renderer='templates/home.pt')
+def logged_in(request):
+    return Response('OK')
 
 @view_config(route_name='applications', renderer='templates/applications.pt')
 def view_applications(request):
