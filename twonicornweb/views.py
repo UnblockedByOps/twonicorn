@@ -9,6 +9,14 @@ t_facts = TwonicornWebLib.tFacter()
 def view_home(request):
     return {'project': 'twonicorn-ui'}
 
+@view_config(route_name='login', renderer='templates/login.pt')
+def view_login(request):
+    return {'error_msg': None, 'login_url': '/login'}
+
+@view_config(route_name='logout', renderer='templates/logout.pt')
+def view_logout(request):
+    return {'error_msg': None, 'login_url': '/login'}
+
 @view_config(route_name='applications', renderer='templates/applications.pt')
 def view_applications(request):
 

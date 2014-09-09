@@ -133,3 +133,44 @@ tr.dev, td.dev {
     background-color: #FFC8f2;
     width: 100%;
 }
+
+/* login/logout */
+
+#login {
+    width: 392px ;
+    margin-left: auto ;
+    margin-right: auto ;
+}
+
+.login {
+    text-align: center;
+}
+
+form    {
+    width: 250px ;
+    margin-left: auto ;
+    margin-right: auto ;
+}
+
+input {
+    width: 250px;
+    display: block;
+    border: 1px solid #999;
+    height: 25px;
+}
+
+input.button {
+    width: 100px;
+    position :center;
+    background: #CCCCCC;
+    color: #000000;
+    height: 20px;
+    border-radius: 15px;
+    border: 1p solid #999;
+    margin-left: auto ;
+    margin-right: auto ;
+}
+
+input.button:hover {
+    background: #FF0099;
+}
