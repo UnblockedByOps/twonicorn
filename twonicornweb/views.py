@@ -52,7 +52,8 @@ def login(request):
 
 @view_config(route_name='home', permission='view', renderer='templates/home.pt')
 def logged_in(request):
-    return Response('OK')
+    return {'project': 'twonicorn-ui'}
+#    return Response('OK')
 
 @view_config(route_name='applications', renderer='templates/applications.pt')
 def view_applications(request):

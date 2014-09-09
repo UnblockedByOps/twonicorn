@@ -35,7 +35,7 @@ def main(global_config, **settings):
     config.ldap_setup(
         'ldap://wh-cs-dc1.cs.iac.corp:3268',
         bind='ldapauth',
-        passwd='THE_PASSWORD',
+        passwd='THEPASSWD',
         )
     
     config.ldap_set_login_query(
@@ -45,15 +45,8 @@ def main(global_config, **settings):
         )
     
     config.ldap_set_groups_query(
-#        base_dn='OU=Citysearch Accounts and Security Groups,DC=cs,DC=iac,DC=corp',
-#        base_dn='OU=Security Groups,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp',
-#        base_dn='OU=User Accounts by Department,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp',
-#        base_dn='OU=Distribution Lists,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp',
         base_dn='DC=cs,DC=iac,DC=corp',
         filter_tmpl='(&(objectCategory=group)(member=%(userdn)s))',
-#        filter_tmpl='(&(objectCategory=group)(member=%(userdn)s))',
-#        filter_tmpl='(&(objectCategory=CN=Organizational-Unit,CN=Schema,CN=Configuration,DC=iac,DC=corp)(member=%(userdn)s))',
-#        filter_tmpl='(&(objectCategory=CN=Organizational-Unit,CN=Schema,CN=Configuration,DC=iac,DC=corp)(member=%(userdn)s))',
         scope = ldap.SCOPE_SUBTREE,
         cache_period = 600,
         )
