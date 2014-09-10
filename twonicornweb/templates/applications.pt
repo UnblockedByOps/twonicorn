@@ -2,7 +2,7 @@
   <head profile="http://www.w3.org/2005/10/profile">
     <link rel="icon"
         type="image/png"
-        href="/static/fav.png">
+        href="/static/favico.png">
     <title>TUI: Applications</title>
     <link href="static/tc.css" rel="stylesheet" type="text/css" />
   </head>
@@ -21,7 +21,7 @@
     </table>
 
     <p>
-    <img src="static/logo.jpg">
+    <img src="static/logo_small.gif">
 
     <h1>Applications</h1>
 
@@ -30,28 +30,46 @@
       <h3>TODO</h3>
       <ul>
        <li>search for deployments via nodegroup</li>
-       <li>pagenate results (aka steal Wil's code)</li>
        <li>Make table sortable by column</li>
       </ul>
     </p>
-
-    <table tal:condition="applications">
-      <tr>
-        <th>Application ID</th>
-        <th>Node Group</th>
-        <th>Created</th>
-      </tr>
-      <tbody tal:repeat="item applications">
-      <tr tal:attributes="class 'subh_app' if repeat.item.even else 'white'">
-        <td><a href="deploys?application_id=0"
-               tal:attributes="href '/deploys?application_id=%d&nodegroup=%s' % (item[0],item[1])"
-               tal:content="item[0]">Artifacts By ID Link</a></td>
-        <td><a href="deploys?application_id=0"
-               tal:attributes="href '/deploys?application_id=%d&nodegroup=%s' % (item[0],item[1])"
-               tal:content="item[1]">Artifacts By nodegroupLink</a></td>
-        <td tal:content="item[2]">1975-09-28 00:00:00</td>
-      </tr>
-      </tbody>
-    </table>
+      
+    <div id="app_main">
+      <div id="results_nav">
+        <!!-- Results navigation -->
+        <a class="nb_disable" disabled tal:condition="offset == 0">|&lt;&lt;</a>
+        <a class="nb_disable" disabled tal:condition="offset == 0">&lt;&lt;</a>
+        <a class="nb" tal:condition="offset &gt; 0" tal:attributes="href '?start=0'">|&lt;&lt;</a>
+        <a class="nb" tal:condition="offset &gt; 0" tal:attributes="href '?start=%d' % (offset-perpage)">&lt;&lt;</a>
+        <span tal:content="'%d-%d of %d' % (offset+1, min((offset+perpage),total), total)">
+          11-20 of 123
+        </span>
+        <a class="nb" tal:condition="(offset+perpage) &lt; total" tal:attributes="href '?start=%d' % (offset+perpage)">&gt;&gt;</a>
+        <a class="nb" tal:condition="(offset+perpage) &lt; total" tal:attributes="href '?start=%d' % ((total-1)/perpage*perpage)">&gt;&gt;|</a>
+        <a class="nb_disable" tal:condition="(offset+perpage) &gt;= total">&gt;&gt;</a>
+        <a class="nb_disable" tal:condition="(offset+perpage) &gt;= total" disabled>&gt;&gt;|</a>
+      </div>
+  
+      <div id="app_results">
+        <table width="100%" tal:condition="applications">
+          <tr>
+            <th>Application ID</th>
+            <th>Node Group</th>
+            <th>Created</th>
+          </tr>
+          <tbody tal:repeat="item applications">
+          <tr tal:attributes="class 'subh_app' if repeat.item.even else 'white'">
+            <td><a href="deploys?application_id=0"
+                   tal:attributes="href '/deploys?application_id=%d&nodegroup=%s' % (item[0],item[1])"
+                   tal:content="item[0]">Artifacts By ID Link</a></td>
+            <td><a href="deploys?application_id=0"
+                   tal:attributes="href '/deploys?application_id=%d&nodegroup=%s' % (item[0],item[1])"
+                   tal:content="item[1]">Artifacts By nodegroupLink</a></td>
+            <td tal:content="item[2]">1975-09-28 00:00:00</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </body>
 </html>

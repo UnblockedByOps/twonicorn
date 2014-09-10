@@ -2,7 +2,7 @@
   <head profile="http://www.w3.org/2005/10/profile">
     <link rel="icon"
         type="image/png"
-        href="/static/fav.png">
+        href="/static/favico.png">
     <title>TUI: Login</title>
     <link href="static/tc.css" rel="stylesheet" type="text/css" />
   </head>
@@ -10,7 +10,7 @@
 
   <div id="login">
       <p class="login">
-      <img src="static/logo_large.jpg">
+      <img src="static/logo_medium.gif">
       </p>
   
       <h3 class="error" tal:condition="error" tal:content="error"/>

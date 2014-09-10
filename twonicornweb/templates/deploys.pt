@@ -2,7 +2,7 @@
   <head profile="http://www.w3.org/2005/10/profile">
     <link rel="icon"
         type="image/png"
-        href="/static/fav.png">
+        href="/static/favico.png">
     <title>TUI: Deploys</title>
     <link href="static/tc.css" rel="stylesheet" type="text/css" />
   </head>
@@ -21,7 +21,7 @@
     </table>
 
     <p>
-    <img src="static/logo.jpg">
+    <img src="static/logo_small.gif">
 
     <p tal:condition="nodegroup">
     <h1 tal:content="'Deployment summary by env for ' + nodegroup.upper()">Deployment summary by environment</h1>

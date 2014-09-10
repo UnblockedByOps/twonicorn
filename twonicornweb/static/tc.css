@@ -37,6 +37,10 @@ a:hover {
     text-decoration: underline;
 }
 
+.right {
+    float: right;
+}
+
 /* Default table settings */
 table {
     border-collapse: collapse;
@@ -178,4 +182,42 @@ input.button {
 
 input.button:hover {
     background: #FF0099;
+}
+
+.nb {
+    font-family: arial;
+    color: #FFFFFF !important;
+    font-size: 1em;
+    padding: 0px 6px;
+    background: #2FAACE;
+}
+.nb:hover {
+    color: #FFFFFF !important;
+    background: #FF0099;
+}
+
+.nb_disable {
+    font-family: arial;
+    color: #FFFFFF !important;
+    font-size: 1em;
+    padding: 0px 6px;
+    background: #CCCCCC;
+}
+.nb_disable:hover {
+    color: #FFFFFF !important;
+    background: #CCCCCC;
+    text-decoration: none;
+}
+
+#app_main {
+    width: 50%;
+}
+
+#app_results {
+    position: relative;
+    top: 18px;
+}
+
+#results_nav {
+    float: right;    
 }

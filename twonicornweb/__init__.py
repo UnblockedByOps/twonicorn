@@ -4,6 +4,7 @@ from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import Allow, Authenticated
 import ldap
+import ConfigParser
 
 
 class RootFactory(object):
@@ -26,6 +27,20 @@ def main(global_config, **settings):
     config.add_route('promote', '/promote')
     config.add_route('help', '/help')
 
+    # Parse the config
+    config_file = ConfigParser.ConfigParser()
+    config_file.read('/app/twonicorn_web/conf/twonicorn.conf')
+    ldap_server = config_file.get('ldap', 'server')
+    ldap_port = config_file.get('ldap', 'port')
+    ldap_bind = config_file.get('ldap', 'bind')
+
+    # Parse the secret config
+    secret_config_file = ConfigParser.ConfigParser()
+    secret_config_file.read('/app/secrets/twonicorn.conf')
+    ldap_password = secret_config_file.get('ldap', 'password')
+
+    ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, "/etc/pki/CA/certs/ny-dc1.iac.corp.crt")
+
     config.set_authentication_policy(
         AuthTktAuthenticationPolicy('seekr1t', callback=groupfinder)
         )
@@ -33,9 +48,9 @@ def main(global_config, **settings):
         ACLAuthorizationPolicy()
         )
     config.ldap_setup(
-        'ldap://wh-cs-dc1.cs.iac.corp:3268',
-        bind='ldapauth',
-        passwd='THEPASSWD',
+        ldap_server + ':' + ldap_port,
+        bind = ldap_bind,
+        passwd = ldap_password,
         )
     
     config.ldap_set_login_query(
