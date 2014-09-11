@@ -33,6 +33,14 @@
      <li>Moar sparkle</li>
     </ul>
     </p>
+ 
+    <p tal:content="user">
+    <p tal:content="first">
+    <p tal:content="last">
+
+    <span tal:condition="groups">
+      <p tal:repeat="item groups" tal:content="item"></p>
+    </span>
 
   </body>
 </html>

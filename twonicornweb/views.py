@@ -3,7 +3,7 @@ from pyramid.view import view_config, forbidden_view_config
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember, forget
-from pyramid_ldap import get_ldap_connector
+from pyramid_ldap import get_ldap_connector, groupfinder
 
 
 t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf')
@@ -30,21 +30,12 @@ def login(request):
     error = ''
 
     if 'form.submitted' in request.POST:
-        print "trying to log in"
         login = request.POST['login']
         password = request.POST['password']
         connector = get_ldap_connector(request)
         data = connector.authenticate(login, password)
 
         if data is not None:
-            displayname = data[1]['displayname'][0]
-            login_name = login
-
-            print 'DISPLAY NAME: ', displayname
-            print 'LOGIN NAME:   ', login_name
-    
-            for index in range(len(data[1]['memberof'])):
-                print data[1]['memberof'][index] 
             dn = data[0]
             headers = remember(request, dn)
             return HTTPFound('/', headers=headers)
@@ -59,8 +50,14 @@ def login(request):
         )
 
 @view_config(route_name='home', permission='view', renderer='templates/home.pt')
-def logged_in(request):
-    return {'project': 'twonicorn-ui'}
+def view_home(request):
+
+    user = request.authenticated_userid
+    groups = groupfinder(user, request)
+    (last,first,junk) = user.split(',',2)
+    last = last.rstrip('\\')
+    last = last.strip('CN=')
+    return {'user': user, 'groups': groups, 'first':first, 'last': last}
 
 @view_config(route_name='applications', renderer='templates/applications.pt')
 def view_applications(request):

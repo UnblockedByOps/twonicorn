@@ -42,7 +42,7 @@ def main(global_config, **settings):
     ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, "/etc/pki/CA/certs/ny-dc1.iac.corp.crt")
 
     config.set_authentication_policy(
-        AuthTktAuthenticationPolicy('seekr1t', callback=groupfinder)
+        AuthTktAuthenticationPolicy('seekr1t', callback=groupfinder, max_age=604800)
         )
     config.set_authorization_policy(
         ACLAuthorizationPolicy()
