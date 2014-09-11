@@ -188,7 +188,7 @@ input.button:hover {
     font-family: arial;
     color: #FFFFFF !important;
     font-size: 1em;
-    padding: 0px 6px;
+    padding: 2px;
     background: #2FAACE;
 }
 .nb:hover {
@@ -200,7 +200,7 @@ input.button:hover {
     font-family: arial;
     color: #FFFFFF !important;
     font-size: 1em;
-    padding: 0px 6px;
+    padding: 2px;
     background: #CCCCCC;
 }
 .nb_disable:hover {
