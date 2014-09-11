@@ -2,7 +2,7 @@
   <head profile="http://www.w3.org/2005/10/profile">
     <link rel="icon"
         type="image/png"
-        href="/static/favico.png">
+        href="/static/favico.png?v=2">
     <title>TUI: Logout</title>
     <link href="static/tc.css" rel="stylesheet" type="text/css" />
   </head>
@@ -21,19 +21,12 @@
     </table>
 
     <p>
-    <img src="static/logo_small.jpg">
+    <img src="static/logo_small.gif">
 
     <h1>logout</h1>
 
-    <p tal:replace="error"/>
-    <form action="${login_url}" method="POST">
-      Login: <input type="text" name="login" value="${login}"/>
-      <br/>
-      Password: <input type="password" name="password" value="${password}"/>
-      <br/>
-      <input type="hidden" name="form.submitted"/>
-      <input type="submit" name="submit" value="Log In"/>
-    </form>
+    <p>
+      You have successfully logged out.
 
     <h3>TODO</h3>
     <ul>

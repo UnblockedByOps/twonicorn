@@ -39,7 +39,6 @@ def main(global_config, **settings):
     secret_config_file.read('/app/secrets/twonicorn.conf')
     ldap_password = secret_config_file.get('ldap', 'password')
 
-    ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, "/etc/pki/CA/certs/ny-dc1.iac.corp.crt")
 
     config.set_authentication_policy(
         AuthTktAuthenticationPolicy('seekr1t', callback=groupfinder)

@@ -2,7 +2,7 @@
   <head profile="http://www.w3.org/2005/10/profile">
     <link rel="icon"
         type="image/png"
-        href="/static/favico.png">
+        href="/static/favico.png?v=2">
     <title>TUI: Twonicorn Web UI</title>
     <link href="static/tc.css" rel="stylesheet" type="text/css" />
   </head>
@@ -16,6 +16,8 @@
           [ <a class="nav" href="/deploys">DEPLOYS</a> ]
           [ <a class="nav" href="/promote">PROMOTE</a> ]
           [ <a class="nav" href="/help">HELP</a> ]
+          [ <a class="nav" href="/login">LOGIN</a> ]
+          [ <a class="nav" href="/logout">LOGOUT</a> ]
         </td>
       </tr>
     </table>

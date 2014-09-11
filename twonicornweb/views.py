@@ -4,16 +4,22 @@ from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember, forget
 from pyramid_ldap import get_ldap_connector
-import pprint
 
 
 t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf')
 t_facts = TwonicornWebLib.tFacter()
 
-@view_config(route_name='logout')
+@view_config(route_name='logout', renderer='templates/logout.pt')
 def logout(request):
     headers = forget(request)
-    return Response('Logged out', headers=headers)
+    request.response.headers = headers
+    # No idea why I have to re-define these
+    request.response.content_type = 'text/html'
+    request.response.charset = 'UTF-8'
+    request.response.status = '200 OK'
+    
+    return {'project': 'twonicorn-ui'}
+#    return HTTPFound('/', headers=headers)
 
 @view_config(route_name='login', renderer='templates/login.pt')
 @forbidden_view_config(renderer='templates/login.pt')
@@ -29,10 +35,16 @@ def login(request):
         password = request.POST['password']
         connector = get_ldap_connector(request)
         data = connector.authenticate(login, password)
-        pprint.pprint(connector)
-        pprint.pprint(data)
 
         if data is not None:
+            displayname = data[1]['displayname'][0]
+            login_name = login
+
+            print 'DISPLAY NAME: ', displayname
+            print 'LOGIN NAME:   ', login_name
+    
+            for index in range(len(data[1]['memberof'])):
+                print data[1]['memberof'][index] 
             dn = data[0]
             headers = remember(request, dn)
             return HTTPFound('/', headers=headers)
