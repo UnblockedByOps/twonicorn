@@ -1,7 +1,6 @@
 import TwonicornWebLib
 from pyramid.view import view_config, forbidden_view_config
 from pyramid.renderers import get_renderer
-from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember, forget
 from pyramid_ldap import get_ldap_connector, groupfinder
@@ -15,10 +14,34 @@ def site_layout():
     layout = renderer.implementation().macros['layout']
     return layout
 
+def format_user(user):
+    # Make the name readable
+    (last,first,junk) = user.split(',',2)
+    last = last.rstrip('\\')
+    last = last.strip('CN=')
+    return(first,last)
+
+def format_groups(groups):
+
+    formatted = []
+    for g in range(len(groups)):
+        formatted.append(find_between(groups[g], 'CN=', ',OU='))
+    return formatted
+
+def find_between(s, first, last):
+    try:
+        start = s.index( first ) + len( first )
+        end = s.index( last, start )
+        return s[start:end]
+    except ValueError:
+        return ""
+
 @view_config(route_name='logout', renderer='templates/logout.pt')
 def logout(request):
+
     headers = forget(request)
     request.response.headers = headers
+
     # No idea why I have to re-define these, but I do or it poops itself
     request.response.content_type = 'text/html'
     request.response.charset = 'UTF-8'
@@ -29,7 +52,11 @@ def logout(request):
 @view_config(route_name='login', renderer='templates/login.pt')
 @forbidden_view_config(renderer='templates/login.pt')
 def login(request):
+
     url = request.current_route_url()
+    path = request.path
+    if path == '/login':
+        url = '/'
     login = ''
     password = ''
     error = ''
@@ -43,7 +70,7 @@ def login(request):
         if data is not None:
             dn = data[0]
             headers = remember(request, dn)
-            return HTTPFound('/', headers=headers)
+            return HTTPFound(url, headers=headers)
         else:
             error = 'Invalid credentials'
 
@@ -57,14 +84,13 @@ def login(request):
 @view_config(route_name='home', permission='view', renderer='templates/home.pt')
 def view_home(request):
 
+    # Get and format user/groups
     user = request.authenticated_userid
-    groups = groupfinder(user, request)
-    for g in range(len(groups)):
-        print groups[g]
+    (first,last) = format_user(user)
 
-    (last,first,junk) = user.split(',',2)
-    last = last.rstrip('\\')
-    last = last.strip('CN=')
+    groups = groupfinder(user, request)
+    groups = format_groups(groups)
+
     return {'layout': site_layout(),
             'user': user,
             'groups': groups,
@@ -72,8 +98,15 @@ def view_home(request):
             'last': last
            }
 
-@view_config(route_name='applications', renderer='templates/applications.pt')
+@view_config(route_name='applications', permission='view', renderer='templates/applications.pt')
 def view_applications(request):
+
+    # Get and format user/groups
+    user = request.authenticated_userid
+    (first,last) = format_user(user)
+
+    groups = groupfinder(user, request)
+    groups = format_groups(groups)
 
     perpage = 10
     offset = 0
@@ -93,10 +126,25 @@ def view_applications(request):
     except:
         raise
     return {'layout': site_layout(),
-            'applications': applications, 'perpage': perpage, 'offset': offset, 'total': total}
+            'user': user,
+            'groups': groups,
+            'first':first,
+            'last': last,
+            'applications': applications,
+            'perpage': perpage,
+            'offset': offset,
+            'total': total
+           }
 
-@view_config(route_name='deploys', renderer='templates/deploys.pt')
+@view_config(route_name='deploys', permission='view', renderer='templates/deploys.pt')
 def view_deploys(request):
+
+    # Get and format user/groups
+    user = request.authenticated_userid
+    (first,last) = format_user(user)
+
+    groups = groupfinder(user, request)
+    groups = format_groups(groups)
 
     params = {'application_id': None,
               'nodegroup': None,
@@ -142,6 +190,10 @@ def view_deploys(request):
             raise
 
     return {'layout': site_layout(),
+            'user': user,
+            'groups': groups,
+            'first':first,
+            'last': last,
             'deploys_dev': deploys_dev,
             'deploys_qat': deploys_qat,
             'deploys_prd': deploys_prd,
@@ -153,12 +205,36 @@ def view_deploys(request):
             'deploy_id': deploy_id
            }
 
-@view_config(route_name='promote', renderer='templates/promote.pt')
+@view_config(route_name='promote', permission='view', renderer='templates/promote.pt')
 def view_promote(request):
+
+    # Get and format user/groups
+    user = request.authenticated_userid
+    (first,last) = format_user(user)
+
+    groups = groupfinder(user, request)
+    groups = format_groups(groups)
+
     return {'layout': site_layout(),
+            'user': user,
+            'groups': groups,
+            'first':first,
+            'last': last,
             'project': 'twonicorn-ui'}
 
-@view_config(route_name='help', renderer='templates/help.pt')
+@view_config(route_name='help', permission='view', renderer='templates/help.pt')
 def view_help(request):
+
+    # Get and format user/groups
+    user = request.authenticated_userid
+    (first,last) = format_user(user)
+
+    groups = groupfinder(user, request)
+    groups = format_groups(groups)
+
     return {'layout': site_layout(),
+            'user': user,
+            'groups': groups,
+            'first':first,
+            'last': last,
             'project': 'twonicorn-ui'}
