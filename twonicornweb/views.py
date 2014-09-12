@@ -92,7 +92,7 @@ def login(request):
 
         if request.path == '/login':
           error = 'You are already logged in'
-          page_title = 'Login'
+          page_title = 'Already Logged In'
           denied = True
         else:
           error = 'You do not have permission to access that page'
