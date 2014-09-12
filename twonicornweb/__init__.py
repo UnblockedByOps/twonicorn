@@ -9,7 +9,7 @@ import ConfigParser
 
 class RootFactory(object):
     __acl__ = [(Allow, Authenticated, 'view'),
-               (Allow, 'CN=Unix_Team,OU=Security Groups,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp', 'prom')]
+               (Allow, 'CN=C_Team,OU=Security Groups,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp', 'prom')]
     def __init__(self, request):
         pass
 

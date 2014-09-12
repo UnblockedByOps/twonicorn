@@ -8,11 +8,12 @@
     <link rel="icon"
         type="image/png"
         href="/static/favico.png?v=2">
-    <title>TUI: Twonicorn Web UI</title>
+    <title>TUI: ${page_title}</title>
     <link href="static/tc.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
 
+  <div tal:condition="page_title is not 'Login'">
     <table class="nav" width="100%">
       <tr class="nav">
         <td class="nav">
@@ -31,7 +32,9 @@
     </table>
 
     <p>
-    <img src="static/logo_small.gif">
+    <img tal:condition="not denied" src="static/logo_small.gif">
+    </p>
+  </div>
 
     <div metal:define-slot="content">
     </div>

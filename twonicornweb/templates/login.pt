@@ -1,12 +1,5 @@
-<html lang="en-US">
-  <head profile="http://www.w3.org/2005/10/profile">
-    <link rel="icon"
-        type="image/png"
-        href="/static/favico.png?v=2">
-    <title>TUI: Login</title>
-    <link href="static/tc.css" rel="stylesheet" type="text/css" />
-  </head>
-  <body>
+<div metal:use-macro="layout">
+    <div metal:fill-slot="content">
 
   <div id="login">
       <p class="login">
@@ -15,7 +8,7 @@
   
       <h2 class="error" tal:condition="error" tal:content="error"/>
 
-      <p class="login">
+      <p tal:condition="not denied" class="login">
       <form action="${login_url}" method="POST">
         Login: <input type="text" name="login"/>
         <br/>
@@ -27,5 +20,5 @@
       </p>
   </div>
 
-  </body>
-</html>
+  </div>
+</div>

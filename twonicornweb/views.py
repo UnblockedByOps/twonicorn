@@ -8,6 +8,7 @@ from pyramid_ldap import get_ldap_connector, groupfinder
 
 t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf')
 t_facts = TwonicornWebLib.tFacter()
+denied = ''
 
 def site_layout():
     renderer = get_renderer("templates/global_layout.pt")
@@ -53,6 +54,12 @@ def logout(request):
 @forbidden_view_config(renderer='templates/login.pt')
 def login(request):
 
+    user = ''
+    groups = ''
+    first = ''
+    last = ''
+    denied = ''
+
     url = request.current_route_url()
     path = request.path
     if path == '/login':
@@ -60,6 +67,7 @@ def login(request):
     login = ''
     password = ''
     error = ''
+    page_title = 'Login'
 
     if 'form.submitted' in request.POST:
         login = request.POST['login']
@@ -74,15 +82,40 @@ def login(request):
         else:
             error = 'Invalid credentials'
 
-    return dict(
-        login_url=url,
-        login=login,
-        password=password,
-        error=error,
-        )
+    if request.authenticated_userid:
+        # Get and format user/groups
+        user = request.authenticated_userid
+        (first,last) = format_user(user)
+    
+        groups = groupfinder(user, request)
+        groups = format_groups(groups)
+
+        if request.path == '/login':
+          error = 'You are already logged in'
+          page_title = 'Login'
+          denied = True
+        else:
+          error = 'You do not have permission to access that page'
+          page_title = 'Access Denied'
+          denied = True
+
+    return {'layout': site_layout(),
+            'page_title': page_title,
+            'user': user,
+            'groups': groups,
+            'first':first,
+            'last': last,
+            'login_url': url,
+            'login': login,
+            'password': password,
+            'error': error,
+            'denied': denied,
+           }
 
 @view_config(route_name='home', permission='view', renderer='templates/home.pt')
 def view_home(request):
+
+    page_title = 'Home'
 
     # Get and format user/groups
     user = request.authenticated_userid
@@ -92,14 +125,18 @@ def view_home(request):
     groups = format_groups(groups)
 
     return {'layout': site_layout(),
+            'page_title': page_title,
             'user': user,
             'groups': groups,
             'first':first,
-            'last': last
+            'last': last,
+            'denied': denied
            }
 
 @view_config(route_name='applications', permission='view', renderer='templates/applications.pt')
 def view_applications(request):
+
+    page_title = 'Applications'
 
     # Get and format user/groups
     user = request.authenticated_userid
@@ -126,6 +163,7 @@ def view_applications(request):
     except:
         raise
     return {'layout': site_layout(),
+            'page_title': page_title,
             'user': user,
             'groups': groups,
             'first':first,
@@ -133,11 +171,14 @@ def view_applications(request):
             'applications': applications,
             'perpage': perpage,
             'offset': offset,
-            'total': total
+            'total': total,
+            'denied': denied
            }
 
 @view_config(route_name='deploys', permission='view', renderer='templates/deploys.pt')
 def view_deploys(request):
+
+    page_title = 'Deploys'
 
     # Get and format user/groups
     user = request.authenticated_userid
@@ -190,6 +231,7 @@ def view_deploys(request):
             raise
 
     return {'layout': site_layout(),
+            'page_title': page_title,
             'user': user,
             'groups': groups,
             'first':first,
@@ -202,14 +244,15 @@ def view_deploys(request):
             'history': history,
             'hist_list': hist_list,
             'env': env,
-            'deploy_id': deploy_id
+            'deploy_id': deploy_id,
+            'denied': denied
            }
-
-# @forbidden_view_config(renderer='templates/forbidden.pt')
 
 @view_config(route_name='promote', permission='prom', renderer='templates/promote.pt')
 def view_promote(request):
 
+    page_title = 'Promote'
+
     # Get and format user/groups
     user = request.authenticated_userid
     (first,last) = format_user(user)
@@ -218,15 +261,19 @@ def view_promote(request):
     groups = format_groups(groups)
 
     return {'layout': site_layout(),
+            'page_title': page_title,
             'user': user,
             'groups': groups,
             'first':first,
             'last': last,
-            'project': 'twonicorn-ui'}
+            'denied': denied
+           }
 
 @view_config(route_name='help', permission='view', renderer='templates/help.pt')
 def view_help(request):
 
+    page_title = 'Help'
+
     # Get and format user/groups
     user = request.authenticated_userid
     (first,last) = format_user(user)
@@ -235,15 +282,19 @@ def view_help(request):
     groups = format_groups(groups)
 
     return {'layout': site_layout(),
+            'page_title': page_title,
             'user': user,
             'groups': groups,
             'first':first,
             'last': last,
-            'project': 'twonicorn-ui'}
+            'denied': denied
+           }
 
 @view_config(route_name='user', permission='view', renderer='templates/user.pt')
 def view_user(request):
 
+    page_title = 'User Data'
+
     # Get and format user/groups
     user = request.authenticated_userid
     (first,last) = format_user(user)
@@ -252,8 +303,10 @@ def view_user(request):
     groups = format_groups(groups)
 
     return {'layout': site_layout(),
+            'page_title': page_title,
             'user': user,
             'groups': groups,
             'first':first,
             'last': last,
+            'denied': denied,
            }
