@@ -1,0 +1,39 @@
+<html lang="en-US"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      metal:define-macro="layout">
+  <head profile="http://www.w3.org/2005/10/profile">
+    <link rel="icon"
+        type="image/png"
+        href="/static/favico.png?v=2">
+    <title>TUI: Twonicorn Web UI</title>
+    <link href="static/tc.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+
+    <table class="nav" width="100%">
+      <tr class="nav">
+        <td class="nav">
+          [ <a class="nav" href="/">HOME</a> ]
+          [ <a class="nav" href="/applications">APPLICATIONS</a> ]
+          [ <a class="nav" href="/deploys">DEPLOYS</a> ]
+          [ <a class="nav" href="/promote">PROMOTE</a> ]
+          [ <a class="nav" href="/help">HELP</a> ]
+        </td>
+        <td class="nav right">
+          <span tal:content="'Welcome ' + first + '!'" 
+                tal:attributes="title 'Logged in as:' + first + ' ' + last">
+                [ <a class="nav nav_logout" href="/logout">LOGOUT</a> ]
+        </td>
+      </tr>
+    </table>
+
+    <p>
+    <img src="static/logo_small.gif">
+
+    <div metal:define-slot="content">
+    </div>
+
+  </body>
+</html>

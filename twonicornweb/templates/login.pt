@@ -13,7 +13,7 @@
       <img src="static/logo_medium.gif">
       </p>
   
-      <h3 class="error" tal:condition="error" tal:content="error"/>
+      <h2 class="error" tal:condition="error" tal:content="error"/>
 
       <p class="login">
       <form action="${login_url}" method="POST">

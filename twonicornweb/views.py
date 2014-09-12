@@ -1,5 +1,6 @@
 import TwonicornWebLib
 from pyramid.view import view_config, forbidden_view_config
+from pyramid.renderers import get_renderer
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember, forget
@@ -9,17 +10,21 @@ from pyramid_ldap import get_ldap_connector, groupfinder
 t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf')
 t_facts = TwonicornWebLib.tFacter()
 
+def site_layout():
+    renderer = get_renderer("templates/global_layout.pt")
+    layout = renderer.implementation().macros['layout']
+    return layout
+
 @view_config(route_name='logout', renderer='templates/logout.pt')
 def logout(request):
     headers = forget(request)
     request.response.headers = headers
-    # No idea why I have to re-define these
+    # No idea why I have to re-define these, but I do or it poops itself
     request.response.content_type = 'text/html'
     request.response.charset = 'UTF-8'
     request.response.status = '200 OK'
     
-    return {'project': 'twonicorn-ui'}
-#    return HTTPFound('/', headers=headers)
+    return {'message': 'You have been logged out'}
 
 @view_config(route_name='login', renderer='templates/login.pt')
 @forbidden_view_config(renderer='templates/login.pt')
@@ -54,10 +59,18 @@ def view_home(request):
 
     user = request.authenticated_userid
     groups = groupfinder(user, request)
+    for g in range(len(groups)):
+        print groups[g]
+
     (last,first,junk) = user.split(',',2)
     last = last.rstrip('\\')
     last = last.strip('CN=')
-    return {'user': user, 'groups': groups, 'first':first, 'last': last}
+    return {'layout': site_layout(),
+            'user': user,
+            'groups': groups,
+            'first':first,
+            'last': last
+           }
 
 @view_config(route_name='applications', renderer='templates/applications.pt')
 def view_applications(request):
@@ -79,7 +92,8 @@ def view_applications(request):
 
     except:
         raise
-    return {'applications': applications, 'perpage': perpage, 'offset': offset, 'total': total}
+    return {'layout': site_layout(),
+            'applications': applications, 'perpage': perpage, 'offset': offset, 'total': total}
 
 @view_config(route_name='deploys', renderer='templates/deploys.pt')
 def view_deploys(request):
@@ -127,7 +141,8 @@ def view_deploys(request):
         except:
             raise
 
-    return {'deploys_dev': deploys_dev,
+    return {'layout': site_layout(),
+            'deploys_dev': deploys_dev,
             'deploys_qat': deploys_qat,
             'deploys_prd': deploys_prd,
             'application_id': application_id,
@@ -140,8 +155,10 @@ def view_deploys(request):
 
 @view_config(route_name='promote', renderer='templates/promote.pt')
 def view_promote(request):
-    return {'project': 'twonicorn-ui'}
+    return {'layout': site_layout(),
+            'project': 'twonicorn-ui'}
 
 @view_config(route_name='help', renderer='templates/help.pt')
 def view_help(request):
-    return {'project': 'twonicorn-ui'}
+    return {'layout': site_layout(),
+            'project': 'twonicorn-ui'}

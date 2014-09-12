@@ -1,27 +1,5 @@
-<html lang="en-US">
-  <head profile="http://www.w3.org/2005/10/profile">
-    <link rel="icon"
-        type="image/png"
-        href="/static/favico.png?v=2">
-    <title>TUI: Applications</title>
-    <link href="static/tc.css" rel="stylesheet" type="text/css" />
-  </head>
-  <body>
-
-    <table class="nav" width="100%">
-      <tr class="nav">
-        <td class="nav">
-          [ <a class="nav" href="/">HOME</a> ]
-          [ <a class="nav" href="/applications">APPLICATIONS</a> ]
-          [ <a class="nav" href="/deploys">DEPLOYS</a> ]
-          [ <a class="nav" href="/promote">PROMOTE</a> ]
-          [ <a class="nav" href="/help">HELP</a> ]
-        </td>
-      </tr>
-    </table>
-
-    <p>
-    <img src="static/logo_small.gif">
+<div metal:use-macro="layout">
+    <div metal:fill-slot="content">
 
     <h1>Applications</h1>
 
@@ -71,5 +49,6 @@
         </table>
       </div>
     </div>
-  </body>
-</html>
+  </div>
+</div>
+

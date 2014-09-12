@@ -3,36 +3,20 @@
     <link rel="icon"
         type="image/png"
         href="/static/favico.png?v=2">
-    <title>TUI: Logout</title>
+    <title>TUI: Login</title>
     <link href="static/tc.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
 
-    <table class="nav" width="100%">
-      <tr class="nav">
-        <td class="nav">
-          [ <a class="nav" href="/">HOME</a> ]
-          [ <a class="nav" href="/applications">APPLICATIONS</a> ]
-          [ <a class="nav" href="/deploys">DEPLOYS</a> ]
-          [ <a class="nav" href="/promote">PROMOTE</a> ]
-          [ <a class="nav" href="/help">HELP</a> ]
-        </td>
-      </tr>
-    </table>
+  <div id="login">
+      <p class="login">
+      <img src="static/logo_medium.gif">
+      </p>
+  
+      <h2 class="error" tal:condition="message" tal:content="message"/>
 
-    <p>
-    <img src="static/logo_small.gif">
-
-    <h1>logout</h1>
-
-    <p>
-      You have successfully logged out.
-
-    <h3>TODO</h3>
-    <ul>
-     <li>make this work</li>
-    </ul>
-    </p>
+      <input class="button" type="submit" value="Log In Again"  onclick="window.location='/login';"/>
+  </div>
 
   </body>
 </html>
