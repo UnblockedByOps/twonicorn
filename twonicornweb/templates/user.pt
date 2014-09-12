@@ -1,0 +1,22 @@
+<div metal:use-macro="layout">
+    <div metal:fill-slot="content">
+    <p>
+    <h1>User Information</h1><br>
+    </p>
+
+    <p>You are a member of the following groups in Active Directory:</p>
+
+    <p>
+    <table width="100%" tal:condition="groups">
+      <tr>
+        <th>Group Name</th>
+      </tr>
+      <tbody tal:repeat="item groups">
+      <tr>
+        <td tal:content="item">
+      </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>

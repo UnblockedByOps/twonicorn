@@ -1,0 +1,15 @@
+<div metal:use-macro="layout">
+    <div metal:fill-slot="content">
+
+      <div id="login">
+        <p class="login">
+        <img src="static/logo_medium.gif">
+        </p>
+    
+        <h2 class="error">You do not have permission to access this page</h2>
+    
+      </div>
+
+    </span>
+  </div>
+</div>

@@ -9,8 +9,5 @@
     </ul>
     </p>
 
-    <span tal:condition="groups">
-      <p tal:repeat="item groups" tal:content="item"></p>
-    </span>
   </div>
 </div>

@@ -205,7 +205,9 @@ def view_deploys(request):
             'deploy_id': deploy_id
            }
 
-@view_config(route_name='promote', permission='view', renderer='templates/promote.pt')
+# @forbidden_view_config(renderer='templates/forbidden.pt')
+
+@view_config(route_name='promote', permission='prom', renderer='templates/promote.pt')
 def view_promote(request):
 
     # Get and format user/groups
@@ -238,3 +240,20 @@ def view_help(request):
             'first':first,
             'last': last,
             'project': 'twonicorn-ui'}
+
+@view_config(route_name='user', permission='view', renderer='templates/user.pt')
+def view_user(request):
+
+    # Get and format user/groups
+    user = request.authenticated_userid
+    (first,last) = format_user(user)
+
+    groups = groupfinder(user, request)
+    groups = format_groups(groups)
+
+    return {'layout': site_layout(),
+            'user': user,
+            'groups': groups,
+            'first':first,
+            'last': last,
+           }

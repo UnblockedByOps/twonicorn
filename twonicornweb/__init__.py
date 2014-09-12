@@ -8,7 +8,8 @@ import ConfigParser
 
 
 class RootFactory(object):
-    __acl__ = [(Allow, Authenticated, 'view')]
+    __acl__ = [(Allow, Authenticated, 'view'),
+               (Allow, 'CN=Unix_Team,OU=Security Groups,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp', 'prom')]
     def __init__(self, request):
         pass
 
@@ -26,6 +27,7 @@ def main(global_config, **settings):
     config.add_route('deploys', '/deploys')
     config.add_route('promote', '/promote')
     config.add_route('help', '/help')
+    config.add_route('user', '/user')
 
     # Parse the config
     config_file = ConfigParser.ConfigParser()

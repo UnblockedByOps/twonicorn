@@ -4,12 +4,68 @@
     <h1>Help</h1>
 
     <p>
-    Obviously, you're not a golfer...
-    <h3>TODO</h3>
-    <ul>
-     <li>Add a glossary of terms</li>
-    </ul>
-    </p>
+    <a href='https://wiki.ctgrd.com/display/Tech/Twonicorn+Runbook'>Twonicorn Runbook</a>
+
+    <h3>GLOSSARY</h3>
+
+    <table>
+      <tr>
+        <th>Application</th>
+        <td>An application is defined as a colletion of deploys.</td>
+      </tr>
+      <tr>
+        <th>Deploy</th>
+        <td>blah blah blah</td>
+      </tr>
+      <tr>
+        <th>Artifact</th>
+        <td>blah blah blah</td>
+      </tr>
+      <tr>
+        <th>Promote</th>
+        <td>blah blah blah</td>
+      </tr>
+      <tr>
+        <th>Application</th>
+        <td>blah blah blah</td>
+      </tr>
+      <tr>
+        <th>Application ID</th>
+        <td>blah blah blah</td>
+      </tr>
+      <tr>
+        <th>Node Group</th>
+        <td>blah blah blah</td>
+      </tr>
+      <tr>
+        <th>Deploy Path</th>
+        <td>blah blah blah</td>
+      </tr>
+      <tr>
+        <th>Revision</th>
+        <td>blah blah blah</td>
+      </tr>
+      <tr>
+        <th>Repo</th>
+        <td>blah blah blah</td>
+      </tr>
+      <tr>
+        <th>Artifact Type</th>
+        <td>blah blah blah</td>
+      </tr>
+      <tr>
+        <th>URL Location</th>
+        <td>blah blah blah</td>
+      </tr>
+      <tr>
+        <th>Assignment ID</th>
+        <td>blah blah blah</td>
+      </tr>
+      <tr>
+        <th>Artifact ID</th>
+        <td>blah blah blah</td>
+      </tr>
+    </table>
 
   </div>
 </div>
