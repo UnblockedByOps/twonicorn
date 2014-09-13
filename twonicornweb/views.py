@@ -168,10 +168,10 @@ def view_applications(request):
             'groups': groups,
             'first':first,
             'last': last,
-            'applications': applications,
             'perpage': perpage,
             'offset': offset,
             'total': total,
+            'applications': applications,
             'denied': denied
            }
 
@@ -186,6 +186,17 @@ def view_deploys(request):
 
     groups = groupfinder(user, request)
     groups = format_groups(groups)
+
+    perpage = 10
+    offset = 0
+    end = 10
+    total = 0
+
+    try:
+        offset = int(request.GET.getone("start"))
+        end = perpage + offset
+    except:
+        pass
 
     params = {'application_id': None,
               'nodegroup': None,
@@ -226,7 +237,9 @@ def view_deploys(request):
 
     if history:
         try:
-            hist_list = t_core.list_history(env,deploy_id)
+            h_list = t_core.list_history(env,deploy_id)
+            total = len(h_list)
+            hist_list = h_list[offset:end]
         except:
             raise
 
@@ -236,6 +249,9 @@ def view_deploys(request):
             'groups': groups,
             'first':first,
             'last': last,
+            'perpage': perpage,
+            'offset': offset,
+            'total': total,
             'deploys_dev': deploys_dev,
             'deploys_qat': deploys_qat,
             'deploys_prd': deploys_prd,
