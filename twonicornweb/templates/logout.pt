@@ -3,13 +3,13 @@
     <link rel="icon"
         type="image/png"
         href="/static/favico.png?v=2">
-    <title>TUI: Login</title>
+    <title>TUI: Loout</title>
     <link href="static/tc.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
 
-  <div id="login">
-      <p class="login">
+  <div id="logout">
+      <p class="logout">
       <img src="static/logo_medium.gif">
       </p>
   

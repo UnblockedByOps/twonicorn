@@ -110,7 +110,7 @@ tr.subh_app, th.subh_app, td.subh_app {
     width: 100%;
 }
 
-tr.white {
+tr.white, td.white, ul.white, li.white {
     background-color: #FFFFFF;
     color: #000000;
     width: 100%;
@@ -122,19 +122,19 @@ tr.gray {
     width: 100%;
 }
 
-tr.prd, td.prd {
+tr.prd, td.prd, ul.prd, li.prd {
     color: #000000;
     background-color: #CAFEB8;
     width: 100%;
 }
 
-tr.qat, td.qat {
+tr.qat, td.qat, ul.qat, li.qat {
     color: #000000;
     background-color: #FFF284;
     width: 100%;
 }
 
-tr.dev, td.dev {
+tr.dev, td.dev, ul.dev, li.dev {
     color: #000000;
     background-color: #FFC8f2;
     width: 100%;
@@ -142,17 +142,13 @@ tr.dev, td.dev {
 
 /* login/logout */
 
-#login {
+#login, #logout, #error {
     width: 392px ;
     margin-left: auto ;
     margin-right: auto ;
 }
 
-.login {
-    text-align: center;
-}
-
-.error {
+.login, .logout, .error {
     text-align: center;
     color: #F70000;
 }
@@ -215,11 +211,71 @@ input.button:hover {
     width: 50%;
 }
 
-#app_results {
+#history_main {
+    width: 100%;
+}
+
+#app_results, #history_results {
     position: relative;
     top: 18px;
 }
 
 #results_nav {
     float: right;    
+}
+
+/* promote menu */
+ul.promote {
+  text-align: left;
+  display: inline;
+  margin: 0;
+  padding: 0px 0px 0px 0;
+  list-style: none;
+  z-index: 50;
+}
+ul.promote li.promote {
+  display: inline-block;
+  margin-right: -4px;
+  position: relative;
+  padding: 0px 2px;
+  cursor: pointer;
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -ms-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: all 0.2s;
+}
+ul.promote li.promote:hover {
+  background: #2FAACE;
+  color: #fff;
+}
+/* Sub menu properties */
+ul.promote li.promote ul.promote {
+  padding: 0px 0px;
+  position: absolute;
+  top: 17px;
+  left: 0;
+  width: 80;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transiton: opacity 0.2s;
+  -moz-transition: opacity 0.2s;
+  -ms-transition: opacity 0.2s;
+  -o-transition: opacity 0.2s;
+  -transition: opacity 0.2s;
+}
+ul.promote li.promote ul.promote li.promote {
+  display: block;
+}
+ul.promote li.promote ul.promote li.promote:hover {
+  background: #CEFFFD;
+}
+ul.promote li.promote:hover ul.promote {
+  display: block;
+  opacity: 1;
+  visibility: visible;
 }

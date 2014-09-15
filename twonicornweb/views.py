@@ -9,6 +9,7 @@ from pyramid_ldap import get_ldap_connector, groupfinder
 t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf')
 t_facts = TwonicornWebLib.tFacter()
 denied = ''
+prod_groups = ['junk1', 'Unix_Team', 'junk3']
 
 def site_layout():
     renderer = get_renderer("templates/global_layout.pt")
@@ -172,7 +173,7 @@ def view_applications(request):
             'offset': offset,
             'total': total,
             'applications': applications,
-            'denied': denied
+            'denied': denied,
            }
 
 @view_config(route_name='deploys', permission='view', renderer='templates/deploys.pt')
@@ -191,6 +192,15 @@ def view_deploys(request):
     offset = 0
     end = 10
     total = 0
+    prod_auth = False
+
+    # Check if the user is authorized to do stuff to prod
+    for a in prod_groups:
+        print "Checking if %s is in %s" % (user, a)
+        if a in groups:
+            print "%s found in %s" % (user, a)
+            prod_auth = True
+            break
 
     try:
         offset = int(request.GET.getone("start"))
@@ -261,13 +271,31 @@ def view_deploys(request):
             'hist_list': hist_list,
             'env': env,
             'deploy_id': deploy_id,
-            'denied': denied
+            'denied': denied,
+            'prod_auth': prod_auth
            }
 
 @view_config(route_name='promote', permission='prom', renderer='templates/promote.pt')
 def view_promote(request):
 
     page_title = 'Promote'
+    prod_auth = False
+    denied = ''
+    message = ''
+
+    params = {'deploy_id': None,
+              'artifact_id': None,
+              'to_env': None
+             }
+    for p in params:
+        try:
+            params[p] = request.params[p]
+        except:
+            pass
+
+    deploy_id = params['deploy_id']
+    artifact_id = params['artifact_id']
+    to_env = params['to_env']
 
     # Get and format user/groups
     user = request.authenticated_userid
@@ -276,13 +304,25 @@ def view_promote(request):
     groups = groupfinder(user, request)
     groups = format_groups(groups)
 
+    # Check if the user is authorized to do stuff to prod
+    for a in prod_groups:
+        if a in groups:
+            prod_auth = True
+            break
+
+    if not prod_auth and to_env == 'prd':
+        denied = True
+        message = 'You do not have permission to perform the promote action on production!'
+
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
             'groups': groups,
             'first':first,
             'last': last,
-            'denied': denied
+            'denied': denied,
+            'message': message,
+            'prod_auth': prod_auth
            }
 
 @view_config(route_name='help', permission='view', renderer='templates/help.pt')

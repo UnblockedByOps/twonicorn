@@ -3,14 +3,23 @@
 
     <h1>Promote</h1>
 
-    <p>
-    Give us da money, Lebowski! This page should display paginated list of promotions
-    <h3>TODO</h3>
-    <ul>
-     <li>search for candidates via nodegroup, application id, or deploy id</li>
-     <li>Make table sortable by column</li>
-    </ul>
+    <p tal:condition="not denied">
+      Give us da money, Lebowski! This page should display paginated list of promotions
+      <h3>TODO</h3>
+      <ul>
+        <li>search for candidates via nodegroup, application id, or deploy id</li>
+        <li>Make table sortable by column</li>
+      </ul>
     </p>
+
+    <div id="error" tal:condition="denied">
+        <p class="error">
+        <img src="static/logo_medium.gif">
+        </p>
+
+        <h2 class="error" tal:condition="message" tal:content="message"/>
+
+    </div>
 
   </div>
 </div>
