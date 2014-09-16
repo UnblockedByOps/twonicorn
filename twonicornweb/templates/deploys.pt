@@ -14,7 +14,7 @@
           <tr>
             <th>Deploy Path</th>
             <th>Revision</th>
-            <th>Branch</th>
+            <th>Branch/Tag</th>
             <th>Repo</th>
             <th>Artifact Type</th>
             <th>URL Location</th>
@@ -154,7 +154,7 @@
             <tr>
               <th>Deploy Path</th>
               <th>Revision</th>
-              <th>Branch</th>
+              <th>Branch/Tag</th>
               <th>Repo</th>
               <th>Artifact Type</th>
               <th>URL Location</th>
