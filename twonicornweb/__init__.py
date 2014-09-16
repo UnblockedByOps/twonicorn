@@ -58,7 +58,8 @@ def main(global_config, **settings):
     config.ldap_set_login_query(
         base_dn='OU=Technology,OU=User Accounts by Department,OU=CGM Accounts Security Groups and Distribution Lists, DC=cs,DC=iac,DC=corp',
         filter_tmpl='(&(objectClass=user)(sAMAccountName=%(login)s))',
-        scope = ldap.SCOPE_SUBTREE
+        scope = ldap.SCOPE_SUBTREE,
+        cache_period = 600,
         )
     
     config.ldap_set_groups_query(

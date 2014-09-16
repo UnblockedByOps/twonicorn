@@ -9,7 +9,7 @@ from pyramid_ldap import get_ldap_connector, groupfinder
 t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf')
 t_facts = TwonicornWebLib.tFacter()
 denied = ''
-prod_groups = ['junk1', 'Unix_Team', 'junk3']
+prod_groups = ['CM_Team']
 
 def site_layout():
     renderer = get_renderer("templates/global_layout.pt")
@@ -121,6 +121,7 @@ def view_home(request):
     # Get and format user/groups
     user = request.authenticated_userid
     (first,last) = format_user(user)
+    print request.effective_principals
 
     groups = groupfinder(user, request)
     groups = format_groups(groups)
