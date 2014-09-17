@@ -273,7 +273,7 @@ def view_deploys(request):
             'prod_auth': prod_auth
            }
 
-@view_config(route_name='promote', permission='prom', renderer='templates/promote.pt')
+@view_config(route_name='promote', permission='view', renderer='templates/promote.pt')
 def view_promote(request):
 
     page_title = 'Promote'
