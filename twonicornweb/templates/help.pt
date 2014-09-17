@@ -1,8 +1,6 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
 
-    <h1>Help</h1>
-
     <p>
     <a href='https://wiki.ctgrd.com/display/Tech/Twonicorn+Runbook'>Twonicorn Runbook</a>
 

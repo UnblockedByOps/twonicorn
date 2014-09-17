@@ -1,8 +1,6 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
 
-    <h1>Applications</h1>
-
     <p>
       This page should display paginated list of applications
       <h3>TODO</h3>

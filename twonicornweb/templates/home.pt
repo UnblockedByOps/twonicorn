@@ -1,7 +1,6 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
     <p>
-    <h1>Twonicorn Web UI</h1><br>
     <span>What should we put on this page?</span>
     <h3>TODO</h3>
     <ul>

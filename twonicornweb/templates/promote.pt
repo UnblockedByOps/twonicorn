@@ -1,8 +1,6 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
 
-    <h1>Promote</h1>
-
     <div id="promote_main">
 
       <p tal:condition="not denied and not state">

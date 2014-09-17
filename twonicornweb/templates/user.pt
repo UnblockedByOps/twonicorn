@@ -1,8 +1,5 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
-    <p>
-    <h1>User Information</h1><br>
-    </p>
 
     <p>You are a member of the following groups in Active Directory:</p>
 

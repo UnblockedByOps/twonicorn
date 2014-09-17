@@ -32,6 +32,7 @@
     </table>
 
     <p>
+    <h1 tal:condition="not denied">${page_title}</h1>
     <img tal:condition="not denied" src="static/logo_small.gif">
     </p>
   </div>
