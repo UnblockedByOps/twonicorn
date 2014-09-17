@@ -3,22 +3,107 @@
 
     <h1>Promote</h1>
 
-    <p tal:condition="not denied">
-      Give us da money, Lebowski! This page should display paginated list of promotions
-      <h3>TODO</h3>
-      <ul>
-        <li>search for candidates via nodegroup, application id, or deploy id</li>
-        <li>Make table sortable by column</li>
-      </ul>
-    </p>
+    <div id="promote_main">
 
-    <div id="error" tal:condition="denied">
-        <p class="error">
-        <img src="static/logo_medium.gif">
+      <p tal:condition="not denied and not state">
+        Give us da money, Lebowski! This page should display paginated list of promotions
+        <h3>TODO</h3>
+        <ul>
+          <li>search for candidates via nodegroup, application id, or deploy id</li>
+          <li>Make table sortable by column</li>
+        </ul>
+      </p>
+  
+      <div id="error" tal:condition="denied">
+          <p class="error">
+          <img src="static/logo_medium.gif">
+          </p>
+  
+          <h2 class="error" tal:condition="message" tal:content="message"/>
+  
+      </div>
+
+      <div tal:condition="state == 'stage' and commit == 'false'">
+ 
+        <H3 id="promote">
+        Confirm promotion
+        </H3>
+
+        <p id="promote">
+        <table width="100%"> 
+          <tr class="subh">
+            <td class="subh">Artifact ID</td>
+            <td class="subh_app" colspan="9" tal:content="artifact_id">0</td>
+          </tr>
+          <tr class="subh">
+            <td class="subh">To State</td>
+            <td class="subh_app" colspan="9" tal:content="state">stage</td>
+          </tr>
+          <tr class="subh">
+            <td class="subh">For env</td>
+            <td class="subh_app" colspan="9" tal:content="to_env">prd</td>
+          </tr>
+          <tr>
+            <th>Application Name</th>
+            <th>Deploy Path</th>
+            <th>Revision</th>
+            <th>Branch/Tag</th>
+            <th>Repo</th>
+            <th>Artifact Type</th>
+            <th>URL Location</th>
+            <th>Created Date</th>
+          </tr>
+
+          <tr tal:repeat="item promote">
+            <!--! Do some reformatting of the urls to make them useful -->
+            <?python
+                if item['repo'] == 'gerrit':
+                    r = item['url_location'].rpartition('/')
+                    item['url_location'] = r[0] + r[1] + 'git/gitweb.cgi?p=' + r[2] + '.git;a=summary'
+                if item['repo'] == 'subversion':
+                    item['url_location'] = item['url_location'] +  '/' + item['env'] + '/?p=' + item['revision']
+            ?>
+            <td tal:content="item['application_name']">myapp</td>
+            <td tal:content="item['deploy_path']" tal:attributes="title 'Deploy ID: ' + str(item['deploy_id'])">/app/something</td>
+            <td tal:content="item['revision'] [:8]">12345</td>
+            <td tal:content="item['branch']">trunk</td>
+            <td tal:content="item['repo']">12345</td>
+            <td tal:content="item['artifact_type']">12345</td>
+            <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
+                   title="some description"
+                   tal:attributes="href item['url_location']; title item['url_location']"
+                   tal:content="item['suffix']">Artifacts By nodegroupLink</a></td>
+            <td tal:content="item['created']">12345</td>
+          </tr>
+        </table>
         </p>
 
-        <h2 class="error" tal:condition="message" tal:content="message"/>
+        <p>
+          <form method="POST" tal:attributes="action '/promote?deploy_id=%s&artifact_id=%s&to_env=%s&state=%s&commit=true' %
+                                             (deploy_id,
+                                               artifact_id,
+                                               to_env,
+                                               state
+                                              );">
+           <input type="hidden" name="form.submitted"/>
+           <input class="button" type="submit" name="submit" value="Stage"/>
+           <p>
+           <a href="/"><input class="button" type="button" value="Cancel" /></a>
+           </p>
+        </p>
 
+      </div>
+
+      <div tal:condition="state == 'stage' and commit == 'true'">
+        <p id="promote">
+        <table width="100%">
+          <tr class="subh">
+            <td class="subh">Success!</td>
+            <td class="subh_app" colspan="8" tal:content="'Successfully staged artifact id to production:  ' + artifact_id">0</td>
+          </tr>
+        </table">
+      </div>
+  
     </div>
 
   </div>

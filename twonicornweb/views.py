@@ -96,7 +96,7 @@ def login(request):
           page_title = 'Already Logged In'
           denied = True
         else:
-          error = 'You do not have permission to access that page'
+          error = 'You do not have permission to access this page'
           page_title = 'Access Denied'
           denied = True
 
@@ -121,7 +121,6 @@ def view_home(request):
     # Get and format user/groups
     user = request.authenticated_userid
     (first,last) = format_user(user)
-    print request.effective_principals
 
     groups = groupfinder(user, request)
     groups = format_groups(groups)
@@ -197,9 +196,7 @@ def view_deploys(request):
 
     # Check if the user is authorized to do stuff to prod
     for a in prod_groups:
-        print "Checking if %s is in %s" % (user, a)
         if a in groups:
-            print "%s found in %s" % (user, a)
             prod_auth = True
             break
 
@@ -283,10 +280,13 @@ def view_promote(request):
     prod_auth = False
     denied = ''
     message = ''
+    promote = ''
 
     params = {'deploy_id': None,
               'artifact_id': None,
-              'to_env': None
+              'to_env': None,
+              'state': None,
+              'commit': 'false'
              }
     for p in params:
         try:
@@ -297,6 +297,8 @@ def view_promote(request):
     deploy_id = params['deploy_id']
     artifact_id = params['artifact_id']
     to_env = params['to_env']
+    state = params['state']
+    commit = params['commit']
 
     # Get and format user/groups
     user = request.authenticated_userid
@@ -311,9 +313,15 @@ def view_promote(request):
             prod_auth = True
             break
 
-    if not prod_auth and to_env == 'prd':
+    if not prod_auth and state == 'current':
         denied = True
         message = 'You do not have permission to perform the promote action on production!'
+
+    if artifact_id:
+        try:
+            promote = t_core.list_promotion(deploy_id, artifact_id)
+        except:
+            raise
 
     return {'layout': site_layout(),
             'page_title': page_title,
@@ -323,7 +331,13 @@ def view_promote(request):
             'last': last,
             'denied': denied,
             'message': message,
-            'prod_auth': prod_auth
+            'prod_auth': prod_auth,
+            'deploy_id': deploy_id,
+            'artifact_id': artifact_id,
+            'to_env': to_env,
+            'state': state,
+            'commit': commit,
+            'promote': promote,
            }
 
 @view_config(route_name='help', permission='view', renderer='templates/help.pt')

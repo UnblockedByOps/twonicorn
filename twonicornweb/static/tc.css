@@ -104,10 +104,13 @@ td.subh {
 }
 
 tr.subh_app, th.subh_app, td.subh_app {
-    font-size: 1.1em;
     background-color: #CEFFFD;
     color: #000000;
     width: 100%;
+}
+
+th.subh_app {
+    font-size: 1.1em;
 }
 
 tr.white, td.white, ul.white, li.white {
@@ -151,6 +154,13 @@ tr.dev, td.dev, ul.dev, li.dev {
 .login, .logout, .error {
     text-align: center;
     color: #F70000;
+}
+
+/* promote */
+#promote {
+    width: 75% ;
+    margin-left: auto ;
+    margin-right: auto ;
 }
 
 form    {

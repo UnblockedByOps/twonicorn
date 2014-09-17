@@ -193,7 +193,7 @@
                     <ul tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                       <li tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                         <a href="http://twonicorn.ctgrd.com/promote?deploy_id=0&artifact_id=0"
-                           tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=dev' %
+                           tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=dev&state=stage&commit=false' %
                                                 (item['deploy_id'],
                                                  item['artifact_id']
                                                 );
@@ -202,7 +202,7 @@
                       </li>
                       <li tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                         <a href="http://twonicorn.ctgrd.com/promote?deploy_id=0&artifact_id=0"
-                           tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=qat' %
+                           tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=qat&state=stage&commit=false' %
                                                 (item['deploy_id'],
                                                  item['artifact_id']
                                                 );
@@ -211,7 +211,7 @@
                       </li>
                       <li tal:condition="prod_auth" tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                         <a href="http://twonicorn.ctgrd.com/promote?deploy_id=0&artifact_id=0"
-                           tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=prd' %
+                           tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=prd&state=stage&commit=false' %
                                                 (item['deploy_id'],
                                                  item['artifact_id']
                                                 );
@@ -225,6 +225,11 @@
             </tr>
             </tbody>
           </table>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
         </div>
       </div>
 
