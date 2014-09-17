@@ -79,7 +79,7 @@
         </p>
 
         <p>
-          <form method="POST" tal:attributes="action '/promote?deploy_id=%s&artifact_id=%s&to_env=%s&state=%s&commit=true' %
+          <form method="POST" tal:attributes="action '/promote?deploy_id=%s&artifact_id=%s&to_env=%s&state=current&commit=true' %
                                              (deploy_id,
                                                artifact_id,
                                                to_env,
@@ -94,7 +94,7 @@
 
       </div>
 
-      <div tal:condition="state == 'stage' and commit == 'true'">
+      <div tal:condition="state == 'current' and commit == 'true' and denied == 'false'">
         <p id="promote">
         <table width="100%">
           <tr class="subh">
