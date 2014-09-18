@@ -23,24 +23,12 @@
 
       <div tal:condition="state == 'stage' and commit == 'false'">
  
-        <H3 id="promote">
-        Confirm promotion
-        </H3>
+        <h1 id="promote">
+        Stage for production?
+        </h1>
 
         <p id="promote">
         <table width="100%"> 
-          <tr class="subh">
-            <td class="subh">Artifact ID</td>
-            <td class="subh_app" colspan="9" tal:content="artifact_id">0</td>
-          </tr>
-          <tr class="subh">
-            <td class="subh">To State</td>
-            <td class="subh_app" colspan="9" tal:content="state">stage</td>
-          </tr>
-          <tr class="subh">
-            <td class="subh">For env</td>
-            <td class="subh_app" colspan="9" tal:content="to_env">prd</td>
-          </tr>
           <tr>
             <th>Application Name</th>
             <th>Deploy Path</th>
@@ -55,23 +43,23 @@
           <tr tal:repeat="item promote">
             <!--! Do some reformatting of the urls to make them useful -->
             <?python
-                if item['repo'] == 'gerrit':
-                    r = item['url_location'].rpartition('/')
-                    item['url_location'] = r[0] + r[1] + 'git/gitweb.cgi?p=' + r[2] + '.git;a=summary'
-                if item['repo'] == 'subversion':
-                    item['url_location'] = item['url_location'] +  '/' + item['env'] + '/?p=' + item['revision']
+                if promote[item]['repo'] == 'gerrit':
+                    r = promote[item]['url_location'].rpartition('/')
+                    promote[item]['url_location'] = r[0] + r[1] + 'git/gitweb.cgi?p=' + r[2] + '.git;a=summary'
+                if promote[item]['repo'] == 'subversion':
+                    promote[item]['url_location'] = promote[item]['url_location'] +  '/' + promote[item]['env'] + '/?p=' + promote[item]['revision']
             ?>
-            <td tal:content="item['application_name']">myapp</td>
-            <td tal:content="item['deploy_path']" tal:attributes="title 'Deploy ID: ' + str(item['deploy_id'])">/app/something</td>
-            <td tal:content="item['revision'] [:8]">12345</td>
-            <td tal:content="item['branch']">trunk</td>
-            <td tal:content="item['repo']">12345</td>
-            <td tal:content="item['artifact_type']">12345</td>
+            <td tal:content="promote[item]['application_name']">myapp</td>
+            <td tal:content="promote[item]['deploy_path']" tal:attributes="title 'Deploy ID: ' + str(promote[item]['deploy_id'])">/app/something</td>
+            <td tal:content="promote[item]['revision'] [:8]">12345</td>
+            <td tal:content="promote[item]['branch']">trunk</td>
+            <td tal:content="promote[item]['repo']">12345</td>
+            <td tal:content="promote[item]['artifact_type']">12345</td>
             <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
                    title="some description"
-                   tal:attributes="href item['url_location']; title item['url_location']"
-                   tal:content="item['suffix']">Artifacts By nodegroupLink</a></td>
-            <td tal:content="item['created']">12345</td>
+                   tal:attributes="href promote[item]['url_location']; title promote[item]['url_location']"
+                   tal:content="promote[item]['suffix']">Artifacts By nodegroupLink</a></td>
+            <td tal:content="promote[item]['created']">12345</td>
           </tr>
         </table>
         </p>
@@ -83,15 +71,15 @@
                                                to_env
                                               );">
            <input type="hidden" name="form.submitted"/>
-           <input class="button" type="submit" name="submit" value="Stage"/>
            <p>
+           <input class="button" type="submit" name="submit" value="Stage"/>
            <a href="/"><input class="button" type="button" value="Cancel" /></a>
            </p>
         </p>
 
       </div>
 
-      <div tal:condition="state == 'current' and commit == 'true' and denied == 'false'">
+      <div tal:condition="state == 'current' and commit == 'true' and not denied">
         <p id="promote">
         <table width="100%">
           <tr class="subh">

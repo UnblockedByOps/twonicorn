@@ -1,15 +1,22 @@
 import TwonicornWebLib
+import ConfigParser
 from pyramid.view import view_config, forbidden_view_config
 from pyramid.renderers import get_renderer
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember, forget
+from pyramid.session import signed_serialize, signed_deserialize
 from pyramid_ldap import get_ldap_connector, groupfinder
 
 
 t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf')
 t_facts = TwonicornWebLib.tFacter()
 denied = ''
-prod_groups = ['CM_Team']
+prod_groups = ['Unix_Team']
+
+# Parse the secret config
+secret_config_file = ConfigParser.ConfigParser()
+secret_config_file.read('/app/secrets/twonicorn.conf')
+cookie_token = secret_config_file.get('cookie', 'token')
 
 def site_layout():
     renderer = get_renderer("templates/global_layout.pt")
@@ -37,6 +44,11 @@ def find_between(s, first, last):
         return s[start:end]
     except ValueError:
         return ""
+
+def validate_username_cookie(cookieval):
+
+    (name, encrypted) = cookieval.split('-')
+    signed_deserialize(encrypted, cookie_token)
 
 @view_config(route_name='logout', renderer='templates/logout.pt')
 def logout(request):
@@ -78,7 +90,15 @@ def login(request):
 
         if data is not None:
             dn = data[0]
+            encrypted = signed_serialize(login, cookie_token)
             headers = remember(request, dn)
+            headers.append(('Set-Cookie', 'un=' + str(login) + '-' + str(encrypted) + '; Max-Age=604800; Path=/'))
+
+            try:
+                 validate_username_cookie(request.cookies['un'])
+            except:
+                print "DIE"
+            
             return HTTPFound(url, headers=headers)
         else:
             error = 'Invalid credentials'
@@ -124,6 +144,11 @@ def view_home(request):
 
     groups = groupfinder(user, request)
     groups = format_groups(groups)
+
+    try:
+         validate_username_cookie(request.cookies['un'])
+    except:
+        print "DIE"
 
     return {'layout': site_layout(),
             'page_title': page_title,
@@ -317,9 +342,17 @@ def view_promote(request):
         denied = True
         message = 'You do not have permission to perform the promote action on production!'
 
-    if artifact_id:
+    # Displaying artifact to be stage to prod
+    if artifact_id and commit == 'false':
         try:
             promote = t_core.list_promotion(deploy_id, artifact_id)
+        except:
+            raise
+
+    # Actually promoting
+    if artifact_id and commit == 'true':
+        try:
+            promote = t_core.promote(deploy_id, artifact_id, options.user)
         except:
             raise
 

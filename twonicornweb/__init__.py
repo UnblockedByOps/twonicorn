@@ -40,11 +40,12 @@ def main(global_config, **settings):
     secret_config_file = ConfigParser.ConfigParser()
     secret_config_file.read('/app/secrets/twonicorn.conf')
     ldap_password = secret_config_file.get('ldap', 'password')
+    cookie_token = secret_config_file.get('cookie', 'token')
 
     ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, "/etc/pki/CA/certs/ny-dc1.iac.corp.crt")
 
     config.set_authentication_policy(
-        AuthTktAuthenticationPolicy('seekr1t', callback=groupfinder, max_age=604800)
+        AuthTktAuthenticationPolicy(cookie_token, callback=groupfinder, max_age=604800)
         )
     config.set_authorization_policy(
         ACLAuthorizationPolicy()
