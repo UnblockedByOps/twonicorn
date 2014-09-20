@@ -28,6 +28,7 @@ def main(global_config, **settings):
     config.add_route('promote', '/promote')
     config.add_route('help', '/help')
     config.add_route('user', '/user')
+    config.add_route('admin', '/admin')
 
     # Parse the config
     config_file = ConfigParser.ConfigParser()

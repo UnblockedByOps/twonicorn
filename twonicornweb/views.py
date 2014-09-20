@@ -6,14 +6,17 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember, forget
 from pyramid.session import signed_serialize, signed_deserialize
 from pyramid_ldap import get_ldap_connector, groupfinder
+import logging
+log = logging.getLogger(__name__)
 
 
-t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf')
+t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf', '/app/secrets/twonicorn.conf', inject=True)
 t_facts = TwonicornWebLib.tFacter()
 denied = ''
 prod_groups = ['Unix_Team']
+admin_groups = ['CM_Team']
 
-# Parse the secret config
+# Parse the secret config - would like to pass this from __init__.py
 secret_config_file = ConfigParser.ConfigParser()
 secret_config_file.read('/app/secrets/twonicorn.conf')
 cookie_token = secret_config_file.get('cookie', 'token')
@@ -22,6 +25,53 @@ def site_layout():
     renderer = get_renderer("templates/global_layout.pt")
     layout = renderer.implementation().macros['layout']
     return layout
+
+def get_user(request):
+    """ Gets all the user information for an authenticated  user. Checks groups
+        and permissions, and returns a dict of everything. """
+
+    prod_auth = False
+    admin_auth = False
+
+    try:
+        id = request.authenticated_userid
+        (first,last) = format_user(id)
+        groups = format_groups(groupfinder(id, request))
+        auth = True
+        pretty = "%s %s" % (first, last)
+    except Exception, e:
+        log.error("%s (%s)" % (Exception, e))
+        (pretty, id, ad_login, groups, first, last, auth, prd_auth, admin_auth) = ('', '', '', '', '', '', False, False, False)
+
+    try:
+        ad_login = validate_username_cookie(request.cookies['un'])
+    except:
+        return HTTPFound('/logout?message=Your cookie has been tampered with. You have been logged out')
+
+    # Check if the user is authorized to do stuff to prod
+    for a in prod_groups:
+        if a in groups:
+            prod_auth = True
+            break
+
+    # Check if the user is authorized as an admin
+    for a in admin_groups:
+        if a in groups:
+            admin_auth = True
+            break
+
+    user = {}
+    user['id'] = id
+    user['ad_login'] = ad_login
+    user['groups'] = groups
+    user['first'] = first
+    user['last'] = last
+    user['loggedin'] = auth
+    user['prod_auth'] = prod_auth
+    user['admin_auth'] = admin_auth
+    user['pretty'] = pretty
+
+    return (user)
 
 def format_user(user):
     # Make the name readable
@@ -46,14 +96,26 @@ def find_between(s, first, last):
         return ""
 
 def validate_username_cookie(cookieval):
+    """ Returns the username if it validates. Otherwise throws
+    an exception"""
 
-    (name, encrypted) = cookieval.split('-')
-    signed_deserialize(encrypted, cookie_token)
+#    return signed_deserialize(cookieval, 'titspervert')
+    return signed_deserialize(cookieval, cookie_token)
 
 @view_config(route_name='logout', renderer='templates/logout.pt')
 def logout(request):
 
+    message = 'You have been logged out'
+
+    try:
+        if request.params['message']:
+            message = request.params['message']
+    except:
+        pass
+
     headers = forget(request)
+    # Do I really need this?
+    headers.append(('Set-Cookie', 'un=; Max-Age=0; Path=/'))
     request.response.headers = headers
 
     # No idea why I have to re-define these, but I do or it poops itself
@@ -61,26 +123,26 @@ def logout(request):
     request.response.charset = 'UTF-8'
     request.response.status = '200 OK'
     
-    return {'message': 'You have been logged out'}
+    return {'message': message}
 
 @view_config(route_name='login', renderer='templates/login.pt')
 @forbidden_view_config(renderer='templates/login.pt')
 def login(request):
+    page_title = 'Login'
 
-    user = ''
-    groups = ''
-    first = ''
-    last = ''
+    user = get_user(request)
     denied = ''
 
-    url = request.current_route_url()
-    path = request.path
-    if path == '/login':
-        url = '/'
+    if request.referer and request.referer.split('/')[3][:6] != 'logout':
+        return_url = request.referer
+    elif request.path != '/login':
+        return_url = request.path
+    else:
+        return_url = '/'
+
     login = ''
     password = ''
     error = ''
-    page_title = 'Login'
 
     if 'form.submitted' in request.POST:
         login = request.POST['login']
@@ -91,25 +153,15 @@ def login(request):
         if data is not None:
             dn = data[0]
             encrypted = signed_serialize(login, cookie_token)
+            #encrypted = signed_serialize(login, 'titspervert')
             headers = remember(request, dn)
-            headers.append(('Set-Cookie', 'un=' + str(login) + '-' + str(encrypted) + '; Max-Age=604800; Path=/'))
+            headers.append(('Set-Cookie', 'un=' + str(encrypted) + '; Max-Age=604800; Path=/'))
 
-            try:
-                 validate_username_cookie(request.cookies['un'])
-            except:
-                print "DIE"
-            
-            return HTTPFound(url, headers=headers)
+            return HTTPFound(request.POST['return_url'], headers=headers)
         else:
             error = 'Invalid credentials'
 
     if request.authenticated_userid:
-        # Get and format user/groups
-        user = request.authenticated_userid
-        (first,last) = format_user(user)
-    
-        groups = groupfinder(user, request)
-        groups = format_groups(groups)
 
         if request.path == '/login':
           error = 'You are already logged in'
@@ -123,10 +175,7 @@ def login(request):
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'groups': groups,
-            'first':first,
-            'last': last,
-            'login_url': url,
+            'return_url': return_url,
             'login': login,
             'password': password,
             'error': error,
@@ -137,25 +186,11 @@ def login(request):
 def view_home(request):
 
     page_title = 'Home'
-
-    # Get and format user/groups
-    user = request.authenticated_userid
-    (first,last) = format_user(user)
-
-    groups = groupfinder(user, request)
-    groups = format_groups(groups)
-
-    try:
-         validate_username_cookie(request.cookies['un'])
-    except:
-        print "DIE"
+    user = get_user(request)
 
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'groups': groups,
-            'first':first,
-            'last': last,
             'denied': denied
            }
 
@@ -163,13 +198,7 @@ def view_home(request):
 def view_applications(request):
 
     page_title = 'Applications'
-
-    # Get and format user/groups
-    user = request.authenticated_userid
-    (first,last) = format_user(user)
-
-    groups = groupfinder(user, request)
-    groups = format_groups(groups)
+    user = get_user(request)
 
     perpage = 10
     offset = 0
@@ -191,9 +220,6 @@ def view_applications(request):
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'groups': groups,
-            'first':first,
-            'last': last,
             'perpage': perpage,
             'offset': offset,
             'total': total,
@@ -205,25 +231,12 @@ def view_applications(request):
 def view_deploys(request):
 
     page_title = 'Deploys'
-
-    # Get and format user/groups
-    user = request.authenticated_userid
-    (first,last) = format_user(user)
-
-    groups = groupfinder(user, request)
-    groups = format_groups(groups)
+    user = get_user(request)
 
     perpage = 10
     offset = 0
     end = 10
     total = 0
-    prod_auth = False
-
-    # Check if the user is authorized to do stuff to prod
-    for a in prod_groups:
-        if a in groups:
-            prod_auth = True
-            break
 
     try:
         offset = int(request.GET.getone("start"))
@@ -279,9 +292,6 @@ def view_deploys(request):
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'groups': groups,
-            'first':first,
-            'last': last,
             'perpage': perpage,
             'offset': offset,
             'total': total,
@@ -295,17 +305,18 @@ def view_deploys(request):
             'env': env,
             'deploy_id': deploy_id,
             'denied': denied,
-            'prod_auth': prod_auth
            }
 
 @view_config(route_name='promote', permission='view', renderer='templates/promote.pt')
 def view_promote(request):
 
     page_title = 'Promote'
-    prod_auth = False
+    user = get_user(request)
+
     denied = ''
     message = ''
     promote = ''
+    to_state = ''
 
     params = {'deploy_id': None,
               'artifact_id': None,
@@ -325,49 +336,38 @@ def view_promote(request):
     state = params['state']
     commit = params['commit']
 
-    # Get and format user/groups
-    user = request.authenticated_userid
-    (first,last) = format_user(user)
-
-    groups = groupfinder(user, request)
-    groups = format_groups(groups)
-
-    # Check if the user is authorized to do stuff to prod
-    for a in prod_groups:
-        if a in groups:
-            prod_auth = True
-            break
-
-    if not prod_auth and state == 'current':
-        denied = True
-        message = 'You do not have permission to perform the promote action on production!'
-
     # Displaying artifact to be stage to prod
     if artifact_id and commit == 'false':
+        if not user['prod_auth'] and to_env == 'prd':
+            to_state = '3'
+        else:
+            to_state = '2'
+
         try:
             promote = t_core.list_promotion(deploy_id, artifact_id)
         except:
             raise
 
-    # Actually promoting
     if artifact_id and commit == 'true':
-        try:
-            promote = t_core.promote(deploy_id, artifact_id, options.user)
-        except:
-            raise
+        if not user['prod_auth'] and to_env == 'prd' and state == '2':
+            denied = True
+            message = 'You do not have permission to perform the promote action on production!'
+        else:
+            # Actually promoting
+            try:
+                promote = t_core.promote(deploy_id, artifact_id, to_env, state, user['ad_login'])
+            except:
+                raise
 
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'groups': groups,
-            'first':first,
-            'last': last,
             'denied': denied,
             'message': message,
-            'prod_auth': prod_auth,
             'deploy_id': deploy_id,
             'artifact_id': artifact_id,
             'to_env': to_env,
+            'to_state': to_state,
             'state': state,
             'commit': commit,
             'promote': promote,
@@ -377,20 +377,11 @@ def view_promote(request):
 def view_help(request):
 
     page_title = 'Help'
-
-    # Get and format user/groups
-    user = request.authenticated_userid
-    (first,last) = format_user(user)
-
-    groups = groupfinder(user, request)
-    groups = format_groups(groups)
+    user = get_user(request)
 
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'groups': groups,
-            'first':first,
-            'last': last,
             'denied': denied
            }
 
@@ -398,19 +389,23 @@ def view_help(request):
 def view_user(request):
 
     page_title = 'User Data'
-
-    # Get and format user/groups
-    user = request.authenticated_userid
-    (first,last) = format_user(user)
-
-    groups = groupfinder(user, request)
-    groups = format_groups(groups)
+    user = get_user(request)
 
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'groups': groups,
-            'first':first,
-            'last': last,
+            'denied': denied,
+           }
+
+@view_config(route_name='admin', permission='view', renderer='templates/admin.pt')
+def view_admin(request):
+
+    page_title = 'Admin'
+    user = get_user(request)
+
+    return {'layout': site_layout(),
+            'page_title': page_title,
+            'user': user,
+            'prod_groups': prod_groups,
             'denied': denied,
            }

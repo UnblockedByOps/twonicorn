@@ -193,7 +193,7 @@
                     <ul tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                       <li tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                         <a href="http://twonicorn.ctgrd.com/promote?deploy_id=0&artifact_id=0"
-                           tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=dev&state=stage&commit=false' %
+                           tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=dev&state=3&commit=false' %
                                                 (item['deploy_id'],
                                                  item['artifact_id']
                                                 );
@@ -202,16 +202,16 @@
                       </li>
                       <li tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                         <a href="http://twonicorn.ctgrd.com/promote?deploy_id=0&artifact_id=0"
-                           tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=qat&state=stage&commit=false' %
+                           tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=qat&state=3&commit=false' %
                                                 (item['deploy_id'],
                                                  item['artifact_id']
                                                 );
                                            title 'Promote to qat: ' + str(item['artifact_id'])"
                            tal:content="'to qat'">promote to qat</a>
                       </li>
-                      <li tal:condition="prod_auth" tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
+                      <li tal:condition="user.prod_auth" tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                         <a href="http://twonicorn.ctgrd.com/promote?deploy_id=0&artifact_id=0"
-                           tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=prd&state=stage&commit=false' %
+                           tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=prd&state=3&commit=false' %
                                                 (item['deploy_id'],
                                                  item['artifact_id']
                                                 );

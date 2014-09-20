@@ -24,9 +24,28 @@
           [ <a class="nav" href="/help">HELP</a> ]
         </td>
         <td class="nav right">
-          <span tal:content="'Welcome ' + first + '!'" 
-                tal:attributes="title 'Logged in as:' + first + ' ' + last">
-                [ <a class="nav nav_logout" href="/logout">LOGOUT</a> ]
+          <ul class="user">
+            <li class="user">
+              <span tal:content="'Welcome ' + user.first + '!'"
+                    tal:attributes="title 'Logged in as: ' + user.ad_login">
+              </span>
+              <ul class="user">
+                <li class="user">
+                  <a class="nav" href="/user"
+                     tal:attributes="href '/user';
+                                     title 'Display user info'"
+                     tal:content="'User Info'">user info</a>
+                </li>
+                <li class="user" tal:condition="user.admin_auth">
+                  <a class="nav" href="/admin"
+                     tal:attributes="href '/admin';
+                                     title 'Display admin info'"
+                     tal:content="'Administer'">administer</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+          [ <a class="nav nav_logout" href="/logout">LOGOUT</a> ]
         </td>
       </tr>
     </table>

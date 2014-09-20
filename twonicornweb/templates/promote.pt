@@ -21,10 +21,14 @@
   
       </div>
 
-      <div tal:condition="state == 'stage' and commit == 'false'">
+      <div tal:condition="not denied and commit == 'false'">
  
-        <h1 id="promote">
+        <h1 id="promote" tal:condition="state == '3' and to_env == 'prd'">
         Stage for production?
+        </h1>
+
+        <h1 id="promote" tal:condition="state != '3' and to_env != 'prd'">
+        Promotoe to ${to_env}?
         </h1>
 
         <p id="promote">
@@ -65,10 +69,11 @@
         </p>
 
         <p>
-          <form method="POST" tal:attributes="action '/promote?deploy_id=%s&artifact_id=%s&to_env=%s&state=current&commit=true' %
+          <form method="POST" tal:attributes="action '/promote?deploy_id=%s&artifact_id=%s&to_env=%s&state=%s&commit=true' %
                                              (deploy_id,
                                                artifact_id,
-                                               to_env
+                                               to_env,
+                                               to_state
                                               );">
            <input type="hidden" name="form.submitted"/>
            <p>
@@ -79,12 +84,13 @@
 
       </div>
 
-      <div tal:condition="state == 'current' and commit == 'true' and not denied">
+      <div tal:condition="not denied and state == '3' and commit == 'true'">
         <p id="promote">
         <table width="100%">
           <tr class="subh">
             <td class="subh">Success!</td>
-            <td class="subh_app" colspan="8" tal:content="'Successfully staged artifact id to production:  ' + artifact_id">0</td>
+            <td class="subh_app" colspan="8" tal:condition="state == '3' and to_env == 'prd'" tal:content="'Successfully staged artifact id to production:  ' + artifact_id">0</td>
+            <td class="subh_app" colspan="8" tal:condition="state != '3' and to_env != 'prd'" tal:content="'Successfully promoted artifact id to %s:  %s' % (to_env,artifact_id)">0</td>
           </tr>
         </table">
       </div>
