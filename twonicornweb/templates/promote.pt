@@ -21,7 +21,7 @@
   
       </div>
 
-      <div id="promote_results" tal:condition="not denied and commit == 'false'">
+      <div id="promote_results" tal:condition="not denied and state">
  
         <h1 tal:condition="state == '3' and to_env == 'prd'">
         Stage for production?

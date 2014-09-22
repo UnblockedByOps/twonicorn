@@ -23,7 +23,7 @@
         <table width="100%" tal:condition="(application_id or nodegroup)">
           <tr class="subh">
             <td class="subh">Node Group</td>
-            <td class="subh_app" colspan="8" tal:content="nodegroup.upper() + ' (' + application_id + ')'">tct</td>
+            <td class="subh_app" colspan="10" tal:content="nodegroup.upper() + ' (' + application_id + ')'">tct</td>
           </tr>
           <tr>
             <th>Deploy Path</th>
@@ -35,11 +35,12 @@
             <th>Artifact ID</th>
             <th>Assignment ID</th>
             <th>Assignment Date</th>
+            <th>Promote</th>
             <th>History</th>
           </tr>
 
           <tr class='prd' tal:condition="deploys_prd">
-            <td colspan="10"><b>PRD</b></td>
+            <td colspan="11"><b>PRD</b></td>
           </tr>
           <tr tal:repeat="item deploys_prd">
             <!--! Do some reformatting of the urls to make them useful -->
@@ -62,6 +63,7 @@
             <td tal:content="deploys_prd[item]['artifact_id']">12345</td>
             <td tal:content="deploys_prd[item]['artifact_assignment_id']">12345</td>
             <td tal:content="deploys_prd[item]['created']">12345</td>
+            <td></td>
             <td><a href="http://twonicorn.ctgrd.com/deploys?history=true"
                    title="Show History"
                    tal:attributes="href '/deploys?history=true&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s' % 
@@ -74,7 +76,7 @@
                    tal:content="'Show History'">show history</a></td>
           </tr>
           <tr class='qat' tal:condition="deploys_qat">
-            <td colspan="10"><b>QAT</b></td>
+            <td colspan="11"><b>QAT</b></td>
           </tr>
           <tr tal:repeat="item deploys_qat">
             <!--! Do some reformatting of the urls to make them useful -->
@@ -97,6 +99,24 @@
             <td tal:content="deploys_qat[item]['artifact_id']">12345</td>
             <td tal:content="deploys_qat[item]['artifact_assignment_id']">12345</td>
             <td tal:content="deploys_qat[item]['created']">12345</td>
+            <td>
+                      <?python
+                        if not user['prod_auth']:
+                            to_state = '3'
+                        else:
+                            to_state = '2'
+                      ?>
+                      <a href="http://twonicorn.ctgrd.com/promote?deploy_id=0&artifact_id=0"
+                         tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=prd&application_id=%s&nodegroup=%s&state=%s&commit=false' %
+                                              (deploys_qat[item]['deploy_id'],
+                                               deploys_qat[item]['artifact_id'],
+                                               application_id,
+                                               nodegroup,
+                                               to_state
+                                              );
+                                         title 'Promote to prd: ' + str(deploys_qat[item]['artifact_id'])"
+                         tal:content="'to prd'">promote to prd</a>
+            </td>
             <td><a href="http://twonicorn.ctgrd.com/deploys?history=true"
                    title="Show History"
                    tal:attributes="href '/deploys?history=true&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s' %
@@ -109,7 +129,7 @@
                    tal:content="'Show History'">show history</a></td>
           </tr>
           <tr class='dev' tal:condition="deploys_dev">
-            <td colspan="10"><b>DEV</b></td>
+            <td colspan="11"><b>DEV</b></td>
           </tr>
           <tr tal:repeat="item deploys_dev">
             <!--! Do some reformatting of the urls to make them useful -->
@@ -132,6 +152,7 @@
             <td tal:content="deploys_dev[item]['artifact_id']">12345</td>
             <td tal:content="deploys_qat[item]['artifact_assignment_id']">12345</td>
             <td tal:content="deploys_dev[item]['created']">12345</td>
+            <td></td>
             <td><a href="http://twonicorn.ctgrd.com/deploys?history=true"
                    title="Show History"
                    tal:attributes="href '/deploys?history=true&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s' %
@@ -233,7 +254,13 @@
                                            title 'Promote to qat: ' + str(item['artifact_id'])"
                            tal:content="'to qat'">promote to qat</a>
                       </li>
-                      <li tal:condition="user.prod_auth" tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
+                      <?python 
+                        if not user['prod_auth']:
+                            to_state = '3'
+                        else:
+                            to_state = '2'
+                      ?>
+                      <li tal:condition="user.prod_auth or env == 'qat' or env == 'prd'" tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                         <a href="http://twonicorn.ctgrd.com/promote?deploy_id=0&artifact_id=0"
                            tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=prd&application_id=%s&nodegroup=%s&state=%s&commit=false' %
                                                 (item['deploy_id'],

@@ -13,8 +13,8 @@ log = logging.getLogger(__name__)
 t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf', '/app/secrets/twonicorn.conf', inject=True)
 t_facts = TwonicornWebLib.tFacter()
 denied = ''
-prod_groups = ['CM_Team']
-admin_groups = ['CM_Team']
+prod_groups = ['C_Team']
+admin_groups = ['M_Team']
 
 # Parse the secret config - would like to pass this from __init__.py
 secret_config_file = ConfigParser.ConfigParser()
@@ -275,7 +275,7 @@ def view_deploys(request):
     deploys_qat = None
     deploys_prd = None
     hist_list = None
-    to_state = None
+    to_state = '2'
 
     if application_id:
         try: 
@@ -299,11 +299,6 @@ def view_deploys(request):
             hist_list = h_list[offset:end]
         except:
             raise
-
-        if not user['prod_auth'] and env == 'prd':
-            to_state = '3'
-        else:
-            to_state = '2'
 
     return {'layout': site_layout(),
             'page_title': page_title,
