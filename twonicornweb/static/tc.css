@@ -160,8 +160,11 @@ tr.dev, td.dev, ul.dev, li.dev {
     margin-right: auto ;
 }
 
-form    {
+form {
     width: 250px ;
+}
+
+form.login {
     margin-left: auto ;
     margin-right: auto ;
 }
@@ -186,6 +189,19 @@ input.button {
 }
 
 input.button:hover {
+    background: #FF0099;
+}
+
+input.button_submit {
+    width: 100px;
+    background: #CCCCCC;
+    color: #000000;
+    height: 20px;
+    border-radius: 15px;
+    border: 1p solid #999;
+}
+
+input.button_submit:hover {
     background: #FF0099;
 }
 
@@ -218,11 +234,11 @@ input.button:hover {
     width: 50%;
 }
 
-#history_main {
+#history_main, #promote_main {
     width: 100%;
 }
 
-#app_results, #history_results {
+#app_results, #history_results, #promote_results {
     position: relative;
     top: 18px;
 }

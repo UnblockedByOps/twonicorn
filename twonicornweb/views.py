@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf', '/app/secrets/twonicorn.conf', inject=True)
 t_facts = TwonicornWebLib.tFacter()
 denied = ''
-prod_groups = ['Unix_Team']
+prod_groups = ['CM_Team']
 admin_groups = ['CM_Team']
 
 # Parse the secret config - would like to pass this from __init__.py
@@ -244,11 +244,17 @@ def view_deploys(request):
     except:
         pass
 
+
     params = {'application_id': None,
               'nodegroup': None,
               'history': None,
               'deploy_id': None,
-              'env': None}
+              'env': None,
+              'to_env': None,
+              'state': None,
+              'commit': None,
+              'artifact_id': None,
+             }
     for p in params:
         try:
             params[p] = request.params[p]
@@ -260,11 +266,16 @@ def view_deploys(request):
     history = params['history']
     deploy_id = params['deploy_id']
     env = params['env']
+    to_env = params['to_env']
+    state = params['state']
+    commit = params['commit']
+    artifact_id = params['artifact_id']
 
     deploys_dev = None
     deploys_qat = None
     deploys_prd = None
     hist_list = None
+    to_state = None
 
     if application_id:
         try: 
@@ -289,6 +300,11 @@ def view_deploys(request):
         except:
             raise
 
+        if not user['prod_auth'] and env == 'prd':
+            to_state = '3'
+        else:
+            to_state = '2'
+
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
@@ -304,6 +320,11 @@ def view_deploys(request):
             'hist_list': hist_list,
             'env': env,
             'deploy_id': deploy_id,
+            'to_env': to_env,
+            'state': state,
+            'to_state': to_state,
+            'commit': commit,
+            'artifact_id': artifact_id,
             'denied': denied,
            }
 
@@ -318,7 +339,9 @@ def view_promote(request):
     promote = ''
     to_state = ''
 
-    params = {'deploy_id': None,
+    params = {'application_id': None,
+              'nodegroup': None,
+              'deploy_id': None,
               'artifact_id': None,
               'to_env': None,
               'state': None,
@@ -330,6 +353,8 @@ def view_promote(request):
         except:
             pass
 
+    application_id = params['application_id']
+    nodegroup = params['nodegroup']
     deploy_id = params['deploy_id']
     artifact_id = params['artifact_id']
     to_env = params['to_env']
@@ -356,6 +381,8 @@ def view_promote(request):
             # Actually promoting
             try:
                 promote = t_core.promote(deploy_id, artifact_id, to_env, state, user['ad_login'])
+                return_url = '/deploys?application_id=%s&nodegroup=%s&artifact_id=%s&to_env=%s&state=%s&commit=%s' % (application_id, nodegroup, artifact_id, to_env, state, commit)
+                return HTTPFound(return_url)
             except:
                 raise
 
@@ -364,6 +391,8 @@ def view_promote(request):
             'user': user,
             'denied': denied,
             'message': message,
+            'application_id': application_id,
+            'nodegroup': nodegroup,
             'deploy_id': deploy_id,
             'artifact_id': artifact_id,
             'to_env': to_env,
