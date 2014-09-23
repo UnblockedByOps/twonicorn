@@ -136,7 +136,7 @@ def login(request):
     if request.referer and request.referer.split('/')[3][:6] != 'logout':
         return_url = request.referer
     elif request.path != '/login':
-        return_url = request.path
+        return_url = request.url
     else:
         return_url = '/'
 
