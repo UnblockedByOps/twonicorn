@@ -1,25 +1,20 @@
 @import url(//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700);
 
 body {
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 75%;
-  font-weight: 300;
-  color: #000000;
-  background: #FFFFFF;
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 75%;
+    font-weight: 300;
+    color: #000000;
+    background: #FFFFFF;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-weight: 300;
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 300;
 }
 
 p {
-  font-weight: 300;
+    font-weight: 300;
 }
 
 /* Default link settings */
@@ -148,9 +143,16 @@ tr.dev, td.dev, ul.dev, li.dev {
     margin-right: auto ;
 }
 
-.login, .logout, .error {
+.logout, .error {
     text-align: center;
     color: #F70000;
+}
+
+.login {
+    text-align: left;
+    color: #2FAACE;
+    font-size: 1.1em;
+    font-weight: 300;
 }
 
 /* promote */
@@ -249,113 +251,113 @@ input.button_submit:hover {
 
 /* promote menu */
 ul.promote {
-  text-align: left;
-  display: inline;
-  margin: 0;
-  padding: 0px 0px 0px 0;
-  list-style: none;
-  z-index: 50;
+    text-align: left;
+    display: inline;
+    margin: 0;
+    padding: 0px 0px 0px 0;
+    list-style: none;
+    z-index: 50;
 }
 ul.promote li.promote {
-  display: inline-block;
-  margin-right: -4px;
-  position: relative;
-  padding: 0px 2px;
-  cursor: pointer;
-  -webkit-transition: all 0.2s;
-  -moz-transition: all 0.2s;
-  -ms-transition: all 0.2s;
-  -o-transition: all 0.2s;
-  transition: all 0.2s;
+    display: inline-block;
+    margin-right: -4px;
+    position: relative;
+    padding: 0px 2px;
+    cursor: pointer;
+    -webkit-transition: all 0.2s;
+    -moz-transition: all 0.2s;
+    -ms-transition: all 0.2s;
+    -o-transition: all 0.2s;
+    transition: all 0.2s;
 }
 ul.promote li.promote:hover {
-  background: #2FAACE;
-  color: #fff;
+    background: #2FAACE;
+    color: #fff;
 }
 /* Sub menu properties */
 ul.promote li.promote ul.promote {
-  padding: 0px 0px;
-  position: absolute;
-  top: 17px;
-  left: 0;
-  width: 80;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-  display: none;
-  opacity: 0;
-  visibility: hidden;
-  -webkit-transiton: opacity 0.2s;
-  -moz-transition: opacity 0.2s;
-  -ms-transition: opacity 0.2s;
-  -o-transition: opacity 0.2s;
-  -transition: opacity 0.2s;
+    padding: 0px 0px;
+    position: absolute;
+    top: 17px;
+    left: 0;
+    width: 80;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    -webkit-transiton: opacity 0.2s;
+    -moz-transition: opacity 0.2s;
+    -ms-transition: opacity 0.2s;
+    -o-transition: opacity 0.2s;
+    -transition: opacity 0.2s;
 }
 ul.promote li.promote ul.promote li.promote {
-  display: block;
+    display: block;
 }
 ul.promote li.promote ul.promote li.promote:hover {
-  background: #CEFFFD;
+    background: #CEFFFD;
 }
 ul.promote li.promote:hover ul.promote {
-  display: block;
-  opacity: 1;
-  visibility: visible;
+    display: block;
+    opacity: 1;
+    visibility: visible;
 }
 
 /* user menu */
 ul.user {
-  text-align: left;
-  display: inline;
-  margin: 0;
-  padding: 0px 0px 0px 0;
-  list-style: none;
-  z-index: 50;
+    text-align: left;
+    display: inline;
+    margin: 0;
+    padding: 0px 0px 0px 0;
+    list-style: none;
+    z-index: 50;
 }
 ul.user li.user {
-  display: inline-block;
-  margin-right: 0px;
-  position: relative;
-  padding: 0px 4px;
-  cursor: pointer;
-  -webkit-transition: all 0.2s;
-  -moz-transition: all 0.2s;
-  -ms-transition: all 0.2s;
-  -o-transition: all 0.2s;
-  transition: all 0.2s;
+    display: inline-block;
+    margin-right: 0px;
+    position: relative;
+    padding: 0px 4px;
+    cursor: pointer;
+    -webkit-transition: all 0.2s;
+    -moz-transition: all 0.2s;
+    -ms-transition: all 0.2s;
+    -o-transition: all 0.2s;
+    transition: all 0.2s;
 }
 ul.user li.user:hover {
-  background: #2FAACE;
-  color: #fff;
+    background: #2FAACE;
+    color: #fff;
 }
 /* Sub menu properties */
 ul.user li.user ul.user {
-  background: #2FAACE;
-  padding: 0px 0px;
-  position: absolute;
-  top: 17px;
-  left: 0;
-  width: 90px;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-  display: none;
-  opacity: 0;
-  visibility: hidden;
-  -webkit-transiton: opacity 0.2s;
-  -moz-transition: opacity 0.2s;
-  -ms-transition: opacity 0.2s;
-  -o-transition: opacity 0.2s;
-  -transition: opacity 0.2s;
+    background: #2FAACE;
+    padding: 0px 0px;
+    position: absolute;
+    top: 17px;
+    left: 0;
+    width: 90px;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    -webkit-transiton: opacity 0.2s;
+    -moz-transition: opacity 0.2s;
+    -ms-transition: opacity 0.2s;
+    -o-transition: opacity 0.2s;
+    -transition: opacity 0.2s;
 }
 ul.user li.user ul.user li.user {
-  display: block;
+    display: block;
 }
 ul.user li.user ul.user li.user:hover {
-  background: #2FAACE;
+    background: #2FAACE;
 }
 ul.user li.user:hover ul.user {
-  display: block;
-  opacity: 1;
-  visibility: visible;
+    display: block;
+    opacity: 1;
+    visibility: visible;
 }
