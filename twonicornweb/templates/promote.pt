@@ -3,7 +3,7 @@
 
     <div id="promote_main">
 
-      <p tal:condition="not denied and not state">
+      <p tal:condition="not denied and not artifact_id">
         Give us da money, Lebowski! This page should display paginated list of promotions
         <h3>TODO</h3>
         <ul>
@@ -21,14 +21,14 @@
   
       </div>
 
-      <div id="promote_results" tal:condition="not denied and state">
+      <div id="promote_results" tal:condition="not denied and artifact_id">
  
-        <h1 tal:condition="state == '3' and to_env == 'prd'">
-        Stage for production?
+        <h1 tal:condition="to_state == '3'">
+        Stage artifact ID for ${to_env}? ${artifact_id}
         </h1>
 
-        <h1 tal:condition="state != '3' and to_env != 'prd'">
-        Promote to ${to_env}?
+        <h1 tal:condition="to_state != '3'">
+        Promote artifact ID to ${to_env}? ${artifact_id}
         </h1>
 
         <p>
@@ -62,28 +62,25 @@
             <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
                    title="some description"
                    tal:attributes="href promote[item]['url_location']; title promote[item]['url_location']"
-                   tal:content="promote[item]['suffix']">Artifacts By nodegroupLink</a></td>
+                   tal:content="promote[item]['suffix']">Artifact</a></td>
             <td tal:content="promote[item]['created']">12345</td>
           </tr>
         </table>
         </p>
 
         <p>
-          <form method="POST" tal:attributes="action '/promote?application_id=%s&nodegroup=%s&deploy_id=%s&artifact_id=%s&to_env=%s&state=%s&commit=true' %
-                                             (application_id,
-                                               nodegroup,
-                                               deploy_id,
-                                               artifact_id,
-                                               to_env,
-                                               to_state
-                                              );">
+          <form method="POST" tal:attributes="action '/promote?deploy_id=%s&artifact_id=%s&to_env=%s&&commit=true' %
+                                             (deploy_id,
+                                              artifact_id,
+                                              to_env,
+                                             );">
            <input type="hidden" name="form.submitted"/>
            <p>
            <table>
              <tr>
                <td>
-                 <input tal:condition="state == '3'" class="button_submit" type="submit" name="submit" value="Stage"/>
-                 <input tal:condition="state != '3'" class="button_submit" type="submit" name="submit" value="Promote"/>
+                 <input tal:condition="to_state == '3'" class="button_submit" type="submit" name="submit" value="Stage"/>
+                 <input tal:condition="to_state != '3'" class="button_submit" type="submit" name="submit" value="Promote"/>
                </td>
                <td>
                  <a href="/"><input class="button_submit" type="button" value="Cancel" /></a>

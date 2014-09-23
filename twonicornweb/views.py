@@ -13,8 +13,8 @@ log = logging.getLogger(__name__)
 t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf', '/app/secrets/twonicorn.conf', inject=True)
 t_facts = TwonicornWebLib.tFacter()
 denied = ''
-prod_groups = ['C_Team']
-admin_groups = ['M_Team']
+prod_groups = ['CM_Team']
+admin_groups = ['CM_Team']
 
 # Parse the secret config - would like to pass this from __init__.py
 secret_config_file = ConfigParser.ConfigParser()
@@ -251,7 +251,7 @@ def view_deploys(request):
               'deploy_id': None,
               'env': None,
               'to_env': None,
-              'state': None,
+              'to_state': None,
               'commit': None,
               'artifact_id': None,
              }
@@ -267,7 +267,7 @@ def view_deploys(request):
     deploy_id = params['deploy_id']
     env = params['env']
     to_env = params['to_env']
-    state = params['state']
+    to_state = params['to_state']
     commit = params['commit']
     artifact_id = params['artifact_id']
 
@@ -275,7 +275,6 @@ def view_deploys(request):
     deploys_qat = None
     deploys_prd = None
     hist_list = None
-    to_state = '2'
 
     if application_id:
         try: 
@@ -316,7 +315,6 @@ def view_deploys(request):
             'env': env,
             'deploy_id': deploy_id,
             'to_env': to_env,
-            'state': state,
             'to_state': to_state,
             'commit': commit,
             'artifact_id': artifact_id,
@@ -332,14 +330,10 @@ def view_promote(request):
     denied = ''
     message = ''
     promote = ''
-    to_state = ''
 
-    params = {'application_id': None,
-              'nodegroup': None,
-              'deploy_id': None,
+    params = {'deploy_id': None,
               'artifact_id': None,
               'to_env': None,
-              'state': None,
               'commit': 'false'
              }
     for p in params:
@@ -348,35 +342,33 @@ def view_promote(request):
         except:
             pass
 
-    application_id = params['application_id']
-    nodegroup = params['nodegroup']
     deploy_id = params['deploy_id']
     artifact_id = params['artifact_id']
     to_env = params['to_env']
-    state = params['state']
     commit = params['commit']
+
+    if not user['prod_auth'] and to_env == 'prd':
+        to_state = '3'
+    else:
+        to_state = '2'
 
     # Displaying artifact to be stage to prod
     if artifact_id and commit == 'false':
-        if not user['prod_auth'] and to_env == 'prd':
-            to_state = '3'
-        else:
-            to_state = '2'
-
         try:
             promote = t_core.list_promotion(deploy_id, artifact_id)
         except:
             raise
 
     if artifact_id and commit == 'true':
-        if not user['prod_auth'] and to_env == 'prd' and state == '2':
+        if not user['prod_auth'] and to_env == 'prd' and to_state == '2':
             denied = True
             message = 'You do not have permission to perform the promote action on production!'
         else:
             # Actually promoting
             try:
-                promote = t_core.promote(deploy_id, artifact_id, to_env, state, user['ad_login'])
-                return_url = '/deploys?application_id=%s&nodegroup=%s&artifact_id=%s&to_env=%s&state=%s&commit=%s' % (application_id, nodegroup, artifact_id, to_env, state, commit)
+                promote = t_core.promote(deploy_id, artifact_id, to_env, to_state, user['ad_login'])
+                results = t_core.list_app_details_by_deploy(deploy_id)
+                return_url = '/deploys?application_id=%s&nodegroup=%s&artifact_id=%s&to_env=%s&to_state=%s&commit=%s' % (results[0][0], results[0][1], artifact_id, to_env, to_state, commit)
                 return HTTPFound(return_url)
             except:
                 raise
@@ -386,13 +378,10 @@ def view_promote(request):
             'user': user,
             'denied': denied,
             'message': message,
-            'application_id': application_id,
-            'nodegroup': nodegroup,
             'deploy_id': deploy_id,
             'artifact_id': artifact_id,
             'to_env': to_env,
             'to_state': to_state,
-            'state': state,
             'commit': commit,
             'promote': promote,
            }
