@@ -1,6 +1,6 @@
 
-.. image:: https://ci-ops.prod.cs/buildStatus/icon?job=TC_Web-library_Build
-   :target: https://ci-ops.prod.cs/view/Twonicorn/job/TC_Web-library_Build/
+.. image:: https://ci-ops.prod.cs/buildStatus/icon?job=TC_Web_Build
+   :target: https://ci-ops.prod.cs/view/Twonicorn/job/TC_Web_Build/
    :alt: Build Status
 
 Description
