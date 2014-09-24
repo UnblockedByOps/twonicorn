@@ -9,5 +9,5 @@ Description
 This is the pyramid webapp for the Twonicorn web api/ui. It's rich, lives
 in a castle, and can do magic.
 
-   :target: https://twonicorn.ctgrd.com/
-   :alt: twonicorn
+ https://twonicorn.ctgrd.com/
+

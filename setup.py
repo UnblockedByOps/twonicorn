@@ -9,14 +9,14 @@ with open(os.path.join(here, 'CHANGELOG.rst')) as f:
     CHANGELOG = f.read()
 
 requires = [
-    'pyramid',
-    'pyramid_chameleon',
-    'pyramid_debugtoolbar',
-    'waitress',
-    'pyramid_ldap',
-    'python-ldap',
-    'ldappool',
-    'TwonicornWebLib',
+    'pyramid==1.5.1',
+    'pyramid_chameleon==0.3',
+    'pyramid_debugtoolbar==2.2',
+    'waitress==0.8.9',
+    'pyramid_ldap==0.2',
+    'python-ldap==2.4.16',
+    'ldappool==1.0',
+    'TwonicornWebLib==1.1',
     ]
 
 setup(name='TwonicornWeb',
