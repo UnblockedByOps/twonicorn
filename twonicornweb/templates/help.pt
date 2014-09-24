@@ -6,62 +6,66 @@
 
     <h3>GLOSSARY</h3>
 
-    <table>
+    <table width="75%">
       <tr>
         <th>Application</th>
-        <td>An application is defined as a colletion of deploys.</td>
+        <td class="glossary subh_app">An application is defined as a colletion of deploys.</td>
       </tr>
       <tr>
         <th>Deploy</th>
-        <td>blah blah blah</td>
+        <td class="glossary">A sub-component of an application. A deployment defines the what, where and how of how an artifact is installed on a system. It includes things like the type or artifact (war, jar, conf, etc.), how it is downloaded, and where it is installed to on the server.</td>
       </tr>
       <tr>
         <th>Artifact</th>
-        <td>blah blah blah</td>
+        <td class="glossary subh_app">The actual bits that get installed on a system (code, conf, json files, etc).</td>
       </tr>
       <tr>
         <th>Promote</th>
-        <td>blah blah blah</td>
+        <td class="glossary">Marking a deployment as staged or current for a given environment. Authenticated users can mark any artifact as current for dev or qat, and mark qat artifacts as staged for production. Authorized users, controlled by Active Directory group membership, can promote artifacts as current in production, which makes them live and installs them the next time the application restarts. </td>
       </tr>
       <tr>
-        <th>Application</th>
-        <td>blah blah blah</td>
+        <th>Application Name</th>
+        <td class="glossary subh_app">A name humans can talk about to reference the application</td>
       </tr>
       <tr>
         <th>Application ID</th>
-        <td>blah blah blah</td>
+        <td class="glossary">A numerical ID in the twonicorn database that identifies the application.</td>
+      </tr>
+      <tr>
+        <th>Deploy ID</th>
+        <td class="glossary subh_app">A numerical ID in the twonicorn database that identifies the deploy (child) as part of an application (parent).</td>
       </tr>
       <tr>
         <th>Node Group</th>
-        <td>blah blah blah</td>
+        <td class="glossary">The TLA of the node group that the application is installed on. For example: paw</td>
       </tr>
       <tr>
         <th>Deploy Path</th>
-        <td>blah blah blah</td>
+        <td class="glossary subh_app">The path to where the artifact will be installed on the server.</td>
       </tr>
       <tr>
         <th>Revision</th>
-        <td>blah blah blah</td>
+        <td class="glossary">The commit revison in the SCM sytem that the code is stored in (svn, git, etc.)</td>
       </tr>
       <tr>
         <th>Repo</th>
-        <td>blah blah blah</td>
+        <td class="glossary subh_app">The external repository where the artifact is stored and downloaded from (nexus, archiva, git, svn, etc.)</td>
       </tr>
       <tr>
         <th>Artifact Type</th>
-        <td>blah blah blah</td>
+        <td class="glossary">The type of artifact that a given artifact is (conf, jar, war, etc) </td>
       </tr>
       <tr>
         <th>URL Location</th>
-        <td>blah blah blah</td>
-      </tr>
-      <tr>
-        <th>Assignment ID</th>
-        <td>blah blah blah</td>
+        <td class="glossary subh_app">The link to download the artifact in it's repsective repo.</td>
       </tr>
       <tr>
         <th>Artifact ID</th>
-        <td>blah blah blah</td>
+        <td class="glossary">The artifact ID in the twonicorn database. An artifact is inserted into the database only once, then assigned to various environments in a separate table.</td>
+      </tr>
+      <tr>
+        <th>Assignment ID</th>
+        <td class="glossary subh_app">The ID of the artifact assignemnt in the twonicorn database. The assignment ID links an artifact to an environment.</td>
       </tr>
     </table>
 

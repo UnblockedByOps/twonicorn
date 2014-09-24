@@ -361,3 +361,9 @@ ul.user li.user:hover ul.user {
     opacity: 1;
     visibility: visible;
 }
+
+/* Glossary */
+td.glossary {
+    white-space: normal;
+}
+
