@@ -15,7 +15,7 @@ requires = [
     'pyramid_ldap==0.2',
     'python-ldap==2.4.16',
     'ldappool==1.0',
-    'TwonicornWebLib==1.2',
+    'TwonicornWebLib==1.3',
     ]
 
 setup(name='TwonicornWeb',
