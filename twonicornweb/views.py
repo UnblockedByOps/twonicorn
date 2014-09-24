@@ -7,24 +7,27 @@ from pyramid.security import remember, forget
 from pyramid.session import signed_serialize, signed_deserialize
 from pyramid_ldap import get_ldap_connector, groupfinder
 import logging
-log = logging.getLogger(__name__)
 
 
-t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf', '/app/secrets/twonicorn.conf', inject=True)
+t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf',
+                              '/app/secrets/twonicorn.conf',
+                              inject=True)
 t_facts = TwonicornWebLib.tFacter()
+log = logging.getLogger(__name__)
+prod_groups = ['Unix_Team']
+admin_groups = ['Unix_Team']
 denied = ''
-prod_groups = ['CM_Team']
-admin_groups = ['CM_Team']
-
 # Parse the secret config - would like to pass this from __init__.py
 secret_config_file = ConfigParser.ConfigParser()
 secret_config_file.read('/app/secrets/twonicorn.conf')
 cookie_token = secret_config_file.get('cookie', 'token')
 
+
 def site_layout():
     renderer = get_renderer("templates/global_layout.pt")
     layout = renderer.implementation().macros['layout']
     return layout
+
 
 def get_user(request):
     """ Gets all the user information for an authenticated  user. Checks groups
@@ -35,18 +38,27 @@ def get_user(request):
 
     try:
         id = request.authenticated_userid
-        (first,last) = format_user(id)
+        (first, last) = format_user(id)
         groups = format_groups(groupfinder(id, request))
         auth = True
         pretty = "%s %s" % (first, last)
     except Exception, e:
         log.error("%s (%s)" % (Exception, e))
-        (pretty, id, ad_login, groups, first, last, auth, prd_auth, admin_auth) = ('', '', '', '', '', '', False, False, False)
+        (pretty,
+         id,
+         ad_login,
+         groups,
+         first,
+         last,
+         auth,
+         prd_auth,
+         admin_auth) = ('', '', '', '', '', '', False, False, False)
 
     try:
         ad_login = validate_username_cookie(request.cookies['un'])
     except:
-        return HTTPFound('/logout?message=Your cookie has been tampered with. You have been logged out')
+        return HTTPFound('/logout?message=Your cookie has been tampered with.'
+                         'You have been logged out')
 
     # Check if the user is authorized to do stuff to prod
     for a in prod_groups:
@@ -73,12 +85,14 @@ def get_user(request):
 
     return (user)
 
+
 def format_user(user):
     # Make the name readable
-    (last,first,junk) = user.split(',',2)
+    (last, first, junk) = user.split(',', 2)
     last = last.rstrip('\\')
     last = last.strip('CN=')
-    return(first,last)
+    return(first, last)
+
 
 def format_groups(groups):
 
@@ -87,20 +101,22 @@ def format_groups(groups):
         formatted.append(find_between(groups[g], 'CN=', ',OU='))
     return formatted
 
+
 def find_between(s, first, last):
     try:
-        start = s.index( first ) + len( first )
-        end = s.index( last, start )
+        start = s.index(first) + len(first)
+        end = s.index(last, start)
         return s[start:end]
     except ValueError:
         return ""
+
 
 def validate_username_cookie(cookieval):
     """ Returns the username if it validates. Otherwise throws
     an exception"""
 
-#    return signed_deserialize(cookieval, 'titspervert')
     return signed_deserialize(cookieval, cookie_token)
+
 
 @view_config(route_name='logout', renderer='templates/logout.pt')
 def logout(request):
@@ -122,8 +138,9 @@ def logout(request):
     request.response.content_type = 'text/html'
     request.response.charset = 'UTF-8'
     request.response.status = '200 OK'
-    
+
     return {'message': message}
+
 
 @view_config(route_name='login', renderer='templates/login.pt')
 @forbidden_view_config(renderer='templates/login.pt')
@@ -153,7 +170,6 @@ def login(request):
         if data is not None:
             dn = data[0]
             encrypted = signed_serialize(login, cookie_token)
-            #encrypted = signed_serialize(login, 'titspervert')
             headers = remember(request, dn)
             headers.append(('Set-Cookie', 'un=' + str(encrypted) + '; Max-Age=604800; Path=/'))
 
@@ -164,13 +180,13 @@ def login(request):
     if request.authenticated_userid:
 
         if request.path == '/login':
-          error = 'You are already logged in'
-          page_title = 'Already Logged In'
-          denied = True
+            error = 'You are already logged in'
+            page_title = 'Already Logged In'
+            denied = True
         else:
-          error = 'You do not have permission to access this page'
-          page_title = 'Access Denied'
-          denied = True
+            error = 'You do not have permission to access this page'
+            page_title = 'Access Denied'
+            denied = True
 
     return {'layout': site_layout(),
             'page_title': page_title,
@@ -181,6 +197,7 @@ def login(request):
             'error': error,
             'denied': denied,
            }
+
 
 @view_config(route_name='home', permission='view', renderer='templates/home.pt')
 def view_home(request):
@@ -193,6 +210,7 @@ def view_home(request):
             'user': user,
             'denied': denied
            }
+
 
 @view_config(route_name='applications', permission='view', renderer='templates/applications.pt')
 def view_applications(request):
@@ -227,6 +245,7 @@ def view_applications(request):
             'denied': denied,
            }
 
+
 @view_config(route_name='deploys', permission='view', renderer='templates/deploys.pt')
 def view_deploys(request):
 
@@ -243,7 +262,6 @@ def view_deploys(request):
         end = perpage + offset
     except:
         pass
-
 
     params = {'application_id': None,
               'nodegroup': None,
@@ -277,23 +295,23 @@ def view_deploys(request):
     hist_list = None
 
     if application_id:
-        try: 
-            deploys_dev = t_core.list_deploys('dev',application_id,nodegroup)
-            deploys_qat = t_core.list_deploys('qat',application_id,nodegroup)
-            deploys_prd = t_core.list_deploys('prd',application_id,nodegroup)
+        try:
+            deploys_dev = t_core.list_deploys('dev', application_id, nodegroup)
+            deploys_qat = t_core.list_deploys('qat', application_id, nodegroup)
+            deploys_prd = t_core.list_deploys('prd', application_id, nodegroup)
         except:
             raise
     elif nodegroup:
         try:
-            deploys_dev = t_core.list_deploys('dev',application_id,nodegroup)
-            deploys_qat = t_core.list_deploys('qat',application_id,nodegroup)
-            deploys_prd = t_core.list_deploys('prd',application_id,nodegroup)
+            deploys_dev = t_core.list_deploys('dev', application_id, nodegroup)
+            deploys_qat = t_core.list_deploys('qat', application_id, nodegroup)
+            deploys_prd = t_core.list_deploys('prd', application_id, nodegroup)
         except:
             raise
 
     if history:
         try:
-            h_list = t_core.list_history(env,deploy_id)
+            h_list = t_core.list_history(env, deploy_id)
             total = len(h_list)
             hist_list = h_list[offset:end]
         except:
@@ -320,6 +338,7 @@ def view_deploys(request):
             'artifact_id': artifact_id,
             'denied': denied,
            }
+
 
 @view_config(route_name='promote', permission='view', renderer='templates/promote.pt')
 def view_promote(request):
@@ -386,6 +405,7 @@ def view_promote(request):
             'promote': promote,
            }
 
+
 @view_config(route_name='help', permission='view', renderer='templates/help.pt')
 def view_help(request):
 
@@ -398,6 +418,7 @@ def view_help(request):
             'denied': denied
            }
 
+
 @view_config(route_name='user', permission='view', renderer='templates/user.pt')
 def view_user(request):
 
@@ -409,6 +430,7 @@ def view_user(request):
             'user': user,
             'denied': denied,
            }
+
 
 @view_config(route_name='admin', permission='view', renderer='templates/admin.pt')
 def view_admin(request):

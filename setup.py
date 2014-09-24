@@ -3,10 +3,10 @@ import os
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, 'README.txt')) as f:
+with open(os.path.join(here, 'README.rst')) as f:
     README = f.read()
-with open(os.path.join(here, 'CHANGES.txt')) as f:
-    CHANGES = f.read()
+with open(os.path.join(here, 'CHANGELOG.rst')) as f:
+    CHANGELOG = f.read()
 
 requires = [
     'pyramid',
@@ -22,7 +22,7 @@ requires = [
 setup(name='TwonicornWeb',
       version='1.1',
       description='TwonicornWeb',
-      long_description=README + '\n\n' + CHANGES,
+      long_description=README + '\n\n' + CHANGELOG,
       classifiers=[
         "Programming Language :: Python",
         "Framework :: Pyramid",
