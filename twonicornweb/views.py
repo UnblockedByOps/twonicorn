@@ -143,7 +143,7 @@ def login(request):
     elif request.path != '/login':
         return_url = request.url
     else:
-        return_url = '/'
+        return_url = '/applications'
 
     login = ''
     password = ''

@@ -266,13 +266,7 @@
       <div>
         <!--! Default Behavior -->
         <p tal:condition="not: nodegroup">
-          For now you need to select an app from the applications page in order to see deploys.
-          <h3>TODO</h3>
-          <ul>
-           <li>Search for deployments via nodegroup</li>
-           <li>Make table sortable by column</li>
-           <li>Add "Make current for env" column with link to promote artifact within the env</li>
-          </ul>
+          For now you need to select an application from the applications page in order to see deploys.
         </p>
       </div>
 

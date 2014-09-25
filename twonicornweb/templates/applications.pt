@@ -2,12 +2,7 @@
     <div metal:fill-slot="content">
 
     <p>
-      This page should display paginated list of applications
-      <h3>TODO</h3>
-      <ul>
-       <li>search for deployments via nodegroup</li>
-       <li>Make table sortable by column</li>
-      </ul>
+      Please select an application from the list below to see deployments.
     </p>
       
     <div id="app_main">

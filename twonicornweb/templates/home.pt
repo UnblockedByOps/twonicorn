@@ -2,10 +2,6 @@
     <div metal:fill-slot="content">
     <p>
     <span>What should we put on this page?</span>
-    <h3>TODO</h3>
-    <ul>
-     <li>Moar sparkle</li>
-    </ul>
     </p>
 
   </div>
