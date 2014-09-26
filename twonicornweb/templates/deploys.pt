@@ -106,7 +106,7 @@
                                                deploys_qat[item]['artifact_id'],
                                               );
                                          title 'Promote to prd: ' + str(deploys_qat[item]['artifact_id'])"
-                         tal:condition="not deploys_qat[item]['artifact_type'] == 'conf'"
+                         tal:condition="not deploys_qat[item]['artifact_type'] == 'conf' and user.prod_auth"
                          tal:content="'to prd'">promote to prd</a>
             </td>
             <td><a href="http://twonicorn.ctgrd.com/deploys?history=true"
@@ -244,7 +244,7 @@
                       </li>
                       <li tal:condition="(not (env == 'prd' and repeat.item.start and offset == 0)) 
                                           and (not (item['artifact_type'] == 'conf' and (env == 'dev' or env == 'qat'))) 
-                                          and (user.prod_auth or env == 'qat' or env == 'prd')"
+                                          and (user.prod_auth)"
                           tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                         <a tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=prd&commit=false' %
                                                 (item['deploy_id'],

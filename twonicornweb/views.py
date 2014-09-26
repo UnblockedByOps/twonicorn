@@ -13,8 +13,8 @@ log = logging.getLogger(__name__)
 t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf', '/app/secrets/twonicorn.conf', inject=True)
 t_facts = TwonicornWebLib.tFacter()
 denied = ''
-prod_groups = ['CM_Team']
-admin_groups = ['CM_Team']
+prod_groups = ['Unix_Team']
+admin_groups = ['Unix_Team']
 
 # Parse the secret config - would like to pass this from __init__.py
 secret_config_file = ConfigParser.ConfigParser()
