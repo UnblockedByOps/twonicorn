@@ -15,6 +15,8 @@ requires = [
     'pyramid_ldap==0.2',
     'python-ldap==2.4.16',
     'ldappool==1.0',
+    'pysvn',
+    'git',
     'TwonicornLib==1.0',
     ]
 
