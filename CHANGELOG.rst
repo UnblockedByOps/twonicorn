@@ -9,6 +9,10 @@ Next Release (TBD)
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+1.5
+~~~~~~~
+* Moving dependency to TwonicornLib from TwonicornWebLib
+
 1.4
 ~~~~~~~
 * bugfix: fixed bug where promote links were shown for confs.
