@@ -1,4 +1,4 @@
-import TwonicornWebLib
+import TwonicornLib
 import ConfigParser
 from pyramid.view import view_config, forbidden_view_config
 from pyramid.renderers import get_renderer
@@ -10,8 +10,8 @@ import logging
 log = logging.getLogger(__name__)
 
 
-t_core = TwonicornWebLib.Core('/app/twonicorn_web/conf/twonicorn.conf', '/app/secrets/twonicorn.conf', inject=True)
-t_facts = TwonicornWebLib.tFacter()
+t_core = TwonicornLib.Core('/app/twonicorn_web/conf/twonicorn.conf', '/app/secrets/twonicorn.conf', inject=True)
+t_facts = TwonicornLib.tFacter()
 denied = ''
 prod_groups = ['Unix_Team']
 admin_groups = ['Unix_Team']
