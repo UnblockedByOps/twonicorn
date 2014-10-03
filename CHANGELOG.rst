@@ -9,6 +9,10 @@ Next Release (TBD)
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+1.5.1
+~~~~~~~
+* Fixing a bad cut and paste in the qat repeat of deploys.pt
+
 1.5
 ~~~~~~~
 * Moving dependency to TwonicornLib from TwonicornWebLib
