@@ -142,7 +142,7 @@
                    tal:attributes="href deploys_dev[item]['url_location']; title deploys_dev[item]['url_location']"
                    tal:content="deploys_dev[item]['suffix']">Artifacts By nodegroupLink</a></td>
             <td tal:content="deploys_dev[item]['artifact_id']">12345</td>
-            <td tal:content="deploys_dev[item]['artifact_assignment_id']">12345</td>
+            <td tal:content="deploys_qat[item]['artifact_assignment_id']">12345</td>
             <td tal:content="deploys_dev[item]['created']">12345</td>
             <td></td>
             <td><a href="http://twonicorn.ctgrd.com/deploys?history=true"

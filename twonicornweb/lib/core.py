@@ -8,9 +8,9 @@ import datetime
 import ast
 from twonicornweb.lib.tfacter import tFacter
 import datetime
+import logging
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm.exc import NoResultFound
-
 from sqlalchemy import func
 from sqlalchemy.sql import label
 from sqlalchemy import distinct
@@ -29,11 +29,12 @@ from twonicornweb.models import (
     ArtifactTypes,
     RepoUrls,
     )
+log = logging.getLogger(__name__)
 
 
 class Core:
 
-    def __init__(self, config_file, secrets_config_file=None, inject=None):
+    def __init__(self):
 
         # Need this to print the right promote urls in the dev environment
         t_facts = tFacter()
@@ -43,24 +44,6 @@ class Core:
             self.tcw_host = 'twonicorn.dev.ctgrd.com'
         else:
             self.tcw_host = 'twonicorn.ctgrd.com'
-
-    def testing(self):
-        try:
-            #dets = DBSession.query(Detection).join(Detection.detection_system_id).all()
-            ##dets = DBSession.query(Detection).all()
-            dq = DBSession.query(Applications)
-            dq = dq.order_by(Detection.detected.desc())
-            dets = dq.limit(perpage).offset(offset)
-            total = dq.count()
-            page_title = "%s (%d)" % (page_title, total)
-            log.debug(pprint.pformat(dets))
-        except DBAPIError, e:
-            log.debug(str(e))
-            return Response(conn_err_msg, content_type='text/plain', status_int=500)
-        return {'layout': site_layout(),
-                'page_title': page_title,
-                'user': user,
-                'dets': dets, 'perpage': perpage, 'offset': offset, 'total': total }
 
     # INJECT functions
     def env_to_id(self):
@@ -889,13 +872,12 @@ class Core:
     # UI functions
     def list_applications(self):
 
-        # Fetch the list of applications
-        sql = ("""
-            SELECT *
-            FROM applications
-            """)
+        try:
+            apps = DBSession.query(Applications)
+        except DBAPIError, e:
+            log.debug(str(e))
+            return Response(conn_err_msg, content_type='text/plain', status_int=500)
 
-        apps = self.db_sa.query_db(sql)
         return apps
 
     def list_deploys(self, env, application_id=None, nodegroup=None):
