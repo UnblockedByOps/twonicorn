@@ -11,15 +11,19 @@ requires = [
     'pyramid==1.5.1',
     'pyramid_chameleon==0.3',
     'pyramid_debugtoolbar==2.2',
-    'waitress==0.8.9',
     'pyramid_ldap==0.2',
+    'waitress==0.8.9',
+    'SQLAlchemy==0.9.7',
+    'transaction==1.4.3',
+    'zope.sqlalchemy==0.7.5',
     'python-ldap==2.4.16',
     'ldappool==1.0',
-    'TwonicornLib',
+    'requests==2.3.0',
+    'arrow==0.4.4',
     ]
 
 setup(name='TwonicornWeb',
-      version='1.5.1',
+      version='1.6',
       description='TwonicornWeb',
       long_description=README + '\n\n' + CHANGELOG,
       classifiers=[
@@ -41,5 +45,7 @@ setup(name='TwonicornWeb',
       entry_points="""\
       [paste.app_factory]
       main = twonicornweb:main
+      [console_scripts]
+      initialize_twonicorn-web_db = twonicornweb.scripts.initializedb:main
       """,
       )
