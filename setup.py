@@ -11,6 +11,7 @@ requires = [
     'pyramid==1.5.1',
     'pyramid_chameleon==0.3',
     'pyramid_debugtoolbar==2.2',
+    'pyramid-tm==0.7',
     'pyramid_ldap==0.2',
     'waitress==0.8.9',
     'SQLAlchemy==0.9.7',
