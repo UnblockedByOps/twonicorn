@@ -315,173 +315,181 @@ class Core:
         self.artifact_deployments = {}
         self.todo_dict = {}
         self.todo_list = []
+#        print "DEPLOY DATA: ", deploy_data
+#        print type(deploy_data)
+        for deploy in deploy_data:
+            print deploy.deploy_id
+            print deploy.application_id
+            print deploy.artifact_type_id
+            print deploy.deploy_path
+            print deploy.created
 
-        if limit:
-            lim = 'LIMIT 1'
-        else:
-            lim = ''
-
-        # Fetch our deployment data for all deploys
-        for index in range(len(deploy_data)):
-            deployment = deploy_data[index]
-            deploy_id = deployment[0]
-
-            # If we passed an artifact id in the deploy data, use it and modify
-            # the sql because we're doing promoions
-            if len(deployment) == 2:
-                artifact_id = deployment[1]
-
-                sql = ("""
-                    SELECT d.application_id,
-                        d.deploy_id,
-                        a.artifact_id,
-                        aa.artifact_assignment_id,
-                        aaa.application_name,
-                        a.created,
-                        d.deploy_path,
-                        u.url url,
-                        a.location,
-                        a.revision,
-                        a.branch,
-                        at.name artifact_type,
-                        rt.name repo_type,
-                        r.name repo
-                    FROM deploys d
-                        JOIN applications aaa USING (application_id)
-                        JOIN artifact_assignments aa USING (deploy_id)
-                        JOIN envs e USING (env_id)
-                        JOIN lifecycles l USING (lifecycle_id)
-                        JOIN artifacts a USING (artifact_id)
-                        JOIN artifact_types at USING (artifact_type_id)
-                        JOIN repos r USING (repo_id)
-                        JOIN repo_types rt USING (repo_type_id)
-                        JOIN repo_urls u USING (repo_id)
-                    WHERE deploy_id=%s
-                        AND a.artifact_id='%s'
-                        AND u.ct_loc='%s' %s
-                """ % (deploy_id, artifact_id, self.ct_loc, lim))
-
-            else:
-
-                sql = ("""
-                    SELECT d.application_id,
-                        d.deploy_id,
-                        aa.artifact_id,
-                        aa.artifact_assignment_id,
-                        aaa.application_name,
-                        aa.created,
-                        d.deploy_path,
-                        u.url url,
-                        a.location,
-                        a.revision,
-                        a.branch,
-                        at.name artifact_type,
-                        rt.name repo_type,
-                        r.name repo
-                    FROM deploys d
-                        JOIN applications aaa USING (application_id)
-                        JOIN artifact_assignments aa USING (deploy_id)
-                        JOIN envs e USING (env_id)
-                        JOIN lifecycles l USING (lifecycle_id)
-                        JOIN artifacts a USING (artifact_id)
-                        JOIN artifact_types at USING (artifact_type_id)
-                        JOIN repos r USING (repo_id)
-                        JOIN repo_types rt USING (repo_type_id)
-                        JOIN repo_urls u USING (repo_id)
-                    WHERE deploy_id=%s
-                        AND l.name='current'
-                        AND e.name='%s'
-                        AND a.valid=1
-                        AND u.ct_loc='%s'
-                    ORDER BY aa.created DESC %s
-                """ % (deploy_id, self.ct_env, self.ct_loc, lim))
-
-            deployment_data = self.db_sa.query_db(sql)
-
-            if not deployment_data:
-                deployment_data = [(str(deploy_id),
-                                    "No Data",
-                                    "No Data",
-                                    "No Data",
-                                    "No Data",
-                                    "No Data",
-                                    "No Data",
-                                    "No Data",
-                                    "No Data",
-                                    "No Data",
-                                    "No Data",
-                                    "No Data",
-                                    "No Data",
-                                    "No Data")]
-
-            logging.debug('Deployment Data: %s' % deployment_data)
-
-            for index in range(len(deployment_data)):
-
-                # Store all the info for the deployment for use in a minute.
-                (application_id,
-                 deploy_id,
-                 artifact_id,
-                 artifact_assignment_id,
-                 application_name,
-                 created,
-                 deploy_path,
-                 url,
-                 location,
-                 revision,
-                 branch,
-                 artifact_type,
-                 repo_type,
-                 repo) = deployment_data[index]
-
-                dict = {
-                    'application_id': application_id,
-                    'deploy_id': deploy_id,
-                    'artifact_id': artifact_id,
-                    'artifact_assignment_id': artifact_assignment_id,
-                    'application_name': application_name,
-                    'created': created,
-                    'deploy_path': deploy_path,
-                    'url': url,
-                    'location': location,
-                    'url_location': url + location,
-                    'suffix': location.split('/',)[-1],
-                    'revision': revision,
-                    'branch': branch,
-                    'artifact_type': artifact_type,
-                    'repo_type': repo_type,
-                    'repo': repo,
-                    'env': self.ct_env
-                }
-
-                if limit:
-                    self.todo_dict[deploy_id] = dict
-                else:
-                    self.todo_list.append(dict)
-
-                logging.debug('deploy_id=%s,,artifact_id=%s,'
-                              'artifact_assignment_id=%s,application_name=%s,'
-                              'deploy_path=%s,url=%s,location=%s,'
-                              'url_location=%s,revision=%s,branch=%s,'
-                              'artifact_type=%s,repo_type=%s,repo=%s'
-                              % (deploy_id,
-                                 artifact_id,
-                                 artifact_assignment_id,
-                                 application_name,
-                                 deploy_path,
-                                 url,
-                                 location,
-                                 url + location,
-                                 revision,
-                                 branch,
-                                 artifact_type,
-                                 repo_type,
-                                 repo))
-
-            # Add all the artifact assignement ids to a list to compare
-            # with the manifest.
-            self.artifact_deployments[deploy_id] = (
-                artifact_assignment_id)
+#        if limit:
+#            lim = 'LIMIT 1'
+#        else:
+#            lim = ''
+#
+#        # Fetch our deployment data for all deploys
+#        for index in range(len(deploy_data)):
+#            deployment = deploy_data[index]
+#            deploy_id = deployment[0]
+#
+#            # If we passed an artifact id in the deploy data, use it and modify
+#            # the sql because we're doing promoions
+#            if len(deployment) == 2:
+#                artifact_id = deployment[1]
+#
+#                sql = ("""
+#                    SELECT d.application_id,
+#                        d.deploy_id,
+#                        a.artifact_id,
+#                        aa.artifact_assignment_id,
+#                        aaa.application_name,
+#                        a.created,
+#                        d.deploy_path,
+#                        u.url url,
+#                        a.location,
+#                        a.revision,
+#                        a.branch,
+#                        at.name artifact_type,
+#                        rt.name repo_type,
+#                        r.name repo
+#                    FROM deploys d
+#                        JOIN applications aaa USING (application_id)
+#                        JOIN artifact_assignments aa USING (deploy_id)
+#                        JOIN envs e USING (env_id)
+#                        JOIN lifecycles l USING (lifecycle_id)
+#                        JOIN artifacts a USING (artifact_id)
+#                        JOIN artifact_types at USING (artifact_type_id)
+#                        JOIN repos r USING (repo_id)
+#                        JOIN repo_types rt USING (repo_type_id)
+#                        JOIN repo_urls u USING (repo_id)
+#                    WHERE deploy_id=%s
+#                        AND a.artifact_id='%s'
+#                        AND u.ct_loc='%s' %s
+#                """ % (deploy_id, artifact_id, self.ct_loc, lim))
+#
+#            else:
+#
+#                sql = ("""
+#                    SELECT d.application_id,
+#                        d.deploy_id,
+#                        aa.artifact_id,
+#                        aa.artifact_assignment_id,
+#                        aaa.application_name,
+#                        aa.created,
+#                        d.deploy_path,
+#                        u.url url,
+#                        a.location,
+#                        a.revision,
+#                        a.branch,
+#                        at.name artifact_type,
+#                        rt.name repo_type,
+#                        r.name repo
+#                    FROM deploys d
+#                        JOIN applications aaa USING (application_id)
+#                        JOIN artifact_assignments aa USING (deploy_id)
+#                        JOIN envs e USING (env_id)
+#                        JOIN lifecycles l USING (lifecycle_id)
+#                        JOIN artifacts a USING (artifact_id)
+#                        JOIN artifact_types at USING (artifact_type_id)
+#                        JOIN repos r USING (repo_id)
+#                        JOIN repo_types rt USING (repo_type_id)
+#                        JOIN repo_urls u USING (repo_id)
+#                    WHERE deploy_id=%s
+#                        AND l.name='current'
+#                        AND e.name='%s'
+#                        AND a.valid=1
+#                        AND u.ct_loc='%s'
+#                    ORDER BY aa.created DESC %s
+#                """ % (deploy_id, self.ct_env, self.ct_loc, lim))
+#
+#            deployment_data = self.db_sa.query_db(sql)
+#
+#            if not deployment_data:
+#                deployment_data = [(str(deploy_id),
+#                                    "No Data",
+#                                    "No Data",
+#                                    "No Data",
+#                                    "No Data",
+#                                    "No Data",
+#                                    "No Data",
+#                                    "No Data",
+#                                    "No Data",
+#                                    "No Data",
+#                                    "No Data",
+#                                    "No Data",
+#                                    "No Data",
+#                                    "No Data")]
+#
+#            logging.debug('Deployment Data: %s' % deployment_data)
+#
+#            for index in range(len(deployment_data)):
+#
+#                # Store all the info for the deployment for use in a minute.
+#                (application_id,
+#                 deploy_id,
+#                 artifact_id,
+#                 artifact_assignment_id,
+#                 application_name,
+#                 created,
+#                 deploy_path,
+#                 url,
+#                 location,
+#                 revision,
+#                 branch,
+#                 artifact_type,
+#                 repo_type,
+#                 repo) = deployment_data[index]
+#
+#                dict = {
+#                    'application_id': application_id,
+#                    'deploy_id': deploy_id,
+#                    'artifact_id': artifact_id,
+#                    'artifact_assignment_id': artifact_assignment_id,
+#                    'application_name': application_name,
+#                    'created': created,
+#                    'deploy_path': deploy_path,
+#                    'url': url,
+#                    'location': location,
+#                    'url_location': url + location,
+#                    'suffix': location.split('/',)[-1],
+#                    'revision': revision,
+#                    'branch': branch,
+#                    'artifact_type': artifact_type,
+#                    'repo_type': repo_type,
+#                    'repo': repo,
+#                    'env': self.ct_env
+#                }
+#
+#                if limit:
+#                    self.todo_dict[deploy_id] = dict
+#                else:
+#                    self.todo_list.append(dict)
+#
+#                logging.debug('deploy_id=%s,,artifact_id=%s,'
+#                              'artifact_assignment_id=%s,application_name=%s,'
+#                              'deploy_path=%s,url=%s,location=%s,'
+#                              'url_location=%s,revision=%s,branch=%s,'
+#                              'artifact_type=%s,repo_type=%s,repo=%s'
+#                              % (deploy_id,
+#                                 artifact_id,
+#                                 artifact_assignment_id,
+#                                 application_name,
+#                                 deploy_path,
+#                                 url,
+#                                 location,
+#                                 url + location,
+#                                 revision,
+#                                 branch,
+#                                 artifact_type,
+#                                 repo_type,
+#                                 repo))
+#
+#            # Add all the artifact assignement ids to a list to compare
+#            # with the manifest.
+#            self.artifact_deployments[deploy_id] = (
+#                artifact_assignment_id)
 
     def check_manifest(self):
 
@@ -874,42 +882,21 @@ class Core:
 
         try:
             apps = DBSession.query(Applications)
+            return apps
         except DBAPIError, e:
             log.debug(str(e))
-            return Response(conn_err_msg, content_type='text/plain', status_int=500)
+            raise
 
-        return apps
 
-    def list_deploys(self, env, application_id=None, nodegroup=None):
+    def list_deploys(self, env, application_id=None):
 
         self.ct_env = env
-
-        if application_id:
-            # Fetch the list of deploys
-            sql = ("""
-                SELECT deploy_id
-                FROM deploys
-                WHERE application_id = '%s'
-                """ % (application_id))
-        elif nodegroup:
-            # Fetch the list of deploys
-            sql = ("""
-                SELECT deploy_id
-                FROM deploys
-                WHERE application_id in (
-                    select application_id
-                    from applications
-                    where nodegroup='%s'
-                )
-                """ % (nodegroup))
-        else:
-            print "you suck"
-
-        deploys = self.db_sa.query_db(sql)
-
         # We hard code lax1 as the location so all the urls will be relevant
         # in the office/vpn
         self.ct_loc = 'lax1'
+
+        deploys = DBSession.query(Deploys)
+        deploys = deploys.filter(Deploys.application_id == '%s' % application_id).all()
 
         self.get_artifact_details(deploys, limit='True')
 

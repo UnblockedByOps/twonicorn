@@ -4,6 +4,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember, forget
 from pyramid.session import signed_serialize, signed_deserialize
 from pyramid_ldap import get_ldap_connector, groupfinder
+from pyramid.response import Response
 import twonicornweb.lib
 import ConfigParser
 import logging
@@ -98,7 +99,6 @@ def validate_username_cookie(cookieval):
     """ Returns the username if it validates. Otherwise throws
     an exception"""
 
-#    return signed_deserialize(cookieval, 'titspervert')
     return signed_deserialize(cookieval, cookie_token)
 
 @view_config(route_name='logout', renderer='twonicornweb:templates/logout.pt')
@@ -217,7 +217,8 @@ def view_applications(request):
         total = apps.count()
         applications = apps.limit(perpage).offset(offset)
     except:
-        raise
+        return Response(conn_err_msg, content_type='text/plain', status_int=500)
+
 
     return {'layout': site_layout(),
             'page_title': page_title,
