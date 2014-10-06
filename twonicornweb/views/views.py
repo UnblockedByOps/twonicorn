@@ -7,30 +7,9 @@ from pyramid_ldap import get_ldap_connector, groupfinder
 import twonicornweb.lib
 import ConfigParser
 import logging
-import datetime
-from sqlalchemy.exc import DBAPIError
-from sqlalchemy.orm.exc import NoResultFound
-
-from sqlalchemy import func
-from sqlalchemy.sql import label
-from sqlalchemy import distinct
-from sqlalchemy import or_
-from twonicornweb.models import (
-    Applications,
-    Deploys,
-    Artifacts,
-    ArtifactAssignments,
-    ArtifactNotes,
-    Lifecycles,
-    Envs,
-    Repos,
-    RepoTypes,
-    ArtifactTypes,
-    RepoUrls,
-    )
 
 log = logging.getLogger(__name__)
-t_core = twonicornweb.lib.Core('/app/twonicorn_web/conf/twonicorn.conf', '/app/secrets/twonicorn.conf', inject=True)
+t_core = twonicornweb.lib.Core()
 t_facts = twonicornweb.lib.tFacter()
 denied = ''
 prod_groups = ['Unix_Team'] # Need to make these configurable
@@ -227,21 +206,19 @@ def view_applications(request):
 
     perpage = 10
     offset = 0
-    end = 10
 
     try:
         offset = int(request.GET.getone("start"))
-        end = perpage + offset
     except:
         pass
 
     try:
         apps = t_core.list_applications()
-        total = len(apps)
-        applications = apps[offset:end]
-
+        total = apps.count()
+        applications = apps.limit(perpage).offset(offset)
     except:
         raise
+
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
