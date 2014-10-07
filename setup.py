@@ -13,6 +13,7 @@ requires = [
     'pyramid_debugtoolbar==2.2',
     'pyramid-tm==0.7',
     'pyramid_ldap==0.2',
+    'pyramid-mako==1.0.2',
     'waitress==0.8.9',
     'SQLAlchemy==0.9.7',
     'mysql-connector-python',
