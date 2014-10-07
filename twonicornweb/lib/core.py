@@ -18,17 +18,17 @@ from sqlalchemy import or_
 from sqlalchemy import desc
 from twonicornweb.models import (
     DBSession,
-    Applications,
-    Deploys,
-    Artifacts,
-    ArtifactAssignments,
-    ArtifactNotes,
-    Lifecycles,
-    Envs,
-    Repos,
-    RepoTypes,
-    ArtifactTypes,
-    RepoUrls,
+    Application,
+    Deploy,
+    Artifact,
+    ArtifactAssignment,
+    ArtifactNote,
+    Lifecycle,
+    Env,
+    Repo,
+    RepoType,
+    ArtifactType,
+    RepoUrl,
     )
 log = logging.getLogger(__name__)
 
@@ -49,8 +49,8 @@ class Core:
     # INJECT functions
     def env_to_id(self, env_name):
 
-        envs = DBSession.query(Envs)
-        envs = envs.filter(Envs.name == '%s' % env_name).first()
+        envs = DBSession.query(Env)
+        envs = envs.filter(Env.name == '%s' % env_name).first()
 
         return envs.env_id
 
@@ -296,8 +296,9 @@ class Core:
 
     # DEPLOY functions
     def get_application_deploys(self, application_id):
-        deploys = DBSession.query(Deploys)
-        deploys = deploys.filter(Deploys.application_id == '%s' % application_id).all()
+        deploys = DBSession.query(Deploy)
+        deploys = deploys.filter(Deploy.application_id == '%s' % application_id).all()
+#        This function was also doing this, which needs to be moved to the righ place:
 #        self.get_artifact_details(deploy_data)
 
         return deploys
@@ -310,42 +311,24 @@ class Core:
         self.todo_list = []
 
         for deploy in deploy_data:
-            print deploy.deploy_id
-            print deploy.application_id
-            print deploy.artifact_type_id
-            print deploy.deploy_path
-            print deploy.created
+            #print deploy.deploy_id
+            #print deploy.application_id
+            #print deploy.artifact_type_id
+            #print deploy.deploy_path
+            #print deploy.created
 
-                                #join(Applications, Applications.application_id==Deploys.application_id).\
-
-#            deploys = DBSession.query(Deploys, Applications, ArtifactAssignments, Envs, Lifecycles, Artifacts, ArtifactTypes, Repos, RepoTypes, RepoUrls).\
-#                                join(Applications, Applications.application_id==Deploys.application_id).\
-#                                join(ArtifactAssignments, ArtifactAssignments.deploy_id==Deploys.deploy_id ).\
-#                                join(Envs, Envs.env_id==ArtifactAssignments.env_id).\
-#                                join(Lifecycles, Lifecycles.lifecycle_id==ArtifactAssignments.lifecycle_id).\
-#                                join(Artifacts, Artifacts.artifact_id==ArtifactAssignments.artifact_id).\
-#                                join(ArtifactTypes, ArtifactTypes.artifact_type_id==Deploys.artifact_type_id).\
-#                                join(Repos, Repos.repo_id==Artifacts.repo_id).\
-#                                join(RepoTypes, RepoTypes.repo_type_id==Repos.repo_type_id).\
-#                                join(RepoUrls, RepoUrls.repo_id==Artifacts.repo_id).\
-#                                filter(Deploys.deploy_id == '%s' % deploy.deploy_id).\
-#                                filter(Lifecycles.name == 'current').\
-#                                filter(Envs.name == 'dev').\
-#                                filter(Artifacts.valid == 1).\
-#                                filter(RepoUrls.ct_loc == 'lax1').\
-#                                order_by(desc(ArtifactAssignments.created)).\
-#                                first()
-
-            dep = DBSession.query(Deploys,).\
-                            filter(Deploys.deploy_id == '%s' % deploy.deploy_id).\
-                            filter(Lifecycles.name == 'current').\
-                            filter(Envs.name == 'dev').\
-                            filter(Artifacts.valid == 1).\
-                            filter(RepoUrls.ct_loc == 'lax1').\
-                            order_by(desc(ArtifactAssignments.created)).\
+            dep = DBSession.query(Deploy, ArtifactAssignment).\
+                            filter(Deploy.deploy_id == '%s' % deploy.deploy_id).\
+                            filter(Lifecycle.name == 'current').\
+                            filter(Env.name == 'dev').\
+                            filter(Artifact.valid == 1).\
+                            filter(RepoUrl.ct_loc == 'lax1').\
+                            order_by(desc(ArtifactAssignment.created)).\
                             first()
 
-            print type(dep)
+            print "SHIT: ", dep[0].artifact_id
+
+            #print type(dep)
             print "DEEEPLOOOYYY: ", dep
 
 
