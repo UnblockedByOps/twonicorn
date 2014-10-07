@@ -37,10 +37,8 @@ class Application(Base):
 class Deploy(Base):
     __tablename__ = 'deploys'
     deploy_id        = Column(Integer, primary_key=True, nullable=False)
-    application_id   = Column(Integer, nullable=False,
-                              ForeignKey('applications.application_id'))
-    artifact_type_id = Column(Integer, nullable=False,
-                              ForeignKey('artifacts.artifact_id'))
+    application_id   = Column(Integer, ForeignKey('applications.application_id'), nullable=False)
+    artifact_type_id = Column(Integer, ForeignKey('artifacts.artifact_id'), nullable=False)
     deploy_path      = Column(Text, nullable=False)
     created          = Column(TIMESTAMP, nullable=False)
     application      = relationship("Application", backref=backref('deploys'))
@@ -49,8 +47,7 @@ class Deploy(Base):
 class Artifact(Base):
     __tablename__ = 'artifacts'
     artifact_id = Column(Integer, primary_key=True, nullable=False)
-    repo_id     = Column(Integer, nullable=False,
-                         ForeignKey('repos.repo_id'))
+    repo_id     = Column(Integer, ForeignKey('repos.repo_id'), nullable=False)
     location    = Column(Text, nullable=False)
     revision    = Column(Text, nullable=False)
     branch      = Column(Text)
@@ -61,14 +58,10 @@ class Artifact(Base):
 class ArtifactAssignment(Base):
     __tablename__     = 'artifact_assignments'
     artifact_assignment_id = Column(Integer, primary_key=True, nullable=False)
-    deploy_id              = Column(Integer, nullable=False,
-                                    ForeignKey('deploys.deploy_id'))
-    env_id                 = Column(Integer, nullable=False,
-                                    ForeignKey('envs.env_id'))
-    lifecycle_id           = Column(Integer, nullable=False,
-                                    ForeignKey('lifecycles.lifecycle_id'))
-    artifact_id            = Column(Integer, nullable=False,
-                                    ForeignKey('artifacts.artifact_id'))
+    deploy_id              = Column(Integer, ForeignKey('deploys.deploy_id'), nullable=False)
+    env_id                 = Column(Integer, ForeignKey('envs.env_id'), nullable=False)
+    lifecycle_id           = Column(Integer, ForeignKey('lifecycles.lifecycle_id'), nullable=False)
+    artifact_id            = Column(Integer, ForeignKey('artifacts.artifact_id'), nullable=False)
     user                   = Column(Text, nullable=False)
     created                = Column(TIMESTAMP, nullable=False)
     deploy                 = relationship("Deploy", backref=backref('artifact_assignments'))
@@ -78,8 +71,7 @@ class ArtifactAssignment(Base):
 class ArtifactNote(Base):
     __tablename__ = 'artifact_notes'
     artifact_note_id = Column(Integer, primary_key=True, nullable=False)
-    artifact_id      = Column(Integer, nullable=False,
-                              ForeignKey('artifacts.artifact_id'))
+    artifact_id      = Column(Integer, ForeignKey('artifacts.artifact_id'), nullable=False)
     user             = Column(Text, nullable=False)
     note             = Column(Text, nullable=False)
     created          = Column(TIMESTAMP, nullable=False)
@@ -103,8 +95,7 @@ class Env(Base):
 class Repo(Base):
     __tablename__ = 'repos'
     repo_id      = Column(Integer, primary_key=True, nullable=False)
-    repo_type_id = Column(Integer, nullable=False,
-                          ForeignKey('repo_types.repo_type_id'))
+    repo_type_id = Column(Integer, ForeignKey('repo_types.repo_type_id'), nullable=False)
     name         = Column(Text, nullable=False)
     artifacts    = relationship("Artifact", backref=backref('repos'))
 
@@ -125,8 +116,7 @@ class ArtifactType(Base):
 class RepoUrl(Base):
     __tablename__ = 'repo_urls'
     repo_url_id = Column(Integer, primary_key=True, nullable=False)
-    repo_id     = Column(Integer, nullable=False,
-                         ForeignKey('repos.repo_id'))
+    repo_id     = Column(Integer, ForeignKey('repos.repo_id'), nullable=False)
     ct_loc      = Column(Text, nullable=False)
     url         = Column(Text, nullable=False)
     repo        = relationship("Repo", backref=backref('url'))
