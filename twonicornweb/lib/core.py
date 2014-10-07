@@ -318,26 +318,35 @@ class Core:
 
                                 #join(Applications, Applications.application_id==Deploys.application_id).\
 
-            deploys = DBSession.query(Deploys, Applications, ArtifactAssignments, Envs, Lifecycles, Artifacts, ArtifactTypes, Repos, RepoTypes, RepoUrls).\
-                                join(Applications, Applications.application_id==Deploys.application_id).\
-                                join(ArtifactAssignments, ArtifactAssignments.deploy_id==Deploys.deploy_id ).\
-                                join(Envs, Envs.env_id==ArtifactAssignments.env_id).\
-                                join(Lifecycles, Lifecycles.lifecycle_id==ArtifactAssignments.lifecycle_id).\
-                                join(Artifacts, Artifacts.artifact_id==ArtifactAssignments.artifact_id).\
-                                join(ArtifactTypes, ArtifactTypes.artifact_type_id==Deploys.artifact_type_id).\
-                                join(Repos, Repos.repo_id==Artifacts.repo_id).\
-                                join(RepoTypes, RepoTypes.repo_type_id==Repos.repo_type_id).\
-                                join(RepoUrls, RepoUrls.repo_id==Artifacts.repo_id).\
-                                filter(Deploys.deploy_id == '%s' % deploy.deploy_id).\
-                                filter(Lifecycles.name == 'current').\
-                                filter(Envs.name == 'dev').\
-                                filter(Artifacts.valid == 1).\
-                                filter(RepoUrls.ct_loc == 'lax1').\
-                                order_by(desc(ArtifactAssignments.created)).\
-                                first()
+#            deploys = DBSession.query(Deploys, Applications, ArtifactAssignments, Envs, Lifecycles, Artifacts, ArtifactTypes, Repos, RepoTypes, RepoUrls).\
+#                                join(Applications, Applications.application_id==Deploys.application_id).\
+#                                join(ArtifactAssignments, ArtifactAssignments.deploy_id==Deploys.deploy_id ).\
+#                                join(Envs, Envs.env_id==ArtifactAssignments.env_id).\
+#                                join(Lifecycles, Lifecycles.lifecycle_id==ArtifactAssignments.lifecycle_id).\
+#                                join(Artifacts, Artifacts.artifact_id==ArtifactAssignments.artifact_id).\
+#                                join(ArtifactTypes, ArtifactTypes.artifact_type_id==Deploys.artifact_type_id).\
+#                                join(Repos, Repos.repo_id==Artifacts.repo_id).\
+#                                join(RepoTypes, RepoTypes.repo_type_id==Repos.repo_type_id).\
+#                                join(RepoUrls, RepoUrls.repo_id==Artifacts.repo_id).\
+#                                filter(Deploys.deploy_id == '%s' % deploy.deploy_id).\
+#                                filter(Lifecycles.name == 'current').\
+#                                filter(Envs.name == 'dev').\
+#                                filter(Artifacts.valid == 1).\
+#                                filter(RepoUrls.ct_loc == 'lax1').\
+#                                order_by(desc(ArtifactAssignments.created)).\
+#                                first()
 
-            print type(deploys)
-            print "DEEEPLOOOYYY: ", deploys
+            dep = DBSession.query(Deploys,).\
+                            filter(Deploys.deploy_id == '%s' % deploy.deploy_id).\
+                            filter(Lifecycles.name == 'current').\
+                            filter(Envs.name == 'dev').\
+                            filter(Artifacts.valid == 1).\
+                            filter(RepoUrls.ct_loc == 'lax1').\
+                            order_by(desc(ArtifactAssignments.created)).\
+                            first()
+
+            print type(dep)
+            print "DEEEPLOOOYYY: ", dep
 
 
 #                sql = ("""
