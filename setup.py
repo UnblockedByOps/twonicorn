@@ -14,6 +14,7 @@ requires = [
     'pyramid-tm==0.7',
     'pyramid_ldap==0.2',
     'pyramid-mako==1.0.2',
+    'Pygments==1.6',
     'waitress==0.8.9',
     'SQLAlchemy==0.9.7',
     'mysql-connector-python',
