@@ -34,16 +34,6 @@ class Application(Base):
     created          = Column(TIMESTAMP, nullable=False)
 
 
-class Deploy(Base):
-    __tablename__ = 'deploys'
-    deploy_id        = Column(Integer, primary_key=True, nullable=False)
-    application_id   = Column(Integer, ForeignKey('applications.application_id'), nullable=False)
-    artifact_type_id = Column(Integer, ForeignKey('artifacts.artifact_id'), nullable=False)
-    deploy_path      = Column(Text, nullable=False)
-    created          = Column(TIMESTAMP, nullable=False)
-    application      = relationship("Application", backref=backref('deploys'))
-
-
 class Artifact(Base):
     __tablename__ = 'artifacts'
     artifact_id = Column(Integer, primary_key=True, nullable=False)
@@ -64,8 +54,24 @@ class ArtifactAssignment(Base):
     artifact_id            = Column(Integer, ForeignKey('artifacts.artifact_id'), nullable=False)
     user                   = Column(Text, nullable=False)
     created                = Column(TIMESTAMP, nullable=False)
-    deploy                 = relationship("Deploy", backref=backref('artifact_assignments'))
+#    deploy                 = relationship("Deploy", backref=backref('artifact_assignments'),
+#                                          order_by=self.created.desc,
+#                                          lazy="dynamic")
     artifact               = relationship("Artifact", backref=backref('artifact_assignments'))
+
+
+
+class Deploy(Base):
+    __tablename__ = 'deploys'
+    deploy_id        = Column(Integer, primary_key=True, nullable=False)
+    application_id   = Column(Integer, ForeignKey('applications.application_id'), nullable=False)
+    artifact_type_id = Column(Integer, ForeignKey('artifacts.artifact_id'), nullable=False)
+    deploy_path      = Column(Text, nullable=False)
+    created          = Column(TIMESTAMP, nullable=False)
+    application      = relationship("Application", backref=backref('deploys'))
+    artifact_assignments = relationship("ArtifactAssignment", backref=backref('deploy'),
+                                          order_by=ArtifactAssignment.created.desc,
+                                          lazy="dynamic")
 
 
 class ArtifactNote(Base):
@@ -97,7 +103,7 @@ class Repo(Base):
     repo_id      = Column(Integer, primary_key=True, nullable=False)
     repo_type_id = Column(Integer, ForeignKey('repo_types.repo_type_id'), nullable=False)
     name         = Column(Text, nullable=False)
-    artifacts    = relationship("Artifact", backref=backref('repos'))
+    artifacts    = relationship("Artifact", backref=backref('repo'))
 
 
 class RepoType(Base):
