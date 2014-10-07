@@ -15,6 +15,7 @@ from sqlalchemy import func
 from sqlalchemy.sql import label
 from sqlalchemy import distinct
 from sqlalchemy import or_
+from sqlalchemy import desc
 from twonicornweb.models import (
     DBSession,
     Applications,
@@ -46,16 +47,12 @@ class Core:
             self.tcw_host = 'twonicorn.ctgrd.com'
 
     # INJECT functions
-    def env_to_id(self):
+    def env_to_id(self, env_name):
 
-        # Convert the env name to the id
-        sql = ("""
-            SELECT env_id
-              FROM envs
-             WHERE name='%s'
-        """ % (self.env))
-        results = self.db_so.query_db(sql)
-        self.env_id = str(results[0])
+        envs = DBSession.query(Envs)
+        envs = envs.filter(Envs.name == '%s' % env_name).first()
+
+        return envs.env_id
 
     def insert_artifact(self):
 
@@ -278,7 +275,7 @@ class Core:
         self.user = user
         self.ct_loc = ct_loc
 
-        self.env_to_id()
+        self.env_id = self.env_to_id(environment)
 
         self.insert_artifact()
 
@@ -298,25 +295,20 @@ class Core:
             self.assign_artifact_conf()
 
     # DEPLOY functions
-    def get_application_deploys(self):
+    def get_application_deploys(self, application_id):
+        deploys = DBSession.query(Deploys)
+        deploys = deploys.filter(Deploys.application_id == '%s' % application_id).all()
+#        self.get_artifact_details(deploy_data)
 
-        # Fetch the list of deploys for the application
-        sql = ("""
-            SELECT deploy_id
-            FROM deploys
-            WHERE application_id = '%s'
-            """ % (self.application_id))
+        return deploys
 
-        deploy_data = self.db_sa.query_db(sql)
-        self.get_artifact_details(deploy_data)
 
     def get_artifact_details(self, deploy_data, limit=None):
 
         self.artifact_deployments = {}
         self.todo_dict = {}
         self.todo_list = []
-#        print "DEPLOY DATA: ", deploy_data
-#        print type(deploy_data)
+
         for deploy in deploy_data:
             print deploy.deploy_id
             print deploy.application_id
@@ -324,53 +316,30 @@ class Core:
             print deploy.deploy_path
             print deploy.created
 
-#        if limit:
-#            lim = 'LIMIT 1'
-#        else:
-#            lim = ''
-#
-#        # Fetch our deployment data for all deploys
-#        for index in range(len(deploy_data)):
-#            deployment = deploy_data[index]
-#            deploy_id = deployment[0]
-#
-#            # If we passed an artifact id in the deploy data, use it and modify
-#            # the sql because we're doing promoions
-#            if len(deployment) == 2:
-#                artifact_id = deployment[1]
-#
-#                sql = ("""
-#                    SELECT d.application_id,
-#                        d.deploy_id,
-#                        a.artifact_id,
-#                        aa.artifact_assignment_id,
-#                        aaa.application_name,
-#                        a.created,
-#                        d.deploy_path,
-#                        u.url url,
-#                        a.location,
-#                        a.revision,
-#                        a.branch,
-#                        at.name artifact_type,
-#                        rt.name repo_type,
-#                        r.name repo
-#                    FROM deploys d
-#                        JOIN applications aaa USING (application_id)
-#                        JOIN artifact_assignments aa USING (deploy_id)
-#                        JOIN envs e USING (env_id)
-#                        JOIN lifecycles l USING (lifecycle_id)
-#                        JOIN artifacts a USING (artifact_id)
-#                        JOIN artifact_types at USING (artifact_type_id)
-#                        JOIN repos r USING (repo_id)
-#                        JOIN repo_types rt USING (repo_type_id)
-#                        JOIN repo_urls u USING (repo_id)
-#                    WHERE deploy_id=%s
-#                        AND a.artifact_id='%s'
-#                        AND u.ct_loc='%s' %s
-#                """ % (deploy_id, artifact_id, self.ct_loc, lim))
-#
-#            else:
-#
+                                #join(Applications, Applications.application_id==Deploys.application_id).\
+
+            deploys = DBSession.query(Deploys, Applications, ArtifactAssignments, Envs, Lifecycles, Artifacts, ArtifactTypes, Repos, RepoTypes, RepoUrls).\
+                                join(Applications, Applications.application_id==Deploys.application_id).\
+                                join(ArtifactAssignments, ArtifactAssignments.deploy_id==Deploys.deploy_id ).\
+                                join(Envs, Envs.env_id==ArtifactAssignments.env_id).\
+                                join(Lifecycles, Lifecycles.lifecycle_id==ArtifactAssignments.lifecycle_id).\
+                                join(Artifacts, Artifacts.artifact_id==ArtifactAssignments.artifact_id).\
+                                join(ArtifactTypes, ArtifactTypes.artifact_type_id==Deploys.artifact_type_id).\
+                                join(Repos, Repos.repo_id==Artifacts.repo_id).\
+                                join(RepoTypes, RepoTypes.repo_type_id==Repos.repo_type_id).\
+                                join(RepoUrls, RepoUrls.repo_id==Artifacts.repo_id).\
+                                filter(Deploys.deploy_id == '%s' % deploy.deploy_id).\
+                                filter(Lifecycles.name == 'current').\
+                                filter(Envs.name == 'dev').\
+                                filter(Artifacts.valid == 1).\
+                                filter(RepoUrls.ct_loc == 'lax1').\
+                                order_by(desc(ArtifactAssignments.created)).\
+                                first()
+
+            print type(deploys)
+            print "DEEEPLOOOYYY: ", deploys
+
+
 #                sql = ("""
 #                    SELECT d.application_id,
 #                        d.deploy_id,
@@ -895,8 +864,7 @@ class Core:
         # in the office/vpn
         self.ct_loc = 'lax1'
 
-        deploys = DBSession.query(Deploys)
-        deploys = deploys.filter(Deploys.application_id == '%s' % application_id).all()
+        deploys = self.get_application_deploys(application_id)
 
         self.get_artifact_details(deploys, limit='True')
 
