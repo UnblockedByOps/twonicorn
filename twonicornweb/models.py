@@ -54,24 +54,46 @@ class ArtifactAssignment(Base):
     artifact_id            = Column(Integer, ForeignKey('artifacts.artifact_id'), nullable=False)
     user                   = Column(Text, nullable=False)
     created                = Column(TIMESTAMP, nullable=False)
-#    deploy                 = relationship("Deploy", backref=backref('artifact_assignments'),
-#                                          order_by=self.created.desc,
-#                                          lazy="dynamic")
     artifact               = relationship("Artifact", backref=backref('artifact_assignments'))
 
+    @hybrid_property
+    def pretty_url(self):
+        url_location = self.artifact.repo.get_url('vir1').url + self.artifact.location
+        if self.artifact.repo.name == 'gerrit':
+            r = url_location.rpartition('/')
+            return r[0] + r[1] + 'git/gitweb.cgi?p=' + r[2] + '.git;a=summary'
+        elif self.artifact.repo.name == 'subversion':
+            return url_location + '/' + self.env.name + '/?p=' + self.artifact.revision
+        else:
+            return url_location
+
+
+class ArtifactType(Base):
+    __tablename__ = 'artifact_types'
+    artifact_type_id = Column(Integer, primary_key=True, nullable=False)
+    name             = Column(Text, nullable=False)
 
 
 class Deploy(Base):
     __tablename__ = 'deploys'
     deploy_id        = Column(Integer, primary_key=True, nullable=False)
     application_id   = Column(Integer, ForeignKey('applications.application_id'), nullable=False)
-    artifact_type_id = Column(Integer, ForeignKey('artifacts.artifact_id'), nullable=False)
+    artifact_type_id = Column(Integer, ForeignKey('artifact_types.artifact_type_id'), nullable=False)
     deploy_path      = Column(Text, nullable=False)
     created          = Column(TIMESTAMP, nullable=False)
     application      = relationship("Application", backref=backref('deploys'))
     artifact_assignments = relationship("ArtifactAssignment", backref=backref('deploy'),
                                           order_by=ArtifactAssignment.created.desc,
                                           lazy="dynamic")
+    type = relationship("ArtifactType")
+
+    @hybrid_method
+    def get_assignments(self, env):
+        return self.artifact_assignments.join(Env, ArtifactAssignment.env_id == Env.env_id).filter(Env.name == env).all()
+
+    @hybrid_method
+    def get_assignment(self, env):
+        return self.artifact_assignments.join(Env, ArtifactAssignment.env_id == Env.env_id).filter(Env.name == env).first()
 
 
 class ArtifactNote(Base):
@@ -105,18 +127,19 @@ class Repo(Base):
     name         = Column(Text, nullable=False)
     artifacts    = relationship("Artifact", backref=backref('repo'))
 
+    @hybrid_method
+    def get_url(self, ct_loc):
+        for u in self.url:
+            if u.ct_loc == ct_loc:
+                return u
+        return None
+
 
 class RepoType(Base):
     __tablename__ = 'repo_types'
     repo_type_id = Column(Integer, primary_key=True, nullable=False)
     name         = Column(Text, nullable=False)
     repos        = relationship("Repo", backref=backref('type'))
-
-
-class ArtifactType(Base):
-    __tablename__ = 'artifact_types'
-    artifact_type_id = Column(Integer, primary_key=True, nullable=False)
-    name             = Column(Text, nullable=False)
 
 
 class RepoUrl(Base):
