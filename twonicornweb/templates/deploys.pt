@@ -51,7 +51,7 @@
             <!--! Do some reformatting of the urls to make them useful -->
             <?python
                 aa = item.get_assignment(denv)
-                if (int(deploy_id) == item.deploy_id) and (env is not None):
+                if ((deploy_id) and int(deploy_id) == item.deploy_id) and (env is not None):
                     histassignments = item.get_assignments(env, offset, perpage)
                     histdeploy = item
                     total = item.get_assignment_count(env)
