@@ -296,12 +296,9 @@ class Core:
 
     # DEPLOY functions
     def get_application_deploys(self, application_id):
-        deploys = DBSession.query(Deploy)
-        deploys = deploys.filter(Deploy.application_id == '%s' % application_id).all()
-#        This function was also doing this, which needs to be moved to the righ place:
-#        self.get_artifact_details(deploy_data)
-
-        return deploys
+        q = DBSession.query(Deploy)
+        deploy = q.filter(Deploy.application_id == '%s' % application_id).one()
+        return deploy
 
 
     def get_artifact_details(self, deploy_data, limit=None):

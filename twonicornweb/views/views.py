@@ -9,6 +9,30 @@ import twonicornweb.lib
 import ConfigParser
 import logging
 
+
+from sqlalchemy.exc import DBAPIError
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import func
+from sqlalchemy.sql import label
+from sqlalchemy import distinct
+from sqlalchemy import or_
+from sqlalchemy import desc
+from twonicornweb.models import (
+    DBSession,
+    Application,
+    Deploy,
+    Artifact,
+    ArtifactAssignment,
+    ArtifactNote,
+    Lifecycle,
+    Env,
+    Repo,
+    RepoType,
+    ArtifactType,
+    RepoUrl,
+    )
+
+
 log = logging.getLogger(__name__)
 t_core = twonicornweb.lib.Core()
 t_facts = twonicornweb.lib.tFacter()
@@ -200,6 +224,40 @@ def view_home(request):
 
 @view_config(route_name='applications', permission='view', renderer='twonicornweb:templates/applications.pt')
 def view_applications(request):
+    page_title = 'Applications'
+    user = get_user(request)
+
+    perpage = 10
+    offset = 0
+
+    try:
+        offset = int(request.GET.getone("start"))
+    except:
+        pass
+
+
+    try:
+        q = DBSession.query(Application)
+        total = q.count()
+        applications = q.limit(perpage).offset(offset)
+    except Exception, e:
+        conn_err_msg = e
+        return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
+
+
+    return {'layout': site_layout(),
+            'page_title': page_title,
+            'user': user,
+            'perpage': perpage,
+            'offset': offset,
+            'total': total,
+            'applications': applications,
+            'denied': denied,
+           }
+
+"""
+@view_config(route_name='applications', permission='view', renderer='twonicornweb:templates/applications.pt')
+def view_applications(request):
 
     page_title = 'Applications'
     user = get_user(request)
@@ -229,7 +287,82 @@ def view_applications(request):
             'applications': applications,
             'denied': denied,
            }
+"""
 
+@view_config(route_name='deploys', permission='view', renderer='twonicornweb:templates/deploys.pt')
+def view_deploys(request):
+
+    page_title = 'Deploys'
+    user = get_user(request)
+
+    perpage = 10
+    offset = 0
+    end = 10
+    total = 0
+
+    try:
+        offset = int(request.GET.getone("start"))
+        end = perpage + offset
+    except:
+        pass
+
+
+    params = {'application_id': None,
+              'nodegroup': None,
+              'history': None,
+              'deploy_id': None,
+              'env': None,
+              'to_env': None,
+              'to_state': None,
+              'commit': None,
+              'artifact_id': None,
+             }
+    for p in params:
+        try:
+            params[p] = request.params[p]
+        except:
+            pass
+
+    application_id = params['application_id']
+    nodegroup = params['nodegroup']
+    history = params['history']
+    deploy_id = params['deploy_id']
+    env = params['env']
+    to_env = params['to_env']
+    to_state = params['to_state']
+    commit = params['commit']
+    artifact_id = params['artifact_id']
+
+    try:
+        q = DBSession.query(Application)
+        q = q.filter(Application.application_id == application_id)
+        app = q.one()
+    except Exception, e:
+        conn_err_msg = e
+        return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
+
+
+    return {'layout': site_layout(),
+            'page_title': page_title,
+            'user': user,
+            'perpage': perpage,
+            'offset': offset,
+            'total': -1, #STUB
+            'app': app,
+            'application_id': application_id,
+            'nodegroup': nodegroup,
+            'history': None,
+            'hist_list': None,
+            'env': env,
+            'deploy_id': deploy_id,
+            'to_env': to_env,
+            'to_state': to_state,
+            'commit': commit,
+            'artifact_id': artifact_id,
+            'denied': denied,
+           }
+
+"""
 @view_config(route_name='deploys', permission='view', renderer='twonicornweb:templates/deploys.pt')
 def view_deploys(request):
 
@@ -323,6 +456,7 @@ def view_deploys(request):
             'artifact_id': artifact_id,
             'denied': denied,
            }
+"""
 
 @view_config(route_name='promote', permission='view', renderer='twonicornweb:templates/promote.pt')
 def view_promote(request):
