@@ -93,7 +93,7 @@ class Deploy(Base):
 
     @hybrid_method
     def get_assignment(self, env):
-        return self.artifact_assignments.join(Env, ArtifactAssignment.env_id == Env.env_id).filter(Env.name == env).first()
+        return self.artifact_assignments.join(Env, ArtifactAssignment.env_id == Env.env_id).filter(Env.name == env).join(Lifecycle, ArtifactAssignment.lifecycle_id == Lifecycle.lifecycle_id).filter(Lifecycle.name == 'current').first()
 
 
 class ArtifactNote(Base):
