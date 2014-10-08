@@ -88,12 +88,33 @@ class Deploy(Base):
     type = relationship("ArtifactType")
 
     @hybrid_method
-    def get_assignments(self, env):
-        return self.artifact_assignments.join(Env, ArtifactAssignment.env_id == Env.env_id).filter(Env.name == env).all()
+    def get_assignment_count(self, env):
+        q = self.artifact_assignments
+        q = q.join(Env, ArtifactAssignment.env_id == Env.env_id)
+        q = q.join(Artifact, ArtifactAssignment.artifact_id == Artifact.artifact_id)
+        q = q.filter(Env.name == env)
+        q = q.filter(Artifact.valid == 1)
+        return q.count()
+
+    @hybrid_method
+    def get_assignments(self, env, offset, perpage):
+        q = self.artifact_assignments
+        q = q.join(Env, ArtifactAssignment.env_id == Env.env_id)
+        q = q.join(Artifact, ArtifactAssignment.artifact_id == Artifact.artifact_id)
+        q = q.filter(Env.name == env)
+        q = q.filter(Artifact.valid == 1)
+        return q.limit(perpage).offset(offset)
 
     @hybrid_method
     def get_assignment(self, env):
-        return self.artifact_assignments.join(Env, ArtifactAssignment.env_id == Env.env_id).filter(Env.name == env).join(Lifecycle, ArtifactAssignment.lifecycle_id == Lifecycle.lifecycle_id).filter(Lifecycle.name == 'current').first()
+        q = self.artifact_assignments
+        q = q.join(Env, ArtifactAssignment.env_id == Env.env_id)
+        q = q.filter(Env.name == env)
+        q = q.join(Lifecycle, ArtifactAssignment.lifecycle_id == Lifecycle.lifecycle_id)
+        q = q.join(Artifact, ArtifactAssignment.artifact_id == Artifact.artifact_id)
+        q = q.filter(Lifecycle.name == 'current')
+        q = q.filter(Artifact.valid == 1)
+        return q.first()
 
 
 class ArtifactNote(Base):

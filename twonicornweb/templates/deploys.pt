@@ -1,5 +1,7 @@
             <?python
                 histassignments = None
+                #import logging
+                #log = logging.getLogger(__name__)
             ?>
 <div metal:use-macro="layout">
   <div metal:fill-slot="content">
@@ -49,8 +51,10 @@
             <!--! Do some reformatting of the urls to make them useful -->
             <?python
                 aa = item.get_assignment(denv)
-                if (deploy_id == item.deploy_id) and env:
-                    histassignments = item.get_assignments(env)
+                if (int(deploy_id) == item.deploy_id) and (env is not None):
+                    histassignments = item.get_assignments(env, offset, perpage)
+                    histdeploy = item
+                    total = item.get_assignment_count(env)
             ?>
             <td tal:content="item.deploy_path" tal:attributes="title 'Deploy ID: ' + str(item.deploy_id)">/app/something</td>
             <td tal:content="aa.artifact.revision[:8]">12345</td>
@@ -118,52 +122,52 @@
             <tbody tal:repeat="item histassignments">
             <!--! Do some reformatting of the urls to make them useful -->
             <tr tal:attributes="class '%s' % env if repeat.item.even else 'white'">
-              <td tal:content="item['deploy_path']" tal:attributes="title 'Deploy ID: ' + str(item['deploy_id'])">/app/something</td>
-              <td tal:content="item['revision'] [:8]">12345</td>
-              <td tal:content="item['branch']">trunk</td>
-              <td tal:content="item['repo']">12345</td>
-              <td tal:content="item['artifact_type']">12345</td>
+              <td tal:content="histdeploy.deploy_path" tal:attributes="title 'Deploy ID: ' + str(item.deploy_id)">/app/something</td>
+              <td tal:content="item.artifact.revision[:8]">12345</td>
+              <td tal:content="item.artifact.branch">trunk</td>
+              <td tal:content="item.artifact.repo.name">12345</td>
+              <td tal:content="histdeploy.type.name">12345</td>
               <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
                      title="some description"
-                     tal:attributes="href item['pretty_url']; title item['pretty_url']"
-                     tal:content="item['suffix']">Artifacts By nodegroupLink</a></td>
-              <td tal:content="item['artifact_id']">0</td>
-              <td tal:content="item['artifact_assignment_id']">12345</td>
-              <td tal:content="item['created']">12345</td>
+                     tal:attributes="href item.pretty_url; title item.pretty_url"
+                     tal:content="item.artifact.location.split('/')[-1]">Artifacts By nodegroupLink</a></td>
+              <td tal:content="item.artifact_id">0</td>
+              <td tal:content="item.artifact_assignment_id">12345</td>
+              <td tal:content="item.created">12345</td>
               <td>
                 <ul tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                   <li tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                     Promote
                     <ul tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                       <li tal:condition="(not (env == 'dev' and repeat.item.start and offset == 0)) 
-                                          and (not (item['artifact_type'] == 'conf' and (env == 'qat' or env == 'prd')))"
+                                          and (not (histdeploy.type.name == 'conf' and (env == 'qat' or env == 'prd')))"
                           tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                         <a tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=dev&commit=false' %
-                                                (item['deploy_id'],
-                                                 item['artifact_id'],
+                                                (item.deploy_id,
+                                                 item.artifact_id,
                                                 );
-                                           title 'Promote to dev: ' + str(item['artifact_id'])"
+                                           title 'Promote to dev: ' + str(item.artifact_id)"
                            tal:content="'to dev'">promote to dev</a>
                       </li>
                       <li tal:condition="not (env == 'qat' and repeat.item.start and offset == 0) 
-                                         and (not (item['artifact_type'] == 'conf' and (env == 'dev' or env == 'prd')))"
+                                         and (not (histdeploy.type.name == 'conf' and (env == 'dev' or env == 'prd')))"
                           tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                         <a tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=qat&commit=false' %
-                                                (item['deploy_id'],
-                                                 item['artifact_id'],
+                                                (item.deploy_id,
+                                                 item.artifact_id,
                                                 );
-                                           title 'Promote to qat: ' + str(item['artifact_id'])"
+                                           title 'Promote to qat: ' + str(item.artifact_id)"
                            tal:content="'to qat'">promote to qat</a>
                       </li>
                       <li tal:condition="(not (env == 'prd' and repeat.item.start and offset == 0)) 
-                                          and (not (item['artifact_type'] == 'conf' and (env == 'dev' or env == 'qat'))) 
+                                          and (not (histdeploy.type.name == 'conf' and (env == 'dev' or env == 'qat'))) 
                                           and (user.prod_auth)"
                           tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                         <a tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=prd&commit=false' %
-                                                (item['deploy_id'],
-                                                 item['artifact_id'],
+                                                (item.deploy_id,
+                                                 item.artifact_id,
                                                 );
-                                           title 'Promote to prd: ' + str(item['artifact_id'])"
+                                           title 'Promote to prd: ' + str(item.artifact_id)"
                            tal:content="'to prd'">promote to prd</a>
                       </li>
                     </ul>

@@ -347,7 +347,7 @@ def view_deploys(request):
             'user': user,
             'perpage': perpage,
             'offset': offset,
-            'total': -1, #STUB
+            'total': 1000, #STUB
             'app': app,
             'application_id': application_id,
             'nodegroup': nodegroup,
