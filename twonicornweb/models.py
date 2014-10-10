@@ -138,7 +138,7 @@ class Env(Base):
     __tablename__ = 'envs'
     env_id = Column(Integer, primary_key=True, nullable=False)
     name   = Column(Text, nullable=False)
-    artifact_assignments = relationship("ArtifactAssignment", backref=backref('env'))
+    artifact_assignments = relationship("ArtifactAssignment", backref=backref('env'), lazy="joined")
 
 
 class Repo(Base):

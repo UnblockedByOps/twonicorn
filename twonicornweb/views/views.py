@@ -255,40 +255,6 @@ def view_applications(request):
             'denied': denied,
            }
 
-"""
-@view_config(route_name='applications', permission='view', renderer='twonicornweb:templates/applications.pt')
-def view_applications(request):
-
-    page_title = 'Applications'
-    user = get_user(request)
-
-    perpage = 10
-    offset = 0
-
-    try:
-        offset = int(request.GET.getone("start"))
-    except:
-        pass
-
-    try:
-        apps = t_core.list_applications()
-        total = apps.count()
-        applications = apps.limit(perpage).offset(offset)
-    except:
-        return Response(conn_err_msg, content_type='text/plain', status_int=500)
-
-
-    return {'layout': site_layout(),
-            'page_title': page_title,
-            'user': user,
-            'perpage': perpage,
-            'offset': offset,
-            'total': total,
-            'applications': applications,
-            'denied': denied,
-           }
-"""
-
 @view_config(route_name='deploys', permission='view', renderer='twonicornweb:templates/deploys.pt')
 def view_deploys(request):
 
@@ -325,7 +291,6 @@ def view_deploys(request):
 
     application_id = params['application_id']
     nodegroup = params['nodegroup']
-    history = params['history']
     deploy_id = params['deploy_id']
     env = params['env']
     to_env = params['to_env']
@@ -362,101 +327,6 @@ def view_deploys(request):
             'denied': denied,
            }
 
-"""
-@view_config(route_name='deploys', permission='view', renderer='twonicornweb:templates/deploys.pt')
-def view_deploys(request):
-
-    page_title = 'Deploys'
-    user = get_user(request)
-
-    perpage = 10
-    offset = 0
-    end = 10
-    total = 0
-
-    try:
-        offset = int(request.GET.getone("start"))
-        end = perpage + offset
-    except:
-        pass
-
-
-    params = {'application_id': None,
-              'nodegroup': None,
-              'history': None,
-              'deploy_id': None,
-              'env': None,
-              'to_env': None,
-              'to_state': None,
-              'commit': None,
-              'artifact_id': None,
-             }
-    for p in params:
-        try:
-            params[p] = request.params[p]
-        except:
-            pass
-
-    application_id = params['application_id']
-    nodegroup = params['nodegroup']
-    history = params['history']
-    deploy_id = params['deploy_id']
-    env = params['env']
-    to_env = params['to_env']
-    to_state = params['to_state']
-    commit = params['commit']
-    artifact_id = params['artifact_id']
-
-    deploys_dev = None
-    deploys_qat = None
-    deploys_prd = None
-    hist_list = None
-
-    if application_id:
-        try: 
-            deploys_dev = t_core.list_deploys('dev',application_id,nodegroup)
-            deploys_qat = t_core.list_deploys('qat',application_id,nodegroup)
-            deploys_prd = t_core.list_deploys('prd',application_id,nodegroup)
-        except:
-            raise
-    elif nodegroup:
-        try:
-            deploys_dev = t_core.list_deploys('dev',application_id,nodegroup)
-            deploys_qat = t_core.list_deploys('qat',application_id,nodegroup)
-            deploys_prd = t_core.list_deploys('prd',application_id,nodegroup)
-        except:
-            raise
-
-    if history:
-        try:
-            h_list = t_core.list_history(env,deploy_id)
-            total = len(h_list)
-            hist_list = h_list[offset:end]
-        except:
-            raise
-
-    return {'layout': site_layout(),
-            'page_title': page_title,
-            'user': user,
-            'perpage': perpage,
-            'offset': offset,
-            'total': total,
-            'deploys_dev': deploys_dev,
-            'deploys_qat': deploys_qat,
-            'deploys_prd': deploys_prd,
-            'application_id': application_id,
-            'nodegroup': nodegroup,
-            'history': history,
-            'hist_list': hist_list,
-            'env': env,
-            'deploy_id': deploy_id,
-            'to_env': to_env,
-            'to_state': to_state,
-            'commit': commit,
-            'artifact_id': artifact_id,
-            'denied': denied,
-           }
-"""
 
 @view_config(route_name='promote', permission='view', renderer='twonicornweb:templates/promote.pt')
 def view_promote(request):
@@ -489,12 +359,18 @@ def view_promote(request):
     else:
         to_state = '2'
 
-    # Displaying artifact to be stage to prod
-    if artifact_id and commit == 'false':
-        try:
-            promote = t_core.list_promotion(deploy_id, artifact_id)
-        except:
-            raise
+    try:
+        dq = DBSession.query(Artifact)
+        dq = dq.filter(Lifecycle.name == 'current')
+        dq = dq.filter(Deploy.deploy_id == '%s' % deploy_id)
+        dq = dq.filter(Env.name == 'qat')
+        dq = dq.filter(Artifact.artifact_id == '%s' % artifact_id)
+        dq = dq.filter(RepoUrl.ct_loc == 'lax1')
+        promote = dq.first()
+    except Exception, e:
+        conn_err_msg = e
+        return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
+
 
     if artifact_id and commit == 'true':
         if not user['prod_auth'] and to_env == 'prd' and to_state == '2':
@@ -503,12 +379,23 @@ def view_promote(request):
         else:
             # Actually promoting
             try:
-                promote = t_core.promote(deploy_id, artifact_id, to_env, to_state, user['ad_login'])
-                results = t_core.list_app_details_by_deploy(deploy_id)
+                # Convert the env name to the id
+                dq = DBSession.query(Env)
+                dq = dq.filter(Env.name == '%s' % to_env)
+                env_id=dq.one()
+
+                promote = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=to_state, user=user['ad_login'])
+                DBSession.add(promote)
+                DBSession.flush()
+                
+
+                dq = DBSession.query(Application)
+                dq = dq.filter(Application.application_id == '%s' % application_id)
                 return_url = '/deploys?application_id=%s&nodegroup=%s&artifact_id=%s&to_env=%s&to_state=%s&commit=%s' % (results[0][0], results[0][1], artifact_id, to_env, to_state, commit)
                 return HTTPFound(return_url)
-            except:
-                raise
+            except Exception, e:
+                log.error("Failed to promote artifact (%s)" % (e))
+                
 
     return {'layout': site_layout(),
             'page_title': page_title,

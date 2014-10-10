@@ -39,26 +39,18 @@
             <th>Created Date</th>
           </tr>
 
-          <tr tal:repeat="item promote" tal:attributes="class '%s' % to_env">
-            <!--! Do some reformatting of the urls to make them useful -->
-            <?python
-                if promote[item]['repo'] == 'gerrit':
-                    r = promote[item]['url_location'].rpartition('/')
-                    promote[item]['url_location'] = r[0] + r[1] + 'git/gitweb.cgi?p=' + r[2] + '.git;a=summary'
-                if promote[item]['repo'] == 'subversion':
-                    promote[item]['url_location'] = promote[item]['url_location'] +  '/' + promote[item]['env'] + '/?p=' + promote[item]['revision']
-            ?>
-            <td tal:content="promote[item]['application_name']">myapp</td>
-            <td tal:content="promote[item]['deploy_path']" tal:attributes="title 'Deploy ID: ' + str(promote[item]['deploy_id'])">/app/something</td>
-            <td tal:content="promote[item]['revision'] [:8]">12345</td>
-            <td tal:content="promote[item]['branch']">trunk</td>
-            <td tal:content="promote[item]['repo']">12345</td>
-            <td tal:content="promote[item]['artifact_type']">12345</td>
+          <tr tal:attributes="class '%s' % to_env">
+            <td tal:content="promote.artifact_assignments[0].deploy.application.application_name">myapp</td>
+            <td tal:content="promote.artifact_assignments[0].deploy.deploy_path" tal:attributes="title 'Deploy ID: ' + str(deploy_id)">/app/something</td>
+            <td tal:content="promote.revision [:8]">12345</td>
+            <td tal:content="promote.branch">trunk</td>
+            <td tal:content="promote.repo.name">12345</td>
+            <td tal:content="promote.artifact_assignments[0].deploy.type.name">12345</td>
             <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
                    title="some description"
-                   tal:attributes="href promote[item]['url_location']; title promote[item]['url_location']"
-                   tal:content="promote[item]['suffix']">Artifact</a></td>
-            <td tal:content="promote[item]['created']">12345</td>
+                   tal:attributes="href promote.artifact_assignments[0].pretty_url; title promote.artifact_assignments[0].pretty_url"
+                   tal:content="promote.location">Artifact</a></td>
+            <td tal:content="promote.created">12345</td>
           </tr>
         </table>
         </p>
