@@ -5,7 +5,6 @@ from pyramid.security import remember, forget
 from pyramid.session import signed_serialize, signed_deserialize
 from pyramid_ldap import get_ldap_connector, groupfinder
 from pyramid.response import Response
-import twonicornweb.lib
 import ConfigParser
 import logging
 
@@ -34,8 +33,6 @@ from twonicornweb.models import (
 
 
 log = logging.getLogger(__name__)
-t_core = twonicornweb.lib.Core()
-t_facts = twonicornweb.lib.tFacter()
 denied = ''
 prod_groups = ['Unix_Team'] # Need to make these configurable
 admin_groups = ['Unix_Team'] # Need to make these configurable
