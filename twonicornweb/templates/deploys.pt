@@ -25,12 +25,12 @@
         <h1 tal:content="'Deployment summary by env for ' + nodegroup.upper()">Deployment summary by environment</h1>
 
         </p>
-        <table width="100%" tal:condition="(application_id or nodegroup)" tal:repeat="denv ['prd','qat','dev']">
-          <tr class="subh" tal:condition="repeat.denv.start">
+        <table width="100%" tal:condition="(application_id or nodegroup)">
+          <tr class="subh">
             <td class="subh">Node Group</td>
             <td class="subh_app" colspan="10" tal:content="nodegroup.upper() + ' (' + application_id + ')'">tct</td>
           </tr>
-          <tr tal:condition="repeat.denv.start">
+          <tr>
             <th>Deploy Path</th>
             <th>Revision</th>
             <th>Branch/Tag</th>
@@ -40,10 +40,10 @@
             <th>Artifact ID</th>
             <th>Assignment ID</th>
             <th>Assignment Date</th>
-            <th>Promote</th>
             <th>History</th>
           </tr>
 
+          <tbody tal:repeat="denv ['prd','qat','dev']" tal:condition="app">
           <tr tal:attributes="class denv" tal:condition="app">
             <td colspan="11"><b tal:content="denv.upper()">DEV</b></td>
           </tr>
@@ -68,7 +68,6 @@
             <td tal:content="aa.artifact_id">12345</td>
             <td tal:content="aa.artifact_assignment_id">12345</td>
             <td tal:content="aa.created">12345</td>
-            <td></td>
             <td><a href="http://twonicorn.ctgrd.com/deploys?history=true"
                    title="Show History"
                    tal:attributes="href '/deploys?history=true&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s' %
@@ -80,6 +79,7 @@
                                    title 'Show history for deploy id: ' + str(item.deploy_id)"
                    tal:content="'Show History'">show history</a></td>
           </tr>
+          </tbody>
         </table>
       </div>
 

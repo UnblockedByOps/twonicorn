@@ -7,13 +7,6 @@ from pyramid_ldap import get_ldap_connector, groupfinder
 from pyramid.response import Response
 import ConfigParser
 import logging
-from sqlalchemy.exc import DBAPIError
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy import func
-from sqlalchemy.sql import label
-from sqlalchemy import distinct
-from sqlalchemy import or_
-from sqlalchemy import desc
 from twonicornweb.models import (
     DBSession,
     Application,
