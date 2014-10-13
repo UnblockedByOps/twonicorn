@@ -365,7 +365,7 @@ def view_promote(request):
                 # Assign
                 promote = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=to_state, user=user['ad_login'])
                 DBSession.add(promote)
-                DBSession.commit()
+                DBSession.flush()
                 
                 app = Application.get_app_by_deploy_id(deploy_id)
                 return_url = '/deploys?application_id=%s&nodegroup=%s&artifact_id=%s&to_env=%s&to_state=%s&commit=%s' % (app.application_id, app.nodegroup, artifact_id, to_env, to_state, commit)
