@@ -9,6 +9,10 @@ Next Release (TBD)
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+2.1
+~~~~~~~
+* bugfix: explicitly inserting with utc timestamp.
+
 2.0
 ~~~~~~~
 * Switched to SQLAlchemy
