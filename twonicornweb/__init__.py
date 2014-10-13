@@ -5,6 +5,14 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import Allow, Authenticated
 import ldap
 import ConfigParser
+from sqlalchemy import engine_from_config
+from sqlalchemy import event
+from sqlalchemy.exc import DisconnectionError
+
+from .models import (
+    DBSession,
+        Base,
+            )
 
 
 class RootFactory(object):
@@ -13,9 +21,43 @@ class RootFactory(object):
     def __init__(self, request):
         pass
 
+
+def getSettings(settings):
+    # Config
+    cp = ConfigParser.ConfigParser()
+    cp.read("/app/twonicorn_web/conf/twonicorn.conf") # STUB, get from settings
+    for k,v in cp.items("app:main"):
+        settings[k] = v
+    # Secrets
+    cp = ConfigParser.ConfigParser()
+    cp.read("/app/secrets/twonicorn.conf") # STUB, get from settings
+    for k,v in cp.items("app:main"):
+        settings[k] = v
+    return settings
+
+
+def checkout_listener(dbapi_con, con_record, con_proxy):
+    try:
+        try:
+            dbapi_con.ping(False)
+        except TypeError:
+            dbapi_con.ping()
+    except Exception, e:
+        import sys
+        print >> sys.stderr, "Error: %s (%s)" % (Exception, e)
+        raise DisconnectionError()
+
+
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
+    settings = getSettings(settings)
+
+    engine = engine_from_config(settings, 'sqlalchemy.')
+    event.listen(engine, 'checkout', checkout_listener)
+    DBSession.configure(bind=engine)
+    Base.metadata.bind = engine
+
     config = Configurator(settings=settings, root_factory=RootFactory)
     config.include('pyramid_chameleon')
     config.include('pyramid_ldap')
@@ -30,31 +72,18 @@ def main(global_config, **settings):
     config.add_route('user', '/user')
     config.add_route('admin', '/admin')
 
-    # Parse the config
-    config_file = ConfigParser.ConfigParser()
-    config_file.read('/app/twonicorn_web/conf/twonicorn.conf')
-    ldap_server = config_file.get('ldap', 'server')
-    ldap_port = config_file.get('ldap', 'port')
-    ldap_bind = config_file.get('ldap', 'bind')
-
-    # Parse the secret config
-    secret_config_file = ConfigParser.ConfigParser()
-    secret_config_file.read('/app/secrets/twonicorn.conf')
-    ldap_password = secret_config_file.get('ldap', 'password')
-    cookie_token = secret_config_file.get('cookie', 'token')
-
     ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, "/etc/pki/CA/certs/ny-dc1.iac.corp.crt")
 
     config.set_authentication_policy(
-        AuthTktAuthenticationPolicy(cookie_token, callback=groupfinder, max_age=604800)
+        AuthTktAuthenticationPolicy(settings['cookie_token'], callback=groupfinder, max_age=604800)
         )
     config.set_authorization_policy(
         ACLAuthorizationPolicy()
         )
     config.ldap_setup(
-        ldap_server + ':' + ldap_port,
-        bind = ldap_bind,
-        passwd = ldap_password,
+        settings['ldap_server'] + ':' + settings['ldap_port'],
+        bind = settings['ldap_bind'],
+        passwd = settings['ldap_password'],
         )
     
     config.ldap_set_login_query(
