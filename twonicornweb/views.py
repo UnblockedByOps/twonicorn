@@ -367,11 +367,6 @@ def view_promote(request):
                 DBSession.add(promote)
                 DBSession.flush()
                 
-#                # Get the application
-#                q = DBSession.query(Application)
-#                q = q.join(Deploy, Application.application_id == Deploy.application_id)
-#                q = q.filter(Deploy.deploy_id == '%s' % deploy_id)
-#                app = q.one()
                 app = Application.get_app_by_deploy_id(deploy_id)
 
                 return_url = '/deploys?application_id=%s&nodegroup=%s&artifact_id=%s&to_env=%s&to_state=%s&commit=%s' % (app.application_id, app.nodegroup, artifact_id, to_env, to_state, commit)
