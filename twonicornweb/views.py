@@ -5,6 +5,7 @@ from pyramid.security import remember, forget
 from pyramid.session import signed_serialize, signed_deserialize
 from pyramid_ldap import get_ldap_connector, groupfinder
 from pyramid.response import Response
+from datetime import datetime
 import ConfigParser
 import logging
 from twonicornweb.models import (
@@ -363,7 +364,8 @@ def view_promote(request):
                 env_id = Env.get_env_id(to_env)
 
                 # Assign
-                promote = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=to_state, user=user['ad_login'])
+                utcnow = datetime.utcnow()
+                promote = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=to_state, user=user['ad_login'], created=utcnow)
                 DBSession.add(promote)
                 DBSession.flush()
                 
