@@ -7,8 +7,6 @@ from pyramid_ldap import get_ldap_connector, groupfinder
 from pyramid.response import Response
 import ConfigParser
 import logging
-
-
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import func
@@ -303,7 +301,6 @@ def view_deploys(request):
         conn_err_msg = e
         return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
 
-
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
@@ -357,17 +354,10 @@ def view_promote(request):
         to_state = '2'
 
     try:
-        dq = DBSession.query(Artifact)
-        dq = dq.filter(Lifecycle.name == 'current')
-        dq = dq.filter(Deploy.deploy_id == '%s' % deploy_id)
-        dq = dq.filter(Env.name == 'qat')
-        dq = dq.filter(Artifact.artifact_id == '%s' % artifact_id)
-        dq = dq.filter(RepoUrl.ct_loc == 'lax1')
-        promote = dq.first()
+        promote = Artifact.get_promotion(to_env, deploy_id, artifact_id)
     except Exception, e:
         conn_err_msg = e
         return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
-
 
     if artifact_id and commit == 'true':
         if not user['prod_auth'] and to_env == 'prd' and to_state == '2':
@@ -377,22 +367,24 @@ def view_promote(request):
             # Actually promoting
             try:
                 # Convert the env name to the id
-                dq = DBSession.query(Env)
-                dq = dq.filter(Env.name == '%s' % to_env)
-                env_id=dq.one()
+                env_id = Env.get_env_id(to_env)
 
+                # Assign
                 promote = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=to_state, user=user['ad_login'])
                 DBSession.add(promote)
                 DBSession.flush()
                 
+#                # Get the application
+#                q = DBSession.query(Application)
+#                q = q.join(Deploy, Application.application_id == Deploy.application_id)
+#                q = q.filter(Deploy.deploy_id == '%s' % deploy_id)
+#                app = q.one()
+                app = Application.get_app_by_deploy_id(deploy_id)
 
-                dq = DBSession.query(Application)
-                dq = dq.filter(Application.application_id == '%s' % application_id)
-                return_url = '/deploys?application_id=%s&nodegroup=%s&artifact_id=%s&to_env=%s&to_state=%s&commit=%s' % (results[0][0], results[0][1], artifact_id, to_env, to_state, commit)
+                return_url = '/deploys?application_id=%s&nodegroup=%s&artifact_id=%s&to_env=%s&to_state=%s&commit=%s' % (app.application_id, app.nodegroup, artifact_id, to_env, to_state, commit)
                 return HTTPFound(return_url)
             except Exception, e:
                 log.error("Failed to promote artifact (%s)" % (e))
-                
 
     return {'layout': site_layout(),
             'page_title': page_title,

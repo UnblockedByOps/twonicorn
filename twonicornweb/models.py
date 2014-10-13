@@ -33,6 +33,14 @@ class Application(Base):
     nodegroup        = Column(Text, nullable=False)
     created          = Column(TIMESTAMP, nullable=False)
 
+    @hybrid_method
+    def get_app_by_deploy_id(self, deploy_id):
+        # Get the application
+        q = DBSession.query(Application)
+        q = q.join(Deploy, Application.application_id == Deploy.application_id)
+        q = q.filter(Deploy.deploy_id == '%s' % deploy_id)
+        return q.one()
+
 
 class Artifact(Base):
     __tablename__ = 'artifacts'
@@ -43,6 +51,16 @@ class Artifact(Base):
     branch      = Column(Text)
     valid       = Column(Integer, nullable=False)
     created     = Column(TIMESTAMP, nullable=False)
+
+    @hybrid_method
+    def get_promotion(self, env, deploy_id, artifact_id):
+        q = DBSession.query(Artifact)
+        q = q.filter(Lifecycle.name == 'current')
+        q = q.filter(Deploy.deploy_id == '%s' % deploy_id)
+        q = q.filter(Env.name == '%s' % env)
+        q = q.filter(Artifact.artifact_id == '%s' % artifact_id)
+        q = q.filter(RepoUrl.ct_loc == 'lax1')
+        return q.first()
 
 
 class ArtifactAssignment(Base):
@@ -58,7 +76,7 @@ class ArtifactAssignment(Base):
 
     @hybrid_property
     def pretty_url(self):
-        url_location = self.artifact.repo.get_url('vir1').url + self.artifact.location
+        url_location = self.artifact.repo.get_url('lax1').url + self.artifact.location
         if self.artifact.repo.name == 'gerrit':
             r = url_location.rpartition('/')
             return r[0] + r[1] + 'git/gitweb.cgi?p=' + r[2] + '.git;a=summary'
@@ -139,6 +157,13 @@ class Env(Base):
     env_id = Column(Integer, primary_key=True, nullable=False)
     name   = Column(Text, nullable=False)
     artifact_assignments = relationship("ArtifactAssignment", backref=backref('env'), lazy="joined")
+
+    @hybrid_method
+    def get_env_id(self, env):
+        # Convert the env name to the id
+        q = DBSession.query(Env)
+        q = q.filter(Env.name == '%s' % env)
+        return q.one()
 
 
 class Repo(Base):

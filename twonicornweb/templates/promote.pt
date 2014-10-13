@@ -49,7 +49,7 @@
             <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
                    title="some description"
                    tal:attributes="href promote.artifact_assignments[0].pretty_url; title promote.artifact_assignments[0].pretty_url"
-                   tal:content="promote.location">Artifact</a></td>
+                   tal:content="promote.location.split('/')[-1]">Artifact</a></td>
             <td tal:content="promote.created">12345</td>
           </tr>
         </table>
