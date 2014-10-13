@@ -57,18 +57,20 @@
                     total = item.get_assignment_count(env)
             ?>
             <td tal:content="item.deploy_path" tal:attributes="title 'Deploy ID: ' + str(item.deploy_id)">/app/something</td>
-            <td tal:content="aa.artifact.revision[:8]">12345</td>
-            <td tal:content="aa.artifact.branch">trunk</td>
-            <td tal:content="aa.artifact.repo.name">12345</td>
+            <td tal:content="aa.artifact.revision[:8] if aa else 'No Data'">12345</td>
+            <td tal:content="aa.artifact.branch if aa else 'No Data'">trunk</td>
+            <td tal:content="aa.artifact.repo.name if aa else 'No Data'">12345</td>
             <td tal:content="item.type.name">12345</td>
-            <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
+            <td tal:condition="not aa">No Data</td>
+            <td tal:condition="aa"><a href="http://code.ctgrd.com/my/awesome/artifact.war"
                    title="some description"
                    tal:attributes="href aa.pretty_url; title aa.pretty_url"
                    tal:content="aa.artifact.location.split('/')[-1]">Artifacts By nodegroupLink</a></td>
-            <td tal:content="aa.artifact_id">12345</td>
-            <td tal:content="aa.artifact_assignment_id">12345</td>
-            <td tal:content="aa.created">12345</td>
-            <td><a href="http://twonicorn.ctgrd.com/deploys?history=true"
+            <td tal:content="aa.artifact_id if aa else 'No Data'">12345</td>
+            <td tal:content="aa.artifact_assignment_id if aa else 'No Data'">12345</td>
+            <td tal:content="aa.created if aa else 'No Data'">12345</td>
+            <td tal:condition="not aa">No Data</td>
+            <td tal:condition="aa"><a href="http://twonicorn.ctgrd.com/deploys?history=true"
                    title="Show History"
                    tal:attributes="href '/deploys?history=true&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s' %
                                         (item.deploy_id,
