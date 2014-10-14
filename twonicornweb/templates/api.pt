@@ -1,0 +1,8 @@
+<div metal:use-macro="layout">
+    <div metal:fill-slot="content">
+    <p>
+    <span>What should we put on this page?</span>
+    </p>
+
+  </div>
+</div>

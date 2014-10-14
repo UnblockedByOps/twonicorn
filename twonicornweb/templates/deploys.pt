@@ -19,8 +19,8 @@
         </p>
       </div>
 
-      <div>
-        <p tal:condition="nodegroup">
+      <div tal:condition="nodegroup">
+        <p>
 
         <h1 tal:content="'Deployment summary by env for ' + nodegroup.upper()">Deployment summary by environment</h1>
 
@@ -48,7 +48,6 @@
             <td colspan="11"><b tal:content="denv.upper()">DEV</b></td>
           </tr>
           <tr tal:repeat="item app.deploys">
-            <!--! Do some reformatting of the urls to make them useful -->
             <?python
                 aa = item.get_assignment(denv)
                 if ((deploy_id) and int(deploy_id) == item.deploy_id) and (env is not None):
