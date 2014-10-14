@@ -9,6 +9,10 @@ Next Release (TBD)
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+2.2
+~~~~~~~
+* bugfix: Fix exception when a deploy has no entry in the database yet.
+
 2.1
 ~~~~~~~
 * bugfix: explicitly inserting with utc timestamp.
