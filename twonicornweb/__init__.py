@@ -23,14 +23,9 @@ class RootFactory(object):
 
 
 def getSettings(settings):
-    # Config
-    cp = ConfigParser.ConfigParser()
-    cp.read("/app/twonicorn_web/conf/twonicorn.conf") # STUB, get from settings
-    for k,v in cp.items("app:main"):
-        settings[k] = v
     # Secrets
     cp = ConfigParser.ConfigParser()
-    cp.read("/app/secrets/twonicorn.conf") # STUB, get from settings
+    cp.read(settings['tcw.secrets_file'])
     for k,v in cp.items("app:main"):
         settings[k] = v
     return settings
@@ -75,26 +70,26 @@ def main(global_config, **settings):
     ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, "/etc/pki/CA/certs/ny-dc1.iac.corp.crt")
 
     config.set_authentication_policy(
-        AuthTktAuthenticationPolicy(settings['cookie_token'], callback=groupfinder, max_age=604800)
+        AuthTktAuthenticationPolicy(settings['tcw.cookie_token'], callback=groupfinder, max_age=604800)
         )
     config.set_authorization_policy(
         ACLAuthorizationPolicy()
         )
     config.ldap_setup(
-        settings['ldap_server'] + ':' + settings['ldap_port'],
-        bind = settings['ldap_bind'],
-        passwd = settings['ldap_password'],
+        settings['tcw.ldap_server'] + ':' + settings['tcw.ldap_port'],
+        bind = settings['tcw.ldap_bind'],
+        passwd = settings['tcw.ldap_password'],
         )
     
     config.ldap_set_login_query(
-        base_dn='OU=Technology,OU=User Accounts by Department,OU=CGM Accounts Security Groups and Distribution Lists, DC=cs,DC=iac,DC=corp',
-        filter_tmpl='(&(objectClass=user)(sAMAccountName=%(login)s))',
+        base_dn = settings['tcw.login_base_dn'],
+        filter_tmpl = '(&(objectClass=user)(sAMAccountName=%(login)s))',
         scope = ldap.SCOPE_SUBTREE,
         cache_period = 600,
         )
     
     config.ldap_set_groups_query(
-        base_dn='DC=cs,DC=iac,DC=corp',
+        base_dn = settings['tcw.group_base_dn'],
         filter_tmpl='(&(objectCategory=group)(member=%(userdn)s))',
         scope = ldap.SCOPE_SUBTREE,
         cache_period = 600,

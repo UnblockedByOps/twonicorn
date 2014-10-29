@@ -6,7 +6,6 @@ from pyramid.session import signed_serialize, signed_deserialize
 from pyramid_ldap import get_ldap_connector, groupfinder
 from pyramid.response import Response
 from datetime import datetime
-import ConfigParser
 import logging
 from twonicornweb.models import (
     DBSession,
@@ -26,13 +25,7 @@ from twonicornweb.models import (
 
 log = logging.getLogger(__name__)
 denied = ''
-prod_groups = ['Unix_Team'] # Need to make these configurable
-admin_groups = ['Unix_Team'] # Need to make these configurable
 
-# Parse the secret config - would like to pass this from __init__.py
-secret_config_file = ConfigParser.ConfigParser()
-secret_config_file.read('/app/secrets/twonicorn.conf')
-cookie_token = secret_config_file.get('app:main', 'cookie_token')
 
 def site_layout():
     renderer = get_renderer("twonicornweb:templates/global_layout.pt")
@@ -56,18 +49,21 @@ def get_user(request):
         log.error("%s (%s)" % (Exception, e))
         (pretty, id, ad_login, groups, first, last, auth, prd_auth, admin_auth) = ('', '', '', '', '', '', False, False, False)
 
+
     try:
-        ad_login = validate_username_cookie(request.cookies['un'])
+        ad_login = validate_username_cookie(request.cookies['un'], request.registry.settings['tcw.cookie_token'])
     except:
         return HTTPFound('/logout?message=Your cookie has been tampered with. You have been logged out')
 
     # Check if the user is authorized to do stuff to prod
+    prod_groups = request.registry.settings['tcw.prod_groups'].splitlines()
     for a in prod_groups:
         if a in groups:
             prod_auth = True
             break
 
     # Check if the user is authorized as an admin
+    admin_groups = request.registry.settings['tcw.admin_groups'].splitlines()
     for a in admin_groups:
         if a in groups:
             admin_auth = True
@@ -108,7 +104,7 @@ def find_between(s, first, last):
     except ValueError:
         return ""
 
-def validate_username_cookie(cookieval):
+def validate_username_cookie(cookieval, cookie_token):
     """ Returns the username if it validates. Otherwise throws
     an exception"""
 
@@ -169,7 +165,7 @@ def login(request):
 
         if data is not None:
             dn = data[0]
-            encrypted = signed_serialize(login, cookie_token)
+            encrypted = signed_serialize(login, request.registry.settings['tcw.cookie_token'])
             #encrypted = signed_serialize(login, 'titspervert')
             headers = remember(request, dn)
             headers.append(('Set-Cookie', 'un=' + str(encrypted) + '; Max-Age=604800; Path=/'))
@@ -254,7 +250,6 @@ def view_deploys(request):
     offset = 0
     end = 10
     total = 0
-    app = None
 
     try:
         offset = int(request.GET.getone("start"))
@@ -288,14 +283,13 @@ def view_deploys(request):
     commit = params['commit']
     artifact_id = params['artifact_id']
 
-    if application_id:
-        try:
-            q = DBSession.query(Application)
-            q = q.filter(Application.application_id == application_id)
-            app = q.one()
-        except Exception, e:
-            conn_err_msg = e
-            return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
+    try:
+        q = DBSession.query(Application)
+        q = q.filter(Application.application_id == application_id)
+        app = q.one()
+    except Exception, e:
+        conn_err_msg = e
+        return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
 
     return {'layout': site_layout(),
             'page_title': page_title,
@@ -419,6 +413,7 @@ def view_admin(request):
 
     page_title = 'Admin'
     user = get_user(request)
+    prod_groups = request.registry.settings['tcw.prod_groups'].splitlines()
 
     return {'layout': site_layout(),
             'page_title': page_title,
