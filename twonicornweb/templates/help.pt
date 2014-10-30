@@ -1,10 +1,23 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
 
+    <h3>External Documentation</h3>
     <p>
     <a href='https://wiki.ctgrd.com/display/Tech/Twonicorn+Runbook'>Twonicorn Runbook</a>
 
-    <h3>GLOSSARY</h3>
+    <h3>API</h3>
+
+    <p>
+    The API is used by the clients to get deploy information. Pass in application_id, env, & loc to recieve a JSON response containing the artifact(s) that are current for the given parameters. 
+
+    <p>
+    For example:<br>
+    <a tal:attributes="href host_url + '/api?application_id=1&env=dev&loc=aws1'" tal:content="host_url + '/api?application_id=1&env=dev&loc=aws1'">/api</a>
+
+    <p>
+    Future plans are to include an authenticated POST action to allow updating of the database.
+
+    <h3>Glossary</h3>
 
     <table width="75%">
       <tr>

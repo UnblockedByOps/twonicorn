@@ -3,6 +3,7 @@ from pyramid_ldap import groupfinder
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import Allow, Authenticated
+from pyramid.renderers import JSON
 import ldap
 import ConfigParser
 from sqlalchemy import engine_from_config
@@ -66,6 +67,8 @@ def main(global_config, **settings):
     config.add_route('help', '/help')
     config.add_route('user', '/user')
     config.add_route('admin', '/admin')
+    config.add_route('api', '/api')
+    config.add_renderer('json', JSON(indent=2))
 
     ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, "/etc/pki/CA/certs/ny-dc1.iac.corp.crt")
 

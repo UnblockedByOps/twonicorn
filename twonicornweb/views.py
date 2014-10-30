@@ -384,6 +384,49 @@ def view_promote(request):
             'promote': promote,
            }
 
+
+@view_config(route_name='api', permission='view', renderer='json')
+def view_api(request):
+
+    params = {'application_id': None,
+              'env': None,
+              'loc': None,
+             }
+    for p in params:
+        try:
+            params[p] = request.params[p]
+        except:
+            pass
+
+    application_id = params['application_id']
+    env = params['env']
+    loc = params['loc']
+
+    try:
+        q = DBSession.query(Application)
+        q = q.filter(Application.application_id == application_id)
+        app = q.one()
+    except Exception, e:
+        conn_err_msg = e
+        return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
+
+    results = []
+    for d in app.deploys:
+        each = {}
+        a = d.get_assignment(env)
+        each['deploy_id'] = d.deploy_id
+        each['artifact_assignment_id'] = a.artifact_assignment_id
+        each['deploy_path'] = d.deploy_path
+        each['download_url'] = a.artifact.repo.get_url(loc).url + a.artifact.location
+        each['revision'] = a.artifact.revision[:8]
+        each['artifact_type'] = d.type.name
+        each['repo_type'] = a.artifact.repo.type.name
+        each['repo_name'] = a.artifact.repo.name
+        results.append(each)
+
+    return results
+
+
 @view_config(route_name='help', permission='view', renderer='twonicornweb:templates/help.pt')
 def view_help(request):
 
@@ -393,6 +436,7 @@ def view_help(request):
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
+            'host_url': request.host_url,
             'denied': denied
            }
 
