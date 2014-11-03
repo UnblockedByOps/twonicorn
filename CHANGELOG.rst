@@ -12,7 +12,7 @@ Next Release (TBD)
 2.3
 ~~~~~~~
 
-* feature: Implimentation of teh API endpoint.
+* feature: Implimentation of the API endpoint.
 
 2.2
 ~~~~~~~
