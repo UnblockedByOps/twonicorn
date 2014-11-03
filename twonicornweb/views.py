@@ -250,6 +250,7 @@ def view_deploys(request):
     offset = 0
     end = 10
     total = 0
+    app = None
 
     try:
         offset = int(request.GET.getone("start"))
@@ -283,13 +284,14 @@ def view_deploys(request):
     commit = params['commit']
     artifact_id = params['artifact_id']
 
-    try:
-        q = DBSession.query(Application)
-        q = q.filter(Application.application_id == application_id)
-        app = q.one()
-    except Exception, e:
-        conn_err_msg = e
-        return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
+    if application_id:
+        try:
+            q = DBSession.query(Application)
+            q = q.filter(Application.application_id == application_id)
+            app = q.one()
+        except Exception, e:
+            conn_err_msg = e
+            return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
 
     return {'layout': site_layout(),
             'page_title': page_title,
