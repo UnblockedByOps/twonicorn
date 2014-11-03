@@ -17,7 +17,7 @@ requires = [
     'Pygments==1.6',
     'waitress==0.8.9',
     'SQLAlchemy==0.9.7',
-    'mysql-connector-python=1.2.2',
+    'mysql-connector-python==1.2.2',
     'transaction==1.4.3',
     'zope.sqlalchemy==0.7.5',
     'python-ldap==2.4.16',
