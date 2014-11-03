@@ -9,9 +9,12 @@ Next Release (TBD)
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+2.4
+~~~~~~~
+* bugfix: hardcode cgm version of mysql-connector-python
+
 2.3
 ~~~~~~~
-
 * feature: Implimentation of the API endpoint.
 
 2.2
