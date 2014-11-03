@@ -9,6 +9,11 @@ Next Release (TBD)
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+2.3
+~~~~~~~
+
+* feature: Implimentation of teh API endpoint.
+
 2.2
 ~~~~~~~
 * bugfix: Fix exception when a deploy has no entry in the database yet.
