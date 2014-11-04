@@ -40,6 +40,7 @@
             <th>Artifact ID</th>
             <th>Assignment ID</th>
             <th>Assignment Date</th>
+            <th>Promoted By</th>
             <th>History</th>
           </tr>
 
@@ -68,6 +69,7 @@
             <td tal:content="aa.artifact_id if aa else 'No Data'">12345</td>
             <td tal:content="aa.artifact_assignment_id if aa else 'No Data'">12345</td>
             <td tal:content="aa.created if aa else 'No Data'">12345</td>
+            <td tal:content="aa.user if aa else 'No Data'">12345</td>
             <td tal:condition="not aa">No Data</td>
             <td tal:condition="aa"><a href="http://twonicorn.ctgrd.com/deploys?history=true"
                    title="Show History"
