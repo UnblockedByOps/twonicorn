@@ -119,6 +119,7 @@
               <th>Artifact ID</th>
               <th>Assignment ID</th>
               <th>Assignment Date</th>
+              <th>Promoted By</th>
               <th></th>
             </tr>
       
@@ -137,6 +138,7 @@
               <td tal:content="item.artifact_id">0</td>
               <td tal:content="item.artifact_assignment_id">12345</td>
               <td tal:content="item.created">12345</td>
+              <td tal:content="item.user">McLovin</td>
               <td>
                 <ul tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
                   <li tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
