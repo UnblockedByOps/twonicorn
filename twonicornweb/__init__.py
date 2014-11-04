@@ -68,6 +68,7 @@ def main(global_config, **settings):
     config.add_route('user', '/user')
     config.add_route('admin', '/admin')
     config.add_route('api', '/api')
+    config.add_route('healthcheck', '/healthcheck')
     config.add_renderer('json', JSON(indent=2))
 
     ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, "/etc/pki/CA/certs/ny-dc1.iac.corp.crt")

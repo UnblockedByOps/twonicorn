@@ -1,12 +1,14 @@
 from pyramid.view import view_config, forbidden_view_config
 from pyramid.renderers import get_renderer
 from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPServiceUnavailable
 from pyramid.security import remember, forget
 from pyramid.session import signed_serialize, signed_deserialize
 from pyramid_ldap import get_ldap_connector, groupfinder
 from pyramid.response import Response
 from datetime import datetime
 import logging
+import os.path
 from twonicornweb.models import (
     DBSession,
     Application,
@@ -48,7 +50,6 @@ def get_user(request):
     except Exception, e:
         log.error("%s (%s)" % (Exception, e))
         (pretty, id, ad_login, groups, first, last, auth, prd_auth, admin_auth) = ('', '', '', '', '', '', False, False, False)
-
 
     try:
         ad_login = validate_username_cookie(request.cookies['un'], request.registry.settings['tcw.cookie_token'])
@@ -109,6 +110,14 @@ def validate_username_cookie(cookieval, cookie_token):
     an exception"""
 
     return signed_deserialize(cookieval, cookie_token)
+
+@view_config(route_name='healthcheck', renderer='twonicornweb:templates/healthcheck.pt')
+def healthcheck(request):
+
+    if os.path.isfile(request.registry.settings['tcw.healthcheck_file']):
+        return {'message': 'ok'}
+    else:
+        return HTTPServiceUnavailable()
 
 @view_config(route_name='logout', renderer='twonicornweb:templates/logout.pt')
 def logout(request):
@@ -387,7 +396,7 @@ def view_promote(request):
            }
 
 
-@view_config(route_name='api', permission='view', renderer='json')
+@view_config(route_name='api', renderer='json')
 def view_api(request):
 
     params = {'application_id': None,
