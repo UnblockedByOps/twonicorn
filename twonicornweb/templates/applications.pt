@@ -40,7 +40,7 @@
             <td><a href="deploys?application_id=0"
                    tal:attributes="href '/deploys?application_id=%d&nodegroup=%s' % (item.application_id,item.nodegroup)"
                    tal:content="item.nodegroup">Nodegroup Link</a></td>
-            <td tal:content="item.created">1975-09-28 00:00:00</td>
+            <td tal:content="item.localize_date">1975-09-28 00:00:00</td>
           </tr>
           </tbody>
         </table>

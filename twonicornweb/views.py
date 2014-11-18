@@ -418,21 +418,26 @@ def view_api(request):
         q = q.filter(Application.application_id == application_id)
         app = q.one()
     except Exception, e:
-        conn_err_msg = e
-        return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
+        log.error("Failed to retrive data on api call (%s)" % (e))
+        results = []
+        return results
+
+    print "APPPPPPPPPPPPPPPPPPPPP: ", app
+    print dir(app)
 
     results = []
     for d in app.deploys:
         each = {}
         a = d.get_assignment(env)
-        each['deploy_id'] = d.deploy_id
-        each['artifact_assignment_id'] = a.artifact_assignment_id
-        each['deploy_path'] = d.deploy_path
-        each['download_url'] = a.artifact.repo.get_url(loc).url + a.artifact.location
-        each['revision'] = a.artifact.revision[:8]
-        each['artifact_type'] = d.type.name
-        each['repo_type'] = a.artifact.repo.type.name
-        each['repo_name'] = a.artifact.repo.name
+        if a:
+            each['deploy_id'] = d.deploy_id
+            each['artifact_assignment_id'] = a.artifact_assignment_id
+            each['deploy_path'] = d.deploy_path
+            each['download_url'] = a.artifact.repo.get_url(loc).url + a.artifact.location
+            each['revision'] = a.artifact.revision[:8]
+            each['artifact_type'] = d.type.name
+            each['repo_type'] = a.artifact.repo.type.name
+            each['repo_name'] = a.artifact.repo.name
         results.append(each)
 
     return results

@@ -1,5 +1,6 @@
 import datetime
 import arrow
+from dateutil import tz
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy import (
@@ -40,6 +41,12 @@ class Application(Base):
         q = q.join(Deploy, Application.application_id == Deploy.application_id)
         q = q.filter(Deploy.deploy_id == '%s' % deploy_id)
         return q.one()
+        
+    @hybrid_property
+    def localize_date(self):
+        utc = arrow.get(self.created)
+        zone = 'US/Pacific'
+        return  utc.to(tz.gettz(zone)).format('YYYY-MM-DD HH:mm:ss')
 
 
 class Artifact(Base):
@@ -84,6 +91,13 @@ class ArtifactAssignment(Base):
             return url_location + '/' + self.env.name + '/?p=' + self.artifact.revision
         else:
             return url_location
+
+    @hybrid_property
+    def localize_date(self):
+        utc = arrow.get(self.created)
+        zone = 'US/Pacific'
+        return  utc.to(tz.gettz(zone)).format('YYYY-MM-DD HH:mm:ss')
+
 
 
 class ArtifactType(Base):
