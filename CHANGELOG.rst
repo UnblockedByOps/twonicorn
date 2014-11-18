@@ -5,13 +5,18 @@ Next Release (TBD)
 ------------------
 
 * feature: Support for listing all staged promotions by application.
+* feature: Localize the display of dates.
 * feature: Support for jars as an artifact type.
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+2.5
+~~~~~~~
+* bugfix: API no longer requires auth for deployments.
+
 2.4
 ~~~~~~~
-* bugfix: hardcode cgm version of mysql-connector-python
+* bugfix: hardcode cgm version of mysql-connector-python.
 
 2.3
 ~~~~~~~
@@ -35,7 +40,7 @@ Next Release (TBD)
 
 1.5
 ~~~~~~~
-* Moving dependency to TwonicornLib from TwonicornWebLib
+* Moving dependency to TwonicornLib from TwonicornWebLib.
 
 1.4
 ~~~~~~~
@@ -43,11 +48,11 @@ Next Release (TBD)
 
 1.3
 ~~~~~~~
-* removing the cheeky commentary on some of the pages
+* removing the cheeky commentary on some of the pages.
 
 1.2
 ~~~~~~~
-* bugfix: fixed a bug when the referer.url was an outside site (jenkins)
+* bugfix: fixed a bug when the referer.url was an outside site (jenkins).
 
 1.1
 ~~~~~~~
