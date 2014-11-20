@@ -22,9 +22,15 @@ from sqlalchemy.orm import (
 from zope.sqlalchemy import ZopeTransactionExtension
 import re
 
+
 cleanse_re = re.compile("[^A-Za-z0-9_]")
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
+
+def _localize_date(obj):
+        utc = arrow.get(obj.created)
+        zone = 'US/Pacific' # FIXME: This needs to be configurable somehow
+        return  utc.to(tz.gettz(zone)).format('YYYY-MM-DD HH:mm:ss ZZ')
 
 
 class Application(Base):
@@ -44,9 +50,8 @@ class Application(Base):
         
     @hybrid_property
     def localize_date(self):
-        utc = arrow.get(self.created)
-        zone = 'US/Pacific'
-        return  utc.to(tz.gettz(zone)).format('YYYY-MM-DD HH:mm:ss')
+        local = _localize_date(self)
+        return local
 
 
 class Artifact(Base):
@@ -68,6 +73,11 @@ class Artifact(Base):
         q = q.filter(Artifact.artifact_id == '%s' % artifact_id)
         q = q.filter(RepoUrl.ct_loc == 'lax1')
         return q.first()
+
+    @hybrid_property
+    def localize_date(self):
+        local = _localize_date(self)
+        return local
 
 
 class ArtifactAssignment(Base):
@@ -94,10 +104,8 @@ class ArtifactAssignment(Base):
 
     @hybrid_property
     def localize_date(self):
-        utc = arrow.get(self.created)
-        zone = 'US/Pacific'
-        return  utc.to(tz.gettz(zone)).format('YYYY-MM-DD HH:mm:ss')
-
+        local = _localize_date(self)
+        return local
 
 
 class ArtifactType(Base):
