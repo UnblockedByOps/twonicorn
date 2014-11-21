@@ -20,7 +20,7 @@ requires = [
     'mysql-connector-python==1.2.2cgm',
     'transaction==1.4.3',
     'zope.sqlalchemy==0.7.5',
-    'python-ldap==2.4.18',
+    'python-ldap==2.4.16',
     'ldappool==1.0',
     'requests==2.3.0',
     'arrow==0.4.4',
