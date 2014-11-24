@@ -431,6 +431,7 @@ def view_api(request):
         a = d.get_assignment(env)
         if a:
             each['deploy_id'] = d.deploy_id
+            each['package_name'] = d.package_name
             each['artifact_assignment_id'] = a.artifact_assignment_id
             each['deploy_path'] = d.deploy_path
             each['download_url'] = a.artifact.repo.get_url(loc).url + a.artifact.location

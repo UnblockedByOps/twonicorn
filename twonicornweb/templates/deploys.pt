@@ -28,10 +28,11 @@
         <table width="100%" tal:condition="(application_id or nodegroup)">
           <tr class="subh">
             <td class="subh">Node Group</td>
-            <td class="subh_app" colspan="10" tal:content="nodegroup.upper() + ' (' + application_id + ')'">tct</td>
+            <td class="subh_app" colspan="11" tal:content="nodegroup.upper() + ' (' + application_id + ')'">tct</td>
           </tr>
           <tr>
             <th>Deploy Path</th>
+            <th>Package Name</th>
             <th>Revision</th>
             <th>Branch/Tag</th>
             <th>Repo</th>
@@ -46,7 +47,7 @@
 
           <tbody tal:repeat="denv ['prd','qat','dev']" tal:condition="app">
           <tr tal:attributes="class denv" tal:condition="app">
-            <td colspan="11"><b tal:content="denv.upper()">DEV</b></td>
+            <td colspan="12"><b tal:content="denv.upper()">DEV</b></td>
           </tr>
           <tr tal:repeat="item app.deploys">
             <?python
@@ -57,6 +58,7 @@
                     total = item.get_assignment_count(env)
             ?>
             <td tal:content="item.deploy_path" tal:attributes="title 'Deploy ID: ' + str(item.deploy_id)">/app/something</td>
+            <td tal:content="item.package_name" tal:attributes="title '%s' % item.package_name">PythonPackage</td>
             <td tal:content="aa.artifact.revision[:8] if aa else 'No Data'">12345</td>
             <td tal:content="aa.artifact.branch if aa else 'No Data'">trunk</td>
             <td tal:content="aa.artifact.repo.name if aa else 'No Data'">12345</td>
@@ -127,6 +129,7 @@
             <!--! Do some reformatting of the urls to make them useful -->
             <tr tal:attributes="class '%s' % env if repeat.item.even else 'white'">
               <td tal:content="histdeploy.deploy_path" tal:attributes="title 'Deploy ID: ' + str(item.deploy_id)">/app/something</td>
+              <td tal:content="histdeploy.package_name" tal:attributes="title '%s' % histdeploy.package_name">PythonPackage</td>
               <td tal:content="item.artifact.revision[:8]">12345</td>
               <td tal:content="item.artifact.branch">trunk</td>
               <td tal:content="item.artifact.repo.name">12345</td>

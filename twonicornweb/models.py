@@ -120,6 +120,7 @@ class Deploy(Base):
     application_id   = Column(Integer, ForeignKey('applications.application_id'), nullable=False)
     artifact_type_id = Column(Integer, ForeignKey('artifact_types.artifact_type_id'), nullable=False)
     deploy_path      = Column(Text, nullable=False)
+    package_name     = Column(Text, nullable=True)
     created          = Column(TIMESTAMP, nullable=False)
     application      = relationship("Application", backref=backref('deploys'))
     artifact_assignments = relationship("ArtifactAssignment", backref=backref('deploy'),
