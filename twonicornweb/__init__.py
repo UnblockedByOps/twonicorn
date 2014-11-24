@@ -9,6 +9,7 @@ import ConfigParser
 from sqlalchemy import engine_from_config
 from sqlalchemy import event
 from sqlalchemy.exc import DisconnectionError
+import os
 
 from .models import (
     DBSession,
@@ -71,7 +72,10 @@ def main(global_config, **settings):
     config.add_route('healthcheck', '/healthcheck')
     config.add_renderer('json', JSON(indent=2))
 
-    ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, "/etc/pki/CA/certs/ny-dc1.iac.corp.crt")
+    # FIXME: Need to do a check because this broke in dev env
+    cert = '/etc/pki/CA/certs/ny-dc1.iac.corp.crt'
+    if os.path.isfile(cert):
+        ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, cert)
 
     config.set_authentication_policy(
         AuthTktAuthenticationPolicy(settings['tcw.cookie_token'], callback=groupfinder, max_age=604800)
