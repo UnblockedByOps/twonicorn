@@ -10,6 +10,9 @@ Next Release (TBD)
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+2.5.1
+~~~~~~~
+* feature: Adding python package support
 2.5
 ~~~~~~~
 * bugfix: API no longer requires auth for deployments.
