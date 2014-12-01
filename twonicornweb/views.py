@@ -2,6 +2,8 @@ from pyramid.view import view_config, forbidden_view_config
 from pyramid.renderers import get_renderer
 from pyramid.httpexceptions import HTTPFound
 from pyramid.httpexceptions import HTTPServiceUnavailable
+from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.security import remember, forget
 from pyramid.session import signed_serialize, signed_deserialize
 from pyramid_ldap import get_ldap_connector, groupfinder
@@ -9,6 +11,7 @@ from pyramid.response import Response
 from datetime import datetime
 import logging
 import os.path
+import binascii
 from twonicornweb.models import (
     DBSession,
     Application,
@@ -110,6 +113,33 @@ def validate_username_cookie(cookieval, cookie_token):
     an exception"""
 
     return signed_deserialize(cookieval, cookie_token)
+
+
+def basicauth(request, l_login, l_password):
+    try:
+        authorization = request.environ['HTTP_AUTHORIZATION']
+    except:
+        return None
+
+    try:
+        authmeth, auth = authorization.split(' ', 1)
+    except ValueError:  # not enough values to unpack
+        return None
+    if authmeth.lower() == 'basic':
+        try:
+            auth = auth.strip().decode('base64')
+        except binascii.Error:  # can't decode
+            return None
+        try:
+            login, password = auth.split(':', 1)
+        except ValueError:  # not enough values to unpack
+            return None
+
+        if login == l_login and password == l_password:
+            return True
+
+    return None
+
 
 @view_config(route_name='healthcheck', renderer='twonicornweb:templates/healthcheck.pt')
 def healthcheck(request):
@@ -396,10 +426,11 @@ def view_promote(request):
            }
 
 
-@view_config(route_name='api', renderer='json')
+@view_config(route_name='api', request_method='GET', renderer='json')
 def view_api(request):
 
     params = {'application_id': None,
+              'deploy_id': None,
               'env': None,
               'loc': None,
              }
@@ -410,38 +441,116 @@ def view_api(request):
             pass
 
     application_id = params['application_id']
+    deploy_id = params['deploy_id']
     env = params['env']
     loc = params['loc']
-
-    try:
-        q = DBSession.query(Application)
-        q = q.filter(Application.application_id == application_id)
-        app = q.one()
-    except Exception, e:
-        log.error("Failed to retrive data on api call (%s)" % (e))
-        results = []
-        return results
-
-    print "APPPPPPPPPPPPPPPPPPPPP: ", app
-    print dir(app)
-
     results = []
-    for d in app.deploys:
+
+    if application_id and deploy_id:
+        return HTTPBadRequest()
+
+    if application_id:
+        try:
+            q = DBSession.query(Application)
+            q = q.filter(Application.application_id == application_id)
+            app = q.one()
+        except Exception, e:
+            log.error("Failed to retrive data on api call (%s)" % (e))
+            return results
+
+        for d in app.deploys:
+            each = {}
+            a = d.get_assignment(env)
+            if a:
+                each['deploy_id'] = d.deploy_id
+                each['package_name'] = d.package_name
+                each['artifact_assignment_id'] = a.artifact_assignment_id
+                each['deploy_path'] = d.deploy_path
+                each['download_url'] = a.artifact.repo.get_url(loc).url + a.artifact.location
+                each['revision'] = a.artifact.revision[:8]
+                each['artifact_type'] = d.type.name
+                each['repo_type'] = a.artifact.repo.type.name
+                each['repo_name'] = a.artifact.repo.name
+            results.append(each)
+
+    if deploy_id:
+        try:
+            q = DBSession.query(Deploy)
+            q = q.filter(Deploy.deploy_id == deploy_id)
+            deploy = q.one()
+            print deploy
+            print dir(deploy)
+        except Exception, e:
+            log.error("Failed to retrive data on api call (%s)" % (e))
+            return results
+
         each = {}
-        a = d.get_assignment(env)
+        a = deploy.get_assignment(env)
         if a:
-            each['deploy_id'] = d.deploy_id
-            each['package_name'] = d.package_name
+            each['deploy_id'] = deploy.deploy_id
+            each['package_name'] = deploy.package_name
             each['artifact_assignment_id'] = a.artifact_assignment_id
-            each['deploy_path'] = d.deploy_path
+            each['deploy_path'] = deploy.deploy_path
             each['download_url'] = a.artifact.repo.get_url(loc).url + a.artifact.location
             each['revision'] = a.artifact.revision[:8]
-            each['artifact_type'] = d.type.name
+            each['artifact_type'] = deploy.type.name
             each['repo_type'] = a.artifact.repo.type.name
             each['repo_name'] = a.artifact.repo.name
         results.append(each)
 
     return results
+
+
+@view_config(route_name='api', request_method='PUT', renderer='json')
+def write_api(request):
+
+    # Require auth
+    if not basicauth(request, request.registry.settings['tcw.api_user'], request.registry.settings['tcw.api_pass']):
+        return HTTPForbidden()
+
+    params = {'deploy_id': None,
+              'repo_id': None,
+              'env': None,
+              'loc': None,
+              'branch': None,
+              'revision': None,
+              'user': None,
+             }
+    for p in params:
+        try:
+            params[p] = request.params[p]
+        except:
+            pass
+
+    deploy_id = params['deploy_id']
+    repo_id = params['repo_id']
+    env = params['env']
+    loc = params['loc']
+    revision = params['revision']
+    branch = params['branch']
+    user = params['user']
+
+    if env == 'prd':
+        return HTTPForbidden()
+
+    # Convert the env name to the id
+    env_id = Env.get_env_id(env)
+
+    # Create
+    utcnow = datetime.utcnow()
+    create = Artifact(repo_id=repo_id, location=loc, revision=revision, branch=branch, valid='1', created=utcnow)
+    DBSession.add(create)
+    DBSession.flush()
+    artifact_id = create.artifact_id
+
+    print "artifact id: %s" % artifact_id
+    # Borked. unicode parameters, env_id is an object? also need to differentiate confs
+
+    # Assign
+    utcnow = datetime.utcnow()
+    assign = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id, lifecycle_id='2', user=user, created=utcnow)
+    DBSession.add(assign)
+    DBSession.flush()
 
 
 @view_config(route_name='help', permission='view', renderer='twonicornweb:templates/help.pt')
