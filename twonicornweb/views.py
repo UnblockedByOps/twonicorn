@@ -4,6 +4,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.httpexceptions import HTTPServiceUnavailable
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.httpexceptions import HTTPConflict
 from pyramid.security import remember, forget
 from pyramid.session import signed_serialize, signed_deserialize
 from pyramid_ldap import get_ldap_connector, groupfinder
@@ -506,7 +507,7 @@ def write_api(request):
 
     # Require auth
     if not basicauth(request, request.registry.settings['tcw.api_user'], request.registry.settings['tcw.api_pass']):
-        return HTTPForbidden()
+        return HTTPForbidden('Invalid username/password')
 
     params = {'deploy_id': None,
               'repo_id': None,
@@ -531,26 +532,38 @@ def write_api(request):
     user = params['user']
 
     if env == 'prd':
-        return HTTPForbidden()
+        return HTTPForbidden('Production artifacts must be '
+                              'promoted through the UI')
 
     # Convert the env name to the id
     env_id = Env.get_env_id(env)
 
     # Create
-    utcnow = datetime.utcnow()
-    create = Artifact(repo_id=repo_id, location=loc, revision=revision, branch=branch, valid='1', created=utcnow)
-    DBSession.add(create)
-    DBSession.flush()
-    artifact_id = create.artifact_id
-
-    print "artifact id: %s" % artifact_id
-    # Borked. unicode parameters, env_id is an object? also need to differentiate confs
-
-    # Assign
-    utcnow = datetime.utcnow()
-    assign = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id, lifecycle_id='2', user=user, created=utcnow)
-    DBSession.add(assign)
-    DBSession.flush()
+    try:
+        utcnow = datetime.utcnow()
+        create = Artifact(repo_id=repo_id, location=loc, revision=revision, branch=branch, valid='1', created=utcnow)
+        DBSession.add(create)
+        DBSession.flush()
+        artifact_id = create.artifact_id
+    
+        # Assign
+        utcnow = datetime.utcnow()
+        assign = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id='2', user=user, created=utcnow)
+        DBSession.add(assign)
+        DBSession.flush()
+    except Exception as ex:
+        if type(ex).__name__ == 'IntegrityError':
+            logging.info('Artifact location/revision combination '
+                          'is not unique. Nothing to do.')
+            # Rollback
+            DBSession.rollback()
+            return HTTPConflict('Artifact location/revision combination '
+                                 'is not unique. Nothing to do.')
+        else:
+            # Rollback in case there is any error
+            DBSession.rollback()
+            raise
+            logging.error('There was an error updating the db!')
 
 
 @view_config(route_name='help', permission='view', renderer='twonicornweb:templates/help.pt')
