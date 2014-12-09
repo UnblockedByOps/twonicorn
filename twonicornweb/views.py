@@ -512,7 +512,7 @@ def write_api(request):
     params = {'deploy_id': None,
               'repo_id': None,
               'env': None,
-              'loc': None,
+              'location': None,
               'branch': None,
               'revision': None,
               'user': None,
@@ -526,7 +526,7 @@ def write_api(request):
     deploy_id = params['deploy_id']
     repo_id = params['repo_id']
     env = params['env']
-    loc = params['loc']
+    location = params['location']
     revision = params['revision']
     branch = params['branch']
     user = params['user']
@@ -541,7 +541,7 @@ def write_api(request):
     # Create
     try:
         utcnow = datetime.utcnow()
-        create = Artifact(repo_id=repo_id, location=loc, revision=revision, branch=branch, valid='1', created=utcnow)
+        create = Artifact(repo_id=repo_id, location=location, revision=revision, branch=branch, valid='1', created=utcnow)
         DBSession.add(create)
         DBSession.flush()
         artifact_id = create.artifact_id
