@@ -552,9 +552,11 @@ def write_api(request):
         assign = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id='2', user=user, created=utcnow)
         DBSession.add(assign)
         DBSession.flush()
+        artifact_assignment_id = assign.artifact_assignment_id
 
         each = {}
         each['artifact_id'] = artifact_id
+        each['artifact_assignment_id'] = artifact_assignment_id
         results.append(each)
         return results
 
