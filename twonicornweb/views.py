@@ -511,6 +511,25 @@ def view_api(request):
             each['name'] = e.name
             results.append(each)
 
+    if request.matchdict['resource'] == 'artifact':
+        try:
+            q = DBSession.query(Artifact)
+            q = q.filter(Artifact.artifact_id == id)
+            artifact = q.one()
+        except Exception, e:
+            log.error("Failed to retrive data on api call (%s)" % (e))
+            return results
+
+        each = {}
+        each['artifact_id'] = artifact.artifact_id
+        each['branch'] = artifact.branch
+        each['created'] = artifact.localize_date
+        each['download_url'] = artifact.repo.get_url(loc).url + artifact.location
+        each['repo_id'] = artifact.repo_id
+        each['revision'] = artifact.revision
+        each['valid'] = artifact.valid
+        results.append(each)
+
     return results
 
 

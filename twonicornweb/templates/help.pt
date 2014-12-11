@@ -10,9 +10,20 @@
     <p>
     The API is used by the clients to get deploy information. Pass in application_id, env, & loc to recieve a JSON response containing the artifact(s) that are current for the given parameters. 
 
+    <h4>Examples</h4>
+
     <p>
-    For example:<br>
+      Retrieve an application:<br>
     <a tal:attributes="href host_url + '/api/application?id=1&env=dev&loc=aws1'" tal:content="host_url + '/api/application?id=1&env=dev&loc=aws1'">/api</a>
+    <p>
+      Retrieve a deploy:<br>
+    <a tal:attributes="href host_url + '/api/deploy?id=1&loc=lax1&env=dev'" tal:content="host_url + '/api/deploy?id=1&loc=lax1&env=dev'">/api</a>
+    <p>
+      Retrieve an artifact:<br>
+    <a tal:attributes="href host_url + '/api/artifact?id=308&loc=lax1'" tal:content="host_url + '/api/artifact?id=308&loc=lax1'">/api</a>
+    <p>
+      Retrieve all configured environments:<br>
+    <a tal:attributes="href host_url + '/api/envs'" tal:content="host_url + '/api/envs'">/api</a>
 
     <p>
     Future plans are to include an authenticated POST action to allow updating of the database.
