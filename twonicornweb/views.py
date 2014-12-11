@@ -551,9 +551,6 @@ def write_api(request):
         return HTTPForbidden('Production artifacts must be '
                               'promoted through the UI')
 
-    # Convert the env name to the id
-    env_id = Env.get_env_id(env)
-
     if request.matchdict['resource'] == 'artifact':
 
         try:
@@ -584,6 +581,9 @@ def write_api(request):
                 logging.error('There was an error updating the db!')
 
     if request.matchdict['resource'] == 'artifact_assignment':
+
+        # Convert the env name to the id
+        env_id = Env.get_env_id(env)
 
         try:
             utcnow = datetime.utcnow()
