@@ -147,13 +147,13 @@ class Deploy(Base):
         return q.limit(perpage).offset(offset)
 
     @hybrid_method
-    def get_assignment(self, env):
+    def get_assignment(self, env, lifecycle):
         q = self.artifact_assignments
         q = q.join(Env, ArtifactAssignment.env_id == Env.env_id)
         q = q.filter(Env.name == env)
         q = q.join(Lifecycle, ArtifactAssignment.lifecycle_id == Lifecycle.lifecycle_id)
         q = q.join(Artifact, ArtifactAssignment.artifact_id == Artifact.artifact_id)
-        q = q.filter(Lifecycle.name == 'current')
+        q = q.filter(Lifecycle.name == lifecycle)
         q = q.filter(Artifact.valid == 1)
         return q.first()
 

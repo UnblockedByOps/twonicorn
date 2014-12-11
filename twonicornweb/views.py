@@ -433,6 +433,7 @@ def view_api(request):
     params = {'id': None,
               'env': None,
               'loc': None,
+              'lifecycle': None,
              }
     for p in params:
         try:
@@ -443,6 +444,7 @@ def view_api(request):
     id = params['id']
     env = params['env']
     loc = params['loc']
+    lifecycle = params['lifecycle']
     results = []
 
 #    if application_id and deploy_id:
@@ -459,7 +461,7 @@ def view_api(request):
 
         for d in app.deploys:
             each = {}
-            a = d.get_assignment(env)
+            a = d.get_assignment(env, lifecycle)
             if a:
                 each['deploy_id'] = d.deploy_id
                 each['package_name'] = d.package_name
@@ -470,6 +472,7 @@ def view_api(request):
                 each['artifact_type'] = d.type.name
                 each['repo_type'] = a.artifact.repo.type.name
                 each['repo_name'] = a.artifact.repo.name
+                each['lifecycle'] = a.lifecycle.name
             results.append(each)
 
     if request.matchdict['resource'] == 'deploy':
@@ -482,7 +485,7 @@ def view_api(request):
             return results
 
         each = {}
-        a = deploy.get_assignment(env)
+        a = deploy.get_assignment(env, lifecycle)
         if a:
             each['deploy_id'] = deploy.deploy_id
             each['package_name'] = deploy.package_name
@@ -493,6 +496,7 @@ def view_api(request):
             each['artifact_type'] = deploy.type.name
             each['repo_type'] = a.artifact.repo.type.name
             each['repo_name'] = a.artifact.repo.name
+            each['lifecycle'] = a.lifecycle.name
         results.append(each)
 
     if request.matchdict['resource'] == 'envs':
@@ -526,6 +530,7 @@ def view_api(request):
         each['created'] = artifact.localize_date
         each['download_url'] = artifact.repo.get_url(loc).url + artifact.location
         each['repo_id'] = artifact.repo_id
+        each['repo_type'] = artifact.repo_type
         each['revision'] = artifact.revision
         each['valid'] = artifact.valid
         results.append(each)

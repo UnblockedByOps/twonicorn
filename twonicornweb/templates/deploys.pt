@@ -51,7 +51,7 @@
           </tr>
           <tr tal:repeat="item app.deploys">
             <?python
-                aa = item.get_assignment(denv)
+                aa = item.get_assignment(denv, 'current')
                 if ((deploy_id) and int(deploy_id) == item.deploy_id) and (env is not None):
                     histassignments = item.get_assignments(env, offset, perpage)
                     histdeploy = item
