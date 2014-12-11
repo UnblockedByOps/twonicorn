@@ -430,8 +430,7 @@ def view_promote(request):
 @view_config(route_name='api', request_method='GET', renderer='json')
 def view_api(request):
 
-    params = {'application_id': None,
-              'deploy_id': None,
+    params = {'id': None,
               'env': None,
               'loc': None,
              }
@@ -441,19 +440,18 @@ def view_api(request):
         except:
             pass
 
-    application_id = params['application_id']
-    deploy_id = params['deploy_id']
+    id = params['id']
     env = params['env']
     loc = params['loc']
     results = []
 
-    if application_id and deploy_id:
-        return HTTPBadRequest()
+#    if application_id and deploy_id:
+#        return HTTPBadRequest()
 
-    if application_id:
+    if request.matchdict['resource'] == 'application':
         try:
             q = DBSession.query(Application)
-            q = q.filter(Application.application_id == application_id)
+            q = q.filter(Application.application_id == id)
             app = q.one()
         except Exception, e:
             log.error("Failed to retrive data on api call (%s)" % (e))
@@ -474,13 +472,11 @@ def view_api(request):
                 each['repo_name'] = a.artifact.repo.name
             results.append(each)
 
-    if deploy_id:
+    if request.matchdict['resource'] == 'deploy':
         try:
             q = DBSession.query(Deploy)
-            q = q.filter(Deploy.deploy_id == deploy_id)
+            q = q.filter(Deploy.deploy_id == id)
             deploy = q.one()
-            print deploy
-            print dir(deploy)
         except Exception, e:
             log.error("Failed to retrive data on api call (%s)" % (e))
             return results
@@ -499,6 +495,22 @@ def view_api(request):
             each['repo_name'] = a.artifact.repo.name
         results.append(each)
 
+    if request.matchdict['resource'] == 'envs':
+        try:
+            q = DBSession.query(Env)
+            envs = q.all()
+            print envs
+            print dir(envs)
+        except Exception, e:
+            log.error("Failed to retrive data on api call (%s)" % (e))
+            return results
+
+        for e in envs:
+            each = {}
+            each['env_id'] = e.env_id
+            each['name'] = e.name
+            results.append(each)
+
     return results
 
 
@@ -511,6 +523,7 @@ def write_api(request):
 
     results = []
     params = {'deploy_id': None,
+              'artifact_id': None,
               'repo_id': None,
               'env': None,
               'location': None,
@@ -525,6 +538,7 @@ def write_api(request):
             pass
 
     deploy_id = params['deploy_id']
+    artifact_id = params['artifact_id']
     repo_id = params['repo_id']
     env = params['env']
     location = params['location']
@@ -532,6 +546,7 @@ def write_api(request):
     branch = params['branch']
     user = params['user']
 
+    # FIXME: Not true for confs
     if env == 'prd':
         return HTTPForbidden('Production artifacts must be '
                               'promoted through the UI')
@@ -539,40 +554,64 @@ def write_api(request):
     # Convert the env name to the id
     env_id = Env.get_env_id(env)
 
-    # Create
-    try:
-        utcnow = datetime.utcnow()
-        create = Artifact(repo_id=repo_id, location=location, revision=revision, branch=branch, valid='1', created=utcnow)
-        DBSession.add(create)
-        DBSession.flush()
-        artifact_id = create.artifact_id
+    if request.matchdict['resource'] == 'artifact':
+
+        try:
+            utcnow = datetime.utcnow()
+            create = Artifact(repo_id=repo_id, location=location, revision=revision, branch=branch, valid='1', created=utcnow)
+            DBSession.add(create)
+            DBSession.flush()
+            artifact_id = create.artifact_id
+        
+            each = {}
+            each['artifact_id'] = artifact_id
+            results.append(each)
+
+            return results
     
-        # Assign
-        utcnow = datetime.utcnow()
-        assign = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id='2', user=user, created=utcnow)
-        DBSession.add(assign)
-        DBSession.flush()
-        artifact_assignment_id = assign.artifact_assignment_id
+        except Exception as ex:
+            if type(ex).__name__ == 'IntegrityError':
+                logging.info('Artifact location/revision combination '
+                              'is not unique. Nothing to do.')
+                # Rollback
+                DBSession.rollback()
+                return HTTPConflict('Artifact location/revision combination '
+                                     'is not unique. Nothing to do.')
+            else:
+                # Rollback in case there is any error
+                DBSession.rollback()
+                raise
+                logging.error('There was an error updating the db!')
 
-        each = {}
-        each['artifact_id'] = artifact_id
-        each['artifact_assignment_id'] = artifact_assignment_id
-        results.append(each)
-        return results
+    if request.matchdict['resource'] == 'artifact_assignment':
 
-    except Exception as ex:
-        if type(ex).__name__ == 'IntegrityError':
-            logging.info('Artifact location/revision combination '
-                          'is not unique. Nothing to do.')
-            # Rollback
-            DBSession.rollback()
-            return HTTPConflict('Artifact location/revision combination '
-                                 'is not unique. Nothing to do.')
-        else:
-            # Rollback in case there is any error
-            DBSession.rollback()
-            raise
-            logging.error('There was an error updating the db!')
+        try:
+            utcnow = datetime.utcnow()
+            # FIXME: lifecycle_id is different for conf in prod
+            assign = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id='2', user=user, created=utcnow)
+            DBSession.add(assign)
+            DBSession.flush()
+            artifact_assignment_id = assign.artifact_assignment_id
+
+            each = {}
+            each['artifact_assignment_id'] = artifact_assignment_id
+            results.append(each)
+
+            return results
+
+        except Exception as ex:
+            if type(ex).__name__ == 'IntegrityError':
+                logging.info('Artifact location/revision combination '
+                              'is not unique. Nothing to do.')
+                # Rollback
+                DBSession.rollback()
+                return HTTPConflict('Artifact location/revision combination '
+                                     'is not unique. Nothing to do.')
+            else:
+                # Rollback in case there is any error
+                DBSession.rollback()
+                raise
+                logging.error('There was an error updating the db!')
 
 
 @view_config(route_name='help', permission='view', renderer='twonicornweb:templates/help.pt')
