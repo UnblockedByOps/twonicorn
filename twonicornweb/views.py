@@ -455,6 +455,7 @@ def view_api(request):
             q = DBSession.query(Application)
             q = q.filter(Application.application_id == id)
             app = q.one()
+            print "******************** APPP IS: ", app
         except Exception, e:
             log.error("Failed to retrive data on api call (%s)" % (e))
             return results
@@ -530,7 +531,7 @@ def view_api(request):
         each['created'] = artifact.localize_date
         each['download_url'] = artifact.repo.get_url(loc).url + artifact.location
         each['repo_id'] = artifact.repo_id
-        each['repo_type'] = artifact.repo_type
+        each['repo_type'] = artifact.repo.type.name
         each['revision'] = artifact.revision
         each['valid'] = artifact.valid
         results.append(each)

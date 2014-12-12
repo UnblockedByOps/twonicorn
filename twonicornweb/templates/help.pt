@@ -14,10 +14,10 @@
 
     <p>
       Retrieve an application:<br>
-    <a tal:attributes="href host_url + '/api/application?id=1&env=dev&loc=aws1'" tal:content="host_url + '/api/application?id=1&env=dev&loc=aws1'">/api</a>
+    <a tal:attributes="href host_url + '/api/application?id=1&env=dev&loc=aws1&lifecycle=current'" tal:content="host_url + '/api/application?id=1&env=dev&loc=aws1&lifecycle=current'">/api</a>
     <p>
       Retrieve a deploy:<br>
-    <a tal:attributes="href host_url + '/api/deploy?id=1&loc=lax1&env=dev'" tal:content="host_url + '/api/deploy?id=1&loc=lax1&env=dev'">/api</a>
+    <a tal:attributes="href host_url + '/api/deploy?id=1&loc=lax1&env=dev&lifecycle=current'" tal:content="host_url + '/api/deploy?id=1&loc=lax1&env=dev&lifecycle=current'">/api</a>
     <p>
       Retrieve an artifact:<br>
     <a tal:attributes="href host_url + '/api/artifact?id=308&loc=lax1'" tal:content="host_url + '/api/artifact?id=308&loc=lax1'">/api</a>
