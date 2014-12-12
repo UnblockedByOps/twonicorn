@@ -1,34 +1,66 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
 
-    <h3>External Documentation</h3>
+    <h2>External Documentation</h2>
     <p>
     <a href='https://wiki.ctgrd.com/display/Tech/Twonicorn+Runbook'>Twonicorn Runbook</a>
 
-    <h3>API</h3>
+    <h2>API</h2>
 
     <p>
-    The API is used by the clients to get deploy information. Pass in application_id, env, & loc to recieve a JSON response containing the artifact(s) that are current for the given parameters. 
+    The API is used by the clients to get deploy information. All queries return a JSON response. 
 
-    <h4>Examples</h4>
+    <h3>HTTP GET Examples</h3>
 
     <p>
-      Retrieve an application:<br>
+      Application:<br>
     <a tal:attributes="href host_url + '/api/application?id=1&env=dev&loc=aws1&lifecycle=current'" tal:content="host_url + '/api/application?id=1&env=dev&loc=aws1&lifecycle=current'">/api</a>
     <p>
-      Retrieve a deploy:<br>
+      Deploy:<br>
     <a tal:attributes="href host_url + '/api/deploy?id=1&loc=lax1&env=dev&lifecycle=current'" tal:content="host_url + '/api/deploy?id=1&loc=lax1&env=dev&lifecycle=current'">/api</a>
     <p>
-      Retrieve an artifact:<br>
+      Artifact:<br>
     <a tal:attributes="href host_url + '/api/artifact?id=308&loc=lax1'" tal:content="host_url + '/api/artifact?id=308&loc=lax1'">/api</a>
     <p>
-      Retrieve all configured environments:<br>
+      Configured environments:<br>
     <a tal:attributes="href host_url + '/api/envs'" tal:content="host_url + '/api/envs'">/api</a>
+    <p>
+      Configured artifact types:<br>
+    <a tal:attributes="href host_url + '/api/artifact_types'" tal:content="host_url + '/api/artifact_types'">/api</a>
+    <p>
+      Configured lifecycles:<br>
+    <a tal:attributes="href host_url + '/api/lifecycles'" tal:content="host_url + '/api/lifecycles'">/api</a>
+
+    <h3>HTTP PUT Examples</h3>
 
     <p>
-    Future plans are to include an authenticated POST action to allow updating of the database.
+      In order to PUT to the API, you need to authenticate with http basic auth. The username and password are configured in the following application config paramters:
+    <p>
+    tcw.api_user<br>
+    tcw.api_pass<br>
 
-    <h3>Glossary</h3>
+    <p>
+      Insertion and assignment of artifacts is handled by the injection script, this documentation is just for completeness.
+
+    <p>
+      Insert a new artifact:
+
+    <p>
+      telnet twonicorn.mydomain.com 80<br>
+      PUT /api/artifact?repo_id=3&location=/twonicorn-test-war-git-conf&revision=abc123&branch=None HTTP/1.1<br>
+      Host: twonicorn.mydomain.com<br>
+      Authorization: Basic fXBps3VzZXg6Y4JjMDIz <br>
+
+    <p>
+      Make an artifact assignment:
+
+    <p>
+      telnet twonicorn.mydomain.com 80<br>
+      PUT /api/artifact_assignment?deploy_id=3&artifact_id=352&env=dev&user=bandta HTTP/1.1<br>
+      Host: twonicorn.mydomain.com<br>
+      Authorization: Basic fXBps3VzZXg6Y4JjMDIz<br>
+
+    <h2>Glossary</h2>
 
     <table width="75%">
       <tr>

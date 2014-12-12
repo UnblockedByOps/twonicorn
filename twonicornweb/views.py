@@ -500,22 +500,6 @@ def view_api(request):
             each['lifecycle'] = a.lifecycle.name
         results.append(each)
 
-    if request.matchdict['resource'] == 'envs':
-        try:
-            q = DBSession.query(Env)
-            envs = q.all()
-            print envs
-            print dir(envs)
-        except Exception, e:
-            log.error("Failed to retrive data on api call (%s)" % (e))
-            return results
-
-        for e in envs:
-            each = {}
-            each['env_id'] = e.env_id
-            each['name'] = e.name
-            results.append(each)
-
     if request.matchdict['resource'] == 'artifact':
         try:
             q = DBSession.query(Artifact)
@@ -535,6 +519,50 @@ def view_api(request):
         each['revision'] = artifact.revision
         each['valid'] = artifact.valid
         results.append(each)
+
+    if request.matchdict['resource'] == 'envs':
+        try:
+            q = DBSession.query(Env)
+            envs = q.all()
+        except Exception, e:
+            log.error("Failed to retrive data on api call (%s)" % (e))
+            return results
+
+        for e in envs:
+            each = {}
+            each['env_id'] = e.env_id
+            each['name'] = e.name
+            results.append(each)
+
+    if request.matchdict['resource'] == 'artifact_types':
+        try:
+            q = DBSession.query(ArtifactType)
+            artifact_types = q.all()
+        except Exception, e:
+            log.error("Failed to retrive data on api call (%s)" % (e))
+            return results
+
+        for a in artifact_types:
+            each = {}
+            each['artifact_type_id'] = a.artifact_type_id
+            each['name'] = a.name
+            results.append(each)
+
+    if request.matchdict['resource'] == 'lifecycles':
+        try:
+            q = DBSession.query(Lifecycle)
+            lifecycles = q.all()
+        except Exception, e:
+            log.error("Failed to retrive data on api call (%s)" % (e))
+            return results
+
+        for l in lifecycles:
+            each = {}
+            each['lifecycle_id'] = l.lifecycle_id
+            each['name'] = l.name
+            results.append(each)
+
+    # FIXME: Need repo/repo_urls still
 
     return results
 
@@ -613,7 +641,6 @@ def write_api(request):
 
         try:
             utcnow = datetime.utcnow()
-            # FIXME: lifecycle_id is different for conf in prod
             assign = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=lifecycle_id, user=user, created=utcnow)
             DBSession.add(assign)
             DBSession.flush()
