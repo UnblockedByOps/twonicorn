@@ -571,10 +571,11 @@ def write_api(request):
     branch = params['branch']
     user = params['user']
 
-    # FIXME: Not true for confs
+    # Dev and qat go live immediately, prd goes to init
     if env == 'prd':
-        return HTTPForbidden('Production artifacts must be '
-                              'promoted through the UI')
+        lifecycle_id = '1'
+    else:
+        lifecycle_id = '2'
 
     if request.matchdict['resource'] == 'artifact':
 
@@ -613,7 +614,7 @@ def write_api(request):
         try:
             utcnow = datetime.utcnow()
             # FIXME: lifecycle_id is different for conf in prod
-            assign = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id='2', user=user, created=utcnow)
+            assign = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=lifecycle_id, user=user, created=utcnow)
             DBSession.add(assign)
             DBSession.flush()
             artifact_assignment_id = assign.artifact_assignment_id
