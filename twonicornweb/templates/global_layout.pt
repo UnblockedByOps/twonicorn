@@ -17,11 +17,12 @@
     <table class="nav" width="100%">
       <tr class="nav">
         <td class="nav">
-          [ <a class="nav" href="/">HOME</a> ]
-          [ <a class="nav" href="/applications">APPLICATIONS</a> ]
-          [ <a class="nav" href="/deploys">DEPLOYS</a> ]
-          [ <a class="nav" href="/promote">PROMOTE</a> ]
-          [ <a class="nav" href="/help">HELP</a> ]
+          <a class="nav" href="/">[ HOME ]</a>
+          <a class="nav" href="/applications">[ APPLICATIONS ]</a>
+          <a class="nav" href="/deploys">[ DEPLOYS ]</a>
+          <a class="nav" href="/promote">[ PROMOTE ]</a>
+          <a class="nav" href="/control_panel" tal:condition="user.cp_auth">[ CONTROL PANEL ]</a>
+          <a class="nav" href="/help">[ HELP ]</a>
         </td>
         <td class="nav right">
           <ul class="user">

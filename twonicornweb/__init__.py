@@ -19,7 +19,7 @@ from .models import (
 
 class RootFactory(object):
     __acl__ = [(Allow, Authenticated, 'view'),
-               (Allow, 'CN=CM_Team,OU=Security Groups,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp', 'prom')]
+               (Allow, 'CN=CM_Team,OU=Security Groups,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp', 'cp')]
     def __init__(self, request):
         pass
 
@@ -68,6 +68,8 @@ def main(global_config, **settings):
     config.add_route('help', '/help')
     config.add_route('user', '/user')
     config.add_route('admin', '/admin')
+    config.add_route('cp', '/control_panel')
+    config.add_route('cp_resource', '/control_panel/{resource}')
     config.add_route('api', '/api/{resource}')
     config.add_route('healthcheck', '/healthcheck')
     config.add_renderer('json', JSON(indent=2))

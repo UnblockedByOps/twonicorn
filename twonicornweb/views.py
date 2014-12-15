@@ -44,6 +44,7 @@ def get_user(request):
 
     prod_auth = False
     admin_auth = False
+    cp_auth = False
 
     try:
         id = request.authenticated_userid
@@ -53,7 +54,7 @@ def get_user(request):
         pretty = "%s %s" % (first, last)
     except Exception, e:
         log.error("%s (%s)" % (Exception, e))
-        (pretty, id, ad_login, groups, first, last, auth, prd_auth, admin_auth) = ('', '', '', '', '', '', False, False, False)
+        (pretty, id, ad_login, groups, first, last, auth, prd_auth, admin_auth, cp_auth) = ('', '', '', '', '', '', False, False, False, False)
 
     try:
         ad_login = validate_username_cookie(request.cookies['un'], request.registry.settings['tcw.cookie_token'])
@@ -74,6 +75,13 @@ def get_user(request):
             admin_auth = True
             break
 
+    # Check if the user is authorized for cp
+    cp_groups = request.registry.settings['tcw.cp_groups'].splitlines()
+    for a in cp_groups:
+        if a in groups:
+            cp_auth = True
+            break
+
     user = {}
     user['id'] = id
     user['ad_login'] = ad_login
@@ -83,6 +91,7 @@ def get_user(request):
     user['loggedin'] = auth
     user['prod_auth'] = prod_auth
     user['admin_auth'] = admin_auth
+    user['cp_auth'] = cp_auth
     user['pretty'] = pretty
 
     return (user)
@@ -696,6 +705,20 @@ def view_user(request):
 def view_admin(request):
 
     page_title = 'Admin'
+    user = get_user(request)
+    prod_groups = request.registry.settings['tcw.prod_groups'].splitlines()
+
+    return {'layout': site_layout(),
+            'page_title': page_title,
+            'user': user,
+            'prod_groups': prod_groups,
+            'denied': denied,
+           }
+
+@view_config(route_name='cp', permission='cp', renderer='twonicornweb:templates/cp.pt')
+def view_cp(request):
+
+    page_title = 'Control Panel'
     user = get_user(request)
     prod_groups = request.registry.settings['tcw.prod_groups'].splitlines()
 
