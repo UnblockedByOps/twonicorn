@@ -5,14 +5,18 @@ Next Release (TBD)
 ------------------
 
 * feature: Support for listing all staged promotions by application.
-* feature: Localize the display of dates.
 * feature: Support for jars as an artifact type.
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+2.6
+~~~~~~~
+* feature: New PUT API. Injection no longer requires direct DB access.
+
 2.5.1
 ~~~~~~~
 * feature: Adding python package support
+
 2.5
 ~~~~~~~
 * bugfix: API no longer requires auth for deployments.
