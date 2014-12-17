@@ -1,14 +1,29 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
 
-      <p tal:condition="not denied">
-      <form action="/cp" method="POST">
-        Name: <input type="text" name="application_name"/> Node Group: <input type="text" name="node_group"/>
-        <br/>
-        <input type="hidden" name="form.submitted"/>
-        <input class="button" type="submit" name="submit" value="submit"/>
-      </form>
-      </p>
+      <p>
+        What would you like to do?
 
+        <table width="50%">
+          <tr>
+            <th>Application</th>
+          </tr>
+          <tr tal:attributes="class 'subh_app'">
+            <td><a href="/cp/application?mode=add">Add a new application</a></td>
+          </tr>
+          <tr tal:attributes="class 'white'">
+            <td><a href="/cp/application?mode=edit">Edit an existing application</a></td>
+          </tr>
+
+          <tr>
+            <th>Deploy</th>
+          </tr>
+          <tr tal:attributes="class 'subh_app'">
+            <td><a href="/cp/deploy?mode=add">Add a new deploy to an application</a></td>
+          </tr>
+          <tr tal:attributes="class 'white'">
+            <td><a href="/cp/deploy?mode=edit">Edit an existing deploy</a></td>
+          </tr>
+        </table>
   </div>
 </div>

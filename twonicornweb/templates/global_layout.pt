@@ -9,7 +9,7 @@
         type="image/png"
         href="/static/favico.png?v=2">
     <title>TUI: ${page_title}</title>
-    <link href="static/tc.css" rel="stylesheet" type="text/css" />
+    <link href="/static/tc.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
 
@@ -21,7 +21,7 @@
           <a class="nav" href="/applications">[ APPLICATIONS ]</a>
           <a class="nav" href="/deploys">[ DEPLOYS ]</a>
           <a class="nav" href="/promote">[ PROMOTE ]</a>
-          <a class="nav" href="/control_panel" tal:condition="user.cp_auth">[ CONTROL PANEL ]</a>
+          <a class="nav" href="/cp" tal:condition="user.cp_auth">[ CONTROL PANEL ]</a>
           <a class="nav" href="/help">[ HELP ]</a>
         </td>
         <td class="nav right">
@@ -53,7 +53,7 @@
 
     <p>
     <h1 tal:condition="not denied">${page_title}</h1>
-    <img tal:condition="not denied" src="static/logo_small.gif">
+    <img tal:condition="not denied" src="/static/logo_small.gif">
     </p>
   </div>
 

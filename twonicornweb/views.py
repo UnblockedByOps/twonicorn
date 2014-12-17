@@ -728,3 +728,46 @@ def view_cp(request):
             'prod_groups': prod_groups,
             'denied': denied,
            }
+
+
+@view_config(route_name='cp_application', permission='cp', renderer='twonicornweb:templates/cp_application.pt')
+def view_cp_application(request):
+
+    page_title = 'Control Panel - Application'
+    user = get_user(request)
+    prod_groups = request.registry.settings['tcw.prod_groups'].splitlines()
+
+    params = {'mode': None,
+              'stuff': None,
+             }
+    for p in params:
+        try:
+            params[p] = request.params[p]
+        except:
+            pass
+
+    mode = params['mode']
+    stuff = params['stuff']
+
+    if mode == 'add':
+
+       subtitle = 'Add an application'
+    
+    if mode == 'edit':
+
+       subtitle = 'Edit an application'
+
+
+#    if 'form.submitted' in request.POST:
+#        login = request.POST['login']
+#        password = request.POST['password']
+#        connector = get_ldap_connector(request)
+#        data = connector.authenticate(login, password)
+
+    return {'layout': site_layout(),
+            'page_title': page_title,
+            'user': user,
+            'prod_groups': prod_groups,
+            'denied': denied,
+            'subtitle': subtitle,
+           }
