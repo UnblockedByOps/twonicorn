@@ -1,7 +1,9 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
 
+
       <div tal:condition="not commit">
+      <script src="/static/row_expansion.js"></script>
         <p>
           <form class="cp_form" action="/cp/application?mode=add&commit=true" method="POST">
             <input type="hidden" name="form.submitted"/>
@@ -14,13 +16,13 @@
                 <h3>Application</h3>
               </li>
               <li>
-                <label for="name">Name:</label>
-                <input type="text" name="application_name" placeholder="Profile API" required/>
+                <label for="application_name">Name:</label>
+                <input type="text" id="application_name" name="application_name" placeholder="Profile API" required />
                 <span class="form_hint">Friendly name</span>
               </li>
               <li>
                 <label for="nodegroup">Node Group:</label>
-                <input type="text" name="nodegroup" placeholder="paw" required/>
+                <input type="text" id="nodegroup" name="nodegroup" placeholder="paw" required/>
                 <span class="form_hint">Name of the nodegroup this application lives on</span>
               </li>
               <li>
@@ -29,7 +31,7 @@
               </li>
               <li>
                 <label for="artifact_type">Artifact Type:</label>
-                  <select name="artifact_type" placeholder="Select Something" required>
+                  <select id="artifact_type" name="artifact_type" placeholder="Select Something" required>
                     <option value="" disabled="disabled" selected="selected">Please select an artifact Type</option>
                     <option tal:repeat="item artifact_types" tal:content="item.name"></option>
                   </select><br>
@@ -37,13 +39,16 @@
               </li>
               <li>
                 <label for="deploy_path">Deploy Path:</label>
-                <input type="text" name="deploy_path" placeholder="/app/tomcat/conf" required/>
+                <input type="text" id="deploy_path" name="deploy_path" placeholder="/app/tomcat/conf" required/>
                 <span class="form_hint">Where this deploy gets installed</span>
               </li>
               <li>
                 <label for="package_name">Package Name:</label>
-                <input type="text" name="package_name" placeholder="MyPythonPackage"/>
+                <input type="text" id="package_name" name="package_name" placeholder="MyPythonPackage"/>
                 <span class="form_hint">Required for deploys that are deployed using a native package management tool (python (pip), rpm (yum), etc.)</span>
+              </li>
+              <li>
+                <a id="add_row" class="btn btn-default pull-left">Add Row</a><a id='delete_row' class="pull-right btn btn-default">Delete Row</a>
               </li>
               <li>
                 <input class="button" type="submit" name="submit" value="submit"/>

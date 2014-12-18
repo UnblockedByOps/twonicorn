@@ -79,6 +79,19 @@ a.nav_logout {
     font-size: 0.7em;
 }
 
+/* new top nav */
+.top_nav {
+    border: none;
+    box-shadow: 0px 0px 3px #2FAACE, 0 10px 15px #2FAACE inset;
+    border-radius:2px;
+    padding:2px;
+    -moz-transition: padding .25s;
+    -webkit-transition: padding .25s;
+    -o-transition: padding .25s;
+    transition: padding .25s;
+}
+
+
 /* what is this shit */
 table.subh {
     background-color: #2FAACE;
@@ -373,11 +386,15 @@ td.glossary {
 }
  
 ::-webkit-input-placeholder {
-  color: blue;
+    color: blue;
+}
+
+::-webkit-validation-bubble-message {
+    padding: 1em;
 }
 
 *:focus {
-  outline: none;
+    outline: none;
 }
 
 .cp_form ul {
@@ -387,7 +404,7 @@ td.glossary {
     margin:0px;
     padding:0px;
 }
-.cp_form li{
+.cp_form li {
     padding:12px;
     border-bottom:1px solid #eee;
     position:relative;
@@ -399,12 +416,37 @@ td.glossary {
 }
 
 .form_hint, .required_notification {
-  font-size: 11px;
+    font-size: 11px;
 }
 
-.cp_form h2, h3 {
-  margin:0;
-  display: inline;
+.form_hint {
+    background: #d45252;
+    border-radius: 3px 3px 3px 3px;
+    color: white;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left:8px;
+    padding: 1px 6px;
+    z-index: 999; /* hints stay above all other elements */
+    position: absolute; /* allows proper formatting if hint is two lines */
+    display: none;
+}
+
+.form_hint::before {
+    content: "\25C0"; /* left point triangle in escaped unicode */
+    color:#d45252;
+    position: absolute;
+    top:1px;
+    left:-6px;
+}
+
+.cp_form input:focus + .form_hint {display: inline;}
+.cp_form input:required:valid + .form_hint {background: #28921f;} /* change form hint color when valid */
+.cp_form input:required:valid + .form_hint::before {color:#28921f;} /* change form hint arrow color when valid */
+
+.cp_form h2, .cp_form h3 {
+    margin:0;
+    display: inline;
 }
 
 .required_notification {
@@ -421,16 +463,11 @@ td.glossary {
     float:left;
     padding:3px;
 }
-.cp_form input {
+.cp_form input, .cp_form select {
     height:25px;
     width:220px;
     padding:2px;
-}
-
-.cp_form select {
-    height:25px;
-    width:220px;
-    padding:2px;
+    display:inline-block;
 }
 
 .cp_form input.button {
@@ -463,9 +500,7 @@ td.glossary {
     background: #FF0099;
 }
 
-.cp_form textarea {padding:8px; width:300px;}
-
-.cp_form input, .cp_form textarea, .cp_form select {
+.cp_form input, .cp_form select {
     border:1px solid #aaa;
     box-shadow: 0px 0px 3px #ccc, 0 10px 15px #eee inset;
     border-radius:2px;
@@ -480,7 +515,7 @@ td.glossary {
     box-shadow: 0 0 3px #aaa;
 }
 
-input:required, textarea:required {
+input:required {
     background: #fff url(/static/red_asterisk.png) no-repeat 98% center;
 }
 
@@ -488,13 +523,13 @@ select:required {
     background: #fff url(/static/red_asterisk.png) no-repeat 92% center;
 }
 
-.cp_form input:focus:invalid, .cp_form textarea:focus:invalid { /* when a field is considered invalid by the browser */
+.cp_form input:focus:invalid { /* when a field is considered invalid by the browser */
     background: #fff url(/static/invalid.png) no-repeat 98% center;
     box-shadow: 0 0 5px #d45252;
     border-color: #b03535
 }
 
-.cp_form input:required:valid, .cp_form textarea:required:valid { /* when a field is considered valid by the browser */
+.cp_form input:required:valid { /* when a field is considered valid by the browser */
     background: #fff url(/static/valid.png) no-repeat 98% center;
     box-shadow: 0 0 5px #5cd053;
     border-color: #28921f;
@@ -505,4 +540,3 @@ select:required {
     box-shadow: 0 0 5px #5cd053;
     border-color: #28921f;
 }
-

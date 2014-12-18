@@ -14,17 +14,26 @@
   <body>
 
   <div tal:condition="page_title is not 'Login'">
-    <table class="nav" width="100%">
-      <tr class="nav">
-        <td class="nav">
+    <div class="top_nav">
+        <span class="nav">
           <a class="nav" href="/">[ HOME ]</a>
+        </span>
+        <span class="nav">
           <a class="nav" href="/applications">[ APPLICATIONS ]</a>
+        </span>
+        <span class="nav">
           <a class="nav" href="/deploys">[ DEPLOYS ]</a>
+        </span>
+        <span class="nav">
           <a class="nav" href="/promote">[ PROMOTE ]</a>
+        </span>
+        <span class="nav">
           <a class="nav" href="/cp" tal:condition="user.cp_auth">[ CONTROL PANEL ]</a>
+        </span>
+        <span class="nav">
           <a class="nav" href="/help">[ HELP ]</a>
-        </td>
-        <td class="nav right">
+        </span>
+        <span class="nav">
           <ul class="user">
             <li class="user">
               <span tal:content="'Welcome ' + user.first + '!'"
@@ -47,9 +56,8 @@
             </li>
           </ul>
           [ <a class="nav nav_logout" href="/logout">LOGOUT</a> ]
-        </td>
-      </tr>
-    </table>
+        </span>
+    </div>
 
     <p>
     <h1 tal:condition="not denied">${page_title}</h1>
