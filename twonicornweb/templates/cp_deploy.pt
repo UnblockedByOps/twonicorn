@@ -1,0 +1,20 @@
+<div metal:use-macro="layout">
+    <div metal:fill-slot="content">
+
+       <h3>${subtitle}</h3>
+    
+      <p tal:condition="commit == 'false'">
+        <form action="/cp/deploy?mode=add&commit=true" method="POST">
+          Name: <input type="text" name="application_name"/> Node Group: <input type="text" name="node_group"/>
+          <br/>
+          <input type="hidden" name="form.submitted"/>
+          <input class="button" type="submit" name="submit" value="submit"/>
+        </form>
+      </p>
+
+      <p tal:condition="commit == 'true'">
+        Successfully created new Deploy: ${deploy_id}
+
+
+  </div>
+</div>

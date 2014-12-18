@@ -2,8 +2,6 @@
     <div metal:fill-slot="content">
 
       <p>
-        What would you like to do?
-
         <table width="50%">
           <tr>
             <th>Application</th>

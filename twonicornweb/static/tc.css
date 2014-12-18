@@ -367,3 +367,142 @@ td.glossary {
     white-space: normal;
 }
 
+/* Control Panel */
+::-moz-placeholder {
+    color: blue;
+}
+ 
+::-webkit-input-placeholder {
+  color: blue;
+}
+
+*:focus {
+  outline: none;
+}
+
+.cp_form ul {
+    width:750px;
+    list-style-type:none;
+    list-style-position:outside;
+    margin:0px;
+    padding:0px;
+}
+.cp_form li{
+    padding:12px;
+    border-bottom:1px solid #eee;
+    position:relative;
+    list-style-type:none;
+}
+
+.cp_form li:first-child, .cp_form li:last-child {
+    border-bottom:1px solid #777;
+}
+
+.form_hint, .required_notification {
+  font-size: 11px;
+}
+
+.cp_form h2, h3 {
+  margin:0;
+  display: inline;
+}
+
+.required_notification {
+    color:#d45252;
+    margin:5px 0 0 0;
+    display:inline;
+    float:right;
+}
+
+.cp_form label {
+    width:150px;
+    margin-top: 3px;
+    display:inline-block;
+    float:left;
+    padding:3px;
+}
+.cp_form input {
+    height:25px;
+    width:220px;
+    padding:2px;
+}
+
+.cp_form select {
+    height:25px;
+    width:220px;
+    padding:2px;
+}
+
+.cp_form input.button {
+    width: 100px;
+    position :center;
+    background: #CCCCCC;
+    color: #000000;
+    height: 20px;
+    border-radius: 15px;
+    border: 1p solid #999;
+    margin-left: auto ;
+    margin-right: auto ;
+    box-shadow: none;
+}
+
+.cp_form input.button:hover {
+    background: #FF0099;
+}
+
+.cp_form input.button_submit {
+    width: 100px;
+    background: #CCCCCC;
+    color: #000000;
+    height: 20px;
+    border-radius: 15px;
+    border: 1p solid #999;
+}
+
+.cp_form input.button_submit:hover {
+    background: #FF0099;
+}
+
+.cp_form textarea {padding:8px; width:300px;}
+
+.cp_form input, .cp_form textarea, .cp_form select {
+    border:1px solid #aaa;
+    box-shadow: 0px 0px 3px #ccc, 0 10px 15px #eee inset;
+    border-radius:2px;
+    -moz-transition: padding .25s;
+    -webkit-transition: padding .25s;
+    -o-transition: padding .25s;
+    transition: padding .25s;
+}
+.cp_form input:focus, .cp_form textarea:focus, .cp_form select:focus {
+    background: #fff;
+    border:1px solid #555;
+    box-shadow: 0 0 3px #aaa;
+}
+
+input:required, textarea:required {
+    background: #fff url(/static/red_asterisk.png) no-repeat 98% center;
+}
+
+select:required {
+    background: #fff url(/static/red_asterisk.png) no-repeat 92% center;
+}
+
+.cp_form input:focus:invalid, .cp_form textarea:focus:invalid { /* when a field is considered invalid by the browser */
+    background: #fff url(/static/invalid.png) no-repeat 98% center;
+    box-shadow: 0 0 5px #d45252;
+    border-color: #b03535
+}
+
+.cp_form input:required:valid, .cp_form textarea:required:valid { /* when a field is considered valid by the browser */
+    background: #fff url(/static/valid.png) no-repeat 98% center;
+    box-shadow: 0 0 5px #5cd053;
+    border-color: #28921f;
+}
+
+.cp_form select:required:valid { /* when a field is considered valid by the browser */
+    background: #fff url(/static/valid.png) no-repeat 90% center;
+    box-shadow: 0 0 5px #5cd053;
+    border-color: #28921f;
+}
+

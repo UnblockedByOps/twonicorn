@@ -1,15 +1,66 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
 
-       <h3>${subtitle}</h3>
-    
-      <p>
-      <form action="/cp" method="POST">
-        Name: <input type="text" name="application_name"/> Node Group: <input type="text" name="node_group"/>
-        <br/>
-        <input type="hidden" name="form.submitted"/>
-        <input class="button" type="submit" name="submit" value="submit"/>
-      </form>
+      <div tal:condition="not commit">
+        <p>
+          <form class="cp_form" action="/cp/application?mode=add&commit=true" method="POST">
+            <input type="hidden" name="form.submitted"/>
+            <ul>
+              <li>
+                <h2>${subtitle}</h2>
+                <span class="required_notification">* Denotes Required Field</span>
+              </li>
+              <li>
+                <h3>Application</h3>
+              </li>
+              <li>
+                <label for="name">Name:</label>
+                <input type="text" name="application_name" placeholder="Profile API" required/>
+                <span class="form_hint">Friendly name</span>
+              </li>
+              <li>
+                <label for="nodegroup">Node Group:</label>
+                <input type="text" name="nodegroup" placeholder="paw" required/>
+                <span class="form_hint">Name of the nodegroup this application lives on</span>
+              </li>
+              <li>
+                <h3>Deploy</h3>
+                <span class="required_notification">An application requires at least one deploy</span>
+              </li>
+              <li>
+                <label for="artifact_type">Artifact Type:</label>
+                  <select name="artifact_type" placeholder="Select Something" required>
+                    <option value="" disabled="disabled" selected="selected">Please select an artifact Type</option>
+                    <option tal:repeat="item artifact_types" tal:content="item.name"></option>
+                  </select><br>
+                <span class="form_hint">Artifact type</span>
+              </li>
+              <li>
+                <label for="deploy_path">Deploy Path:</label>
+                <input type="text" name="deploy_path" placeholder="/app/tomcat/conf" required/>
+                <span class="form_hint">Where this deploy gets installed</span>
+              </li>
+              <li>
+                <label for="package_name">Package Name:</label>
+                <input type="text" name="package_name" placeholder="MyPythonPackage"/>
+                <span class="form_hint">Required for deploys that are deployed using a native package management tool (python (pip), rpm (yum), etc.)</span>
+              </li>
+              <li>
+                <input class="button" type="submit" name="submit" value="submit"/>
+              </li>
+            </ul>
+          </form>
+
+        </p>
+      </div>
+
+      <p tal:condition="commit and not error_msg">
+        Successfully created new Application: ${application_id}
+      </p>
+
+      <p tal:condition="error_msg">
+        <h2>ERROR</h2>
+        Error creating new Application: ${error_msg}
       </p>
 
   </div>

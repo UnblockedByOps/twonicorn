@@ -113,6 +113,13 @@ class ArtifactType(Base):
     artifact_type_id = Column(Integer, primary_key=True, nullable=False)
     name             = Column(Text, nullable=False)
 
+    @hybrid_method
+    def get_artifact_type_id(self, name):
+        # Convert the env name to the id
+        q = DBSession.query(ArtifactType)
+        q = q.filter(ArtifactType.name == '%s' % name)
+        return q.one()
+
 
 class Deploy(Base):
     __tablename__ = 'deploys'

@@ -3,7 +3,7 @@
 
   <div id="login">
       <p class="login">
-      <img src="static/logo_medium.gif">
+      <img src="/static/logo_medium.gif">
       </p>
   
       <h2 class="error" tal:condition="error" tal:content="error"/>
