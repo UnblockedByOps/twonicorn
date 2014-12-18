@@ -4,10 +4,11 @@
 
       <div tal:condition="not commit">
       <script src="/static/row_expansion.js"></script>
+      <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
         <p>
           <form class="cp_form" action="/cp/application?mode=add&commit=true" method="POST">
             <input type="hidden" name="form.submitted"/>
-            <ul>
+            <ul id='addr0'>
               <li>
                 <h2>${subtitle}</h2>
                 <span class="required_notification">* Denotes Required Field</span>
@@ -25,6 +26,8 @@
                 <input type="text" id="nodegroup" name="nodegroup" placeholder="paw" required/>
                 <span class="form_hint">Name of the nodegroup this application lives on</span>
               </li>
+            </ul>
+            <ul id='ul_logic'>
               <li>
                 <h3>Deploy</h3>
                 <span class="required_notification">An application requires at least one deploy</span>
@@ -47,6 +50,9 @@
                 <input type="text" id="package_name" name="package_name" placeholder="MyPythonPackage"/>
                 <span class="form_hint">Required for deploys that are deployed using a native package management tool (python (pip), rpm (yum), etc.)</span>
               </li>
+            </ul>
+            <ul>
+              <li id='addr2'></li>
               <li>
                 <a id="add_row" class="btn btn-default pull-left">Add Row</a><a id='delete_row' class="pull-right btn btn-default">Delete Row</a>
               </li>

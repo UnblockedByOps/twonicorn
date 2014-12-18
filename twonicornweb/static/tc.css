@@ -56,21 +56,27 @@ th {
 }
 
 /* Top navigation */
-table.nav, th.nav, td.nav {
+.nav {
     border: none;
     background-color: #2FAACE;
     color: #FFFFFF;
+    margin: 1px;
 }
 
 a.nav {
     color: #FFFFFF;
+    font-size: 0.9em;
+    font-weight: bold;
+    padding: 0px 4px;
 }
 a.nav:link, a.nav:visited {
     text-decoration: none;
 }
 a.nav:hover {
-    color: #CEFFFD;
-    text-decoration: underline;
+    color: #2FAACE;
+    text-decoration: none;
+    background-color: #FFF;
+    border-radius:2px;
 }
 a.nav:active {
     color: #CEFFFD;
@@ -81,14 +87,9 @@ a.nav_logout {
 
 /* new top nav */
 .top_nav {
-    border: none;
-    box-shadow: 0px 0px 3px #2FAACE, 0 10px 15px #2FAACE inset;
-    border-radius:2px;
-    padding:2px;
-    -moz-transition: padding .25s;
-    -webkit-transition: padding .25s;
-    -o-transition: padding .25s;
-    transition: padding .25s;
+    background-color: #2FAACE;
+    border-radius:3px;
+    padding:4px;
 }
 
 
@@ -326,6 +327,7 @@ ul.user {
     padding: 0px 0px 0px 0;
     list-style: none;
     z-index: 50;
+    border-radius:3px;
 }
 ul.user li.user {
     display: inline-block;
@@ -338,6 +340,7 @@ ul.user li.user {
     -ms-transition: all 0.2s;
     -o-transition: all 0.2s;
     transition: all 0.2s;
+    border-radius:3px;
 }
 ul.user li.user:hover {
     background: #2FAACE;
@@ -350,7 +353,8 @@ ul.user li.user ul.user {
     position: absolute;
     top: 17px;
     left: 0;
-    width: 90px;
+    width: 100%;
+    padding: 4px 0px;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;

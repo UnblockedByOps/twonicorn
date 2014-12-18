@@ -824,3 +824,17 @@ def view_cp_application(request):
             'commit': commit,
             'error_msg': error_msg,
            }
+
+
+@view_config(route_name='test', permission='view', renderer='twonicornweb:templates/test.pt')
+def view_test(request):
+
+    page_title = 'Test'
+    user = get_user(request)
+
+    return {'layout': site_layout(),
+            'page_title': page_title,
+            'user': user,
+            'denied': denied,
+           }
+

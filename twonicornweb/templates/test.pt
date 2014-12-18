@@ -1,0 +1,19 @@
+<div metal:use-macro="layout">
+    <div metal:fill-slot="content">
+
+    <div>
+      <script src="/static/row_expansion.js"></script>
+      <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+            <ul id='ul_logic'>
+              <li id='addr0'>
+                <input name='name0' type='text' placeholder='Name' />
+              </li>
+              <li id='addr1'></li>
+            </ul>
+
+              <p>
+                <a id="add_row">Add Row</a><a id='delete_row'>Delete Row</a>
+    </div>
+
+  </div>
+</div>

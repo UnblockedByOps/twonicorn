@@ -69,6 +69,7 @@ def main(global_config, **settings):
     config.add_route('user', '/user')
     config.add_route('admin', '/admin')
     config.add_route('cp', '/cp')
+    config.add_route('test', '/test')
     config.add_route('cp_application', '/cp/application')
     config.add_route('cp_deploy', '/cp/deploy')
     config.add_route('api', '/api/{resource}')

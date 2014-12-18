@@ -15,25 +15,25 @@
 
   <div tal:condition="page_title is not 'Login'">
     <div class="top_nav">
-        <span class="nav">
-          <a class="nav" href="/">[ HOME ]</a>
+        <span>
+          <a class="nav" href="/">HOME</a>
         </span>
-        <span class="nav">
-          <a class="nav" href="/applications">[ APPLICATIONS ]</a>
+        <span>
+          <a class="nav" href="/applications">APPLICATIONS</a>
         </span>
-        <span class="nav">
-          <a class="nav" href="/deploys">[ DEPLOYS ]</a>
+        <span>
+          <a class="nav" href="/deploys">DEPLOYS</a>
         </span>
-        <span class="nav">
-          <a class="nav" href="/promote">[ PROMOTE ]</a>
+        <span>
+          <a class="nav" href="/promote">PROMOTE</a>
         </span>
-        <span class="nav">
-          <a class="nav" href="/cp" tal:condition="user.cp_auth">[ CONTROL PANEL ]</a>
+        <span tal:condition="user.cp_auth">
+          <a class="nav" href="/cp">CONTROL PANEL</a>
         </span>
-        <span class="nav">
-          <a class="nav" href="/help">[ HELP ]</a>
+        <span>
+          <a class="nav" href="/help">HELP</a>
         </span>
-        <span class="nav">
+        <span class="nav right">
           <ul class="user">
             <li class="user">
               <span tal:content="'Welcome ' + user.first + '!'"
