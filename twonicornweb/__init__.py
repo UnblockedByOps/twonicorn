@@ -19,7 +19,7 @@ from .models import (
 
 class RootFactory(object):
     __acl__ = [(Allow, Authenticated, 'view'),
-               (Allow, 'CN=CM_Team,OU=Security Groups,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp', 'cp')]
+               (Allow, 'CN=Unix_Team,OU=Security Groups,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp', 'cp')]
     def __init__(self, request):
         pass
 
