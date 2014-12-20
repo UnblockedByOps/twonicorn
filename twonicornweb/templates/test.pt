@@ -1,19 +1,39 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
 
-    <div>
-      <script src="/static/row_expansion.js"></script>
-      <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-            <ul id='ul_logic'>
-              <li id='addr0'>
-                <input name='name0' type='text' placeholder='Name' />
-              </li>
-              <li id='addr1'></li>
-            </ul>
+<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
 
-              <p>
-                <a id="add_row">Add Row</a><a id='delete_row'>Delete Row</a>
-    </div>
+<script>
+
+$(document).ready(function(){
+  var i=1;
+  $("#add_row").click(function(){
+    $('#ul_deploy').append('<li id="addr'+i+'">crap '+i+'</li>');
+    i++;
+  });
+  $("#delete_row").click(function(){
+    if(i>1){
+      $("#addr"+(i-1)).remove();
+      i--;
+    }
+  });
+});
+
+</script>
+
+
+      <ul id="ul_deploy">
+        <li id="addr0">
+          <input name="name0" type="text" placeholder="Name" />
+        </li>
+      </ul>
+
+        <p>
+          <a id="add_row">Add Row</a><a id="delete_row">Delete Row</a>
+
 
   </div>
 </div>
+
+
+

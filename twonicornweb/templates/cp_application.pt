@@ -3,12 +3,14 @@
 
 
       <div tal:condition="not commit">
-      <script src="/static/row_expansion.js"></script>
-      <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="/static/row_expansion.js"></script>
+
+
         <p>
           <form class="cp_form" action="/cp/application?mode=add&commit=true" method="POST">
             <input type="hidden" name="form.submitted"/>
-            <ul id='addr0'>
+            <ul>
               <li>
                 <h2>${subtitle}</h2>
                 <span class="required_notification">* Denotes Required Field</span>
@@ -27,34 +29,48 @@
                 <span class="form_hint">Name of the nodegroup this application lives on</span>
               </li>
             </ul>
-            <ul id='ul_logic'>
+            <ul id="ul_deploy">
               <li>
                 <h3>Deploy</h3>
                 <span class="required_notification">An application requires at least one deploy</span>
               </li>
               <li>
-                <label for="artifact_type">Artifact Type:</label>
-                  <select id="artifact_type" name="artifact_type" placeholder="Select Something" required>
-                    <option value="" disabled="disabled" selected="selected">Please select an artifact Type</option>
-                    <option tal:repeat="item artifact_types" tal:content="item.name"></option>
-                  </select><br>
-                <span class="form_hint">Artifact type</span>
-              </li>
-              <li>
-                <label for="deploy_path">Deploy Path:</label>
-                <input type="text" id="deploy_path" name="deploy_path" placeholder="/app/tomcat/conf" required/>
-                <span class="form_hint">Where this deploy gets installed</span>
-              </li>
-              <li>
-                <label for="package_name">Package Name:</label>
-                <input type="text" id="package_name" name="package_name" placeholder="MyPythonPackage"/>
-                <span class="form_hint">Required for deploys that are deployed using a native package management tool (python (pip), rpm (yum), etc.)</span>
+
+                <table id="tab_deploy">
+                  <tbody>
+                    <tr id='addr0'>
+                      <td>
+                      1
+                      </td>
+                      <td>
+                        <span for="artifact_type0">Artifact Type:</span><br>
+                          <select id="artifact_type0" name="artifact_type" placeholder="Select Something" required>
+                            <option value="" disabled="disabled" selected="selected">Please select an artifact Type</option>
+                            <option tal:repeat="item artifact_types" tal:content="item.name"></option>
+                          </select>
+                        <span class="form_hint">Artifact type</span>
+                      </td>
+                      <td>
+                        <span for="deploy_path0">Deploy Path:</span><br>
+                        <input type="text" id="deploy_path0" name="deploy_path" placeholder="/app/tomcat/conf" required/>
+                        <span class="form_hint">Where this deploy gets installed</span>
+                      </td>
+                      <td>
+                        <span for="package_name0">Package Name:</span><br>
+                        <input type="text" id="package_name0" name="package_name" placeholder="MyPythonPackage"/>
+                        <span class="form_hint">Required for deploys that are deployed using a native package management tool (python (pip), rpm (yum), etc.)</span>
+                      </td>
+                    </tr>
+                    <tr id='addr1'></tr>
+                  </tbody>
+                </table>
+
               </li>
             </ul>
             <ul>
-              <li id='addr2'></li>
               <li>
-                <a id="add_row" class="btn btn-default pull-left">Add Row</a><a id='delete_row' class="pull-right btn btn-default">Delete Row</a>
+                <input id="add_row" class="button" value="+"/>
+                <input id="delete_row" class="button" value="-"/>
               </li>
               <li>
                 <input class="button" type="submit" name="submit" value="submit"/>
