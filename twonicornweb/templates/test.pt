@@ -32,6 +32,19 @@ $(document).ready(function(){
           <a id="add_row">Add Row</a><a id="delete_row">Delete Row</a>
 
 
+
+<div id="container">
+    <div id="left">
+        left<br />left<br />left<br />left<br />left<br />left<br />
+        leftleftleftleftleftleft
+    </div>
+    <div id="right">right</div>
+</div>
+
+
+
+
+
   </div>
 </div>
 

@@ -15,11 +15,11 @@
 
   <div tal:condition="page_title is not 'Login'" class="shell">
 
-    <div class="shell">
+    <div class="nav_shell">
       <div class="nav_logo">
             <img tal:condition="not denied" src="/static/logo_mini.gif">
       </div>
-      <div class="top_nav">
+      <div class="nav_bar">
           <span>
             <a class="nav" href="/">HOME</a>
           </span>

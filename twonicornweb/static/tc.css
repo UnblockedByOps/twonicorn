@@ -63,9 +63,35 @@ th {
 .shell {
     border: none;
     margin: 10px 50px;
+    clear:both;
 }
 
 /* Top navigation */
+.nav_shell {
+    border: none;
+    margin: 10px 50px;
+    height:90px;
+    position:relative;
+}
+
+.nav_logo {
+    width: 110px;
+    position:absolute;
+    bottom:0px;
+    left:0px;
+    float:left;
+}
+
+.nav_bar {
+    background-color: #2FAACE;
+    border-radius:3px;
+    padding:4px;
+    position:absolute;
+    bottom:0px;
+    left:110px;
+    width:92%;
+}
+
 .nav {
     border: none;
     background-color: #2FAACE;
@@ -95,18 +121,7 @@ a.nav_logout {
     font-size: 0.7em;
 }
 
-/* new top nav */
-.nav_logo {
-    width: 110px;
-}
-
-.top_nav {
-    background-color: #2FAACE;
-    border-radius:3px;
-    padding:4px;
-}
-
-/* what is this shit */
+/* what is this stuff? */
 table.subh {
     background-color: #2FAACE;
     color: #FFFFFF;
