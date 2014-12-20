@@ -761,7 +761,6 @@ def view_cp_application(request):
         try:
             q = DBSession.query(ArtifactType)
             artifact_types = q.all()
-
         except Exception, e:
             log.error("Failed to retrive data on api call (%s)" % (e))
             # FIXME
