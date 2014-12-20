@@ -13,6 +13,10 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 300;
 }
 
+h1 {
+    border-bottom:1px solid #777;
+}
+
 p {
     font-weight: 300;
 }
@@ -55,6 +59,12 @@ th {
     color: #ffffff;
 }
 
+/* Shell container */
+.shell {
+    border: none;
+    margin: 10px 50px;
+}
+
 /* Top navigation */
 .nav {
     border: none;
@@ -86,12 +96,15 @@ a.nav_logout {
 }
 
 /* new top nav */
+.nav_logo {
+    width: 110px;
+}
+
 .top_nav {
     background-color: #2FAACE;
     border-radius:3px;
     padding:4px;
 }
-
 
 /* what is this shit */
 table.subh {
@@ -544,3 +557,8 @@ select:required {
     box-shadow: 0 0 5px #5cd053;
     border-color: #28921f;
 }
+
+.exp input.button {
+    width: 10px;
+}
+

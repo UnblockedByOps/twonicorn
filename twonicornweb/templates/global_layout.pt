@@ -13,59 +13,59 @@
   </head>
   <body>
 
-  <div tal:condition="page_title is not 'Login'">
-    <div class="top_nav">
-        <span>
-          <a class="nav" href="/">HOME</a>
-        </span>
-        <span>
-          <a class="nav" href="/applications">APPLICATIONS</a>
-        </span>
-        <span>
-          <a class="nav" href="/deploys">DEPLOYS</a>
-        </span>
-        <span>
-          <a class="nav" href="/promote">PROMOTE</a>
-        </span>
-        <span tal:condition="user.cp_auth">
-          <a class="nav" href="/cp">CONTROL PANEL</a>
-        </span>
-        <span>
-          <a class="nav" href="/help">HELP</a>
-        </span>
-        <span class="nav right">
-          <ul class="user">
-            <li class="user">
-              <span tal:content="'Welcome ' + user.first + '!'"
-                    tal:attributes="title 'Logged in as: ' + user.ad_login">
-              </span>
-              <ul class="user">
-                <li class="user">
-                  <a class="nav" href="/user"
-                     tal:attributes="href '/user';
-                                     title 'Display user info'"
-                     tal:content="'User Info'">user info</a>
-                </li>
-                <li class="user" tal:condition="user.admin_auth">
-                  <a class="nav" href="/admin"
-                     tal:attributes="href '/admin';
-                                     title 'Display admin info'"
-                     tal:content="'Administer'">administer</a>
-                </li>
-              </ul>
-            </li>
-          </ul>
-          [ <a class="nav nav_logout" href="/logout">LOGOUT</a> ]
-        </span>
+  <div tal:condition="page_title is not 'Login'" class="shell">
+
+    <div class="shell">
+      <div class="nav_logo">
+            <img tal:condition="not denied" src="/static/logo_mini.gif">
+      </div>
+      <div class="top_nav">
+          <span>
+            <a class="nav" href="/">HOME</a>
+          </span>
+          <span>
+            <a class="nav" href="/applications">APPLICATIONS</a>
+          </span>
+          <span>
+            <a class="nav" href="/promote">PROMOTE</a>
+          </span>
+          <span tal:condition="user.cp_auth">
+            <a class="nav" href="/cp">CONTROL PANEL</a>
+          </span>
+          <span>
+            <a class="nav" href="/help">HELP</a>
+          </span>
+          <span class="nav right">
+            <ul class="user">
+              <li class="user">
+                <span tal:content="'Welcome ' + user.first + '!'"
+                      tal:attributes="title 'Logged in as: ' + user.ad_login">
+                </span>
+                <ul class="user">
+                  <li class="user">
+                    <a class="nav" href="/user"
+                       tal:attributes="href '/user';
+                                       title 'Display user info'"
+                       tal:content="'User Info'">user info</a>
+                  </li>
+                  <li class="user" tal:condition="user.admin_auth">
+                    <a class="nav" href="/admin"
+                       tal:attributes="href '/admin';
+                                       title 'Display admin info'"
+                       tal:content="'Administer'">administer</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            [ <a class="nav nav_logout" href="/logout">LOGOUT</a> ]
+          </span>
+      </div>
     </div>
 
-    <p>
-    <h1 tal:condition="not denied">${page_title}</h1>
-    <img tal:condition="not denied" src="/static/logo_small.gif">
-    </p>
-  </div>
+    <div class="shell">
+      <h1 tal:condition="not denied">${page_title}</h1>
 
-    <div metal:define-slot="content">
+      <div metal:define-slot="content">
     </div>
 
   </body>
