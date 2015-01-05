@@ -573,7 +573,9 @@ select:required {
     border-color: #28921f;
 }
 
-.exp input.button {
-    width: 10px;
+input.button.exp {
+    width: 20px;
+    padding: 0px;
+    position: right;
 }
 
