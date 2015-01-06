@@ -773,34 +773,45 @@ def view_cp_application(request):
             subtitle = 'Add an application'
 
             if 'form.submitted' in request.POST:
-                application_name = request.POST['application_name']
-                nodegroup = request.POST['nodegroup']
-                artifact_type = request.POST['artifact_type']
-                deploy_path = request.POST['deploy_path']
-                package_name = request.POST['package_name']
+                 print request.POST.dict_of_lists()
+                 artifact_types = request.POST.getall('artifact_type')
+                 deploy_paths = request.POST.getall('deploy_path')
+                 package_names = request.POST.getall('package_name')
 
-            try:
-                utcnow = datetime.utcnow()
-                # FIXME: Add user to Application table or audit table?
-                # create = Application(application_name=application_name, nodegroup=nodegroup, user=user['ad_login'], created=utcnow)
-                create = Application(application_name=application_name, nodegroup=nodegroup, created=utcnow)
-                DBSession.add(create)
-                DBSession.flush()
+                 for i in range(len(deploy_paths)):
+                     total = len(deploy_paths)
+                     print "There are %s deploys" % total
+                     print "Deploy: %s Type: %s Path: %s Package Name: %s" % (i, artifact_types[i], deploy_paths[i], package_names[i])
 
-                application_id = create.application_id
-                artifact_type_id = ArtifactType.get_artifact_type_id(artifact_type)
 
-                create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_path, package_name=package_name, created=utcnow)
-                DBSession.add(create)
-                DBSession.flush()
-
-                deploy_id = create.deploy_id
-
-            except Exception, e:
-                # FIXME not trapping correctly
-                DBSession.rollback()
-                error_msg = ("Failed to create application (%s)" % (e))
-                log.error(error_msg)
+#                application_name = request.POST['application_name']
+#                nodegroup = request.POST['nodegroup']
+#                artifact_type = request.POST['artifact_type']
+#                deploy_path = request.POST['deploy_path']
+#                package_name = request.POST['package_name']
+#
+#            try:
+#                utcnow = datetime.utcnow()
+#                # FIXME: Add user to Application table or audit table?
+#                # create = Application(application_name=application_name, nodegroup=nodegroup, user=user['ad_login'], created=utcnow)
+#                create = Application(application_name=application_name, nodegroup=nodegroup, created=utcnow)
+#                DBSession.add(create)
+#                DBSession.flush()
+#
+#                application_id = create.application_id
+#                artifact_type_id = ArtifactType.get_artifact_type_id(artifact_type)
+#
+#                create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_path, package_name=package_name, created=utcnow)
+#                DBSession.add(create)
+#                DBSession.flush()
+#
+#                deploy_id = create.deploy_id
+#
+#            except Exception, e:
+#                # FIXME not trapping correctly
+#                DBSession.rollback()
+#                error_msg = ("Failed to create application (%s)" % (e))
+#                log.error(error_msg)
 
     if mode == 'edit':
 

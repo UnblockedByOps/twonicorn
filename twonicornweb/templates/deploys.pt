@@ -22,7 +22,7 @@
       <div tal:condition="nodegroup">
         <p>
 
-        <h1 tal:content="'Deployment summary by env for ' + nodegroup.upper()">Deployment summary by environment</h1>
+        <h2 tal:content="'Deployment summary by env for ' + nodegroup.upper()">Deployment summary by environment</h2>
 
         </p>
         <table width="100%" tal:condition="(application_id or nodegroup)">
@@ -109,10 +109,11 @@
           <table width="100%">
             <tr>
               <td class="subh">Deployment History</td>
-              <td class="env" colspan="10" tal:attributes="class '%s' % env ; title 'Env: ' + env.upper() + ' Deploy ID:' + deploy_id" tal:content="env.upper() + ' (' + deploy_id + ')'">env</td>
+              <td class="env" colspan="11" tal:attributes="class '%s' % env ; title 'Env: ' + env.upper() + ' Deploy ID:' + deploy_id" tal:content="env.upper() + ' (' + deploy_id + ')'">env</td>
             </tr>
             <tr>
               <th>Deploy Path</th>
+              <th>Package Name</th>
               <th>Revision</th>
               <th>Branch/Tag</th>
               <th>Repo</th>

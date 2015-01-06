@@ -59,6 +59,10 @@ th {
     color: #ffffff;
 }
 
+tr:nth-child(even) {
+    background-color: #CEFFFD;
+}
+
 /* Shell container */
 .shell {
     border: none;
@@ -455,8 +459,7 @@ td.glossary {
     background: #d45252;
     border-radius: 3px 3px 3px 3px;
     color: white;
-    top: 50%;
-    transform: translateY(-50%);
+    margin-top:4px;
     margin-left:8px;
     padding: 1px 6px;
     z-index: 999; /* hints stay above all other elements */
@@ -574,8 +577,13 @@ select:required {
 }
 
 input.button.exp {
-    width: 20px;
+    width: 100px;
     padding: 0px;
     position: right;
+}
+
+li.exp {
+    float:right;
+    z-index: 50;
 }
 

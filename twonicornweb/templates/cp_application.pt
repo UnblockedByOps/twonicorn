@@ -67,9 +67,9 @@
               </li>
             </ul>
             <ul>
-              <li>
-                <input id="add_row" class="button exp" type="button" value="+"/>
-                <input id="delete_row" class="button exp" type="button" value="-"/>
+              <li class="exp">
+                <input id="add_row" class="button exp" type="button" value="Add A Deploy"/>
+                <input id="delete_row" class="button exp" type="button" value="Remove Last Row"/>
               </li>
               <li>
                 <input class="button" type="submit" name="submit" value="submit"/>
