@@ -1,49 +1,24 @@
 <div metal:use-macro="layout">
-    <div metal:fill-slot="content">
+  <div metal:fill-slot="content">
 
-<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-
-<script>
-
-$(document).ready(function(){
-  var i=1;
-  $("#add_row").click(function(){
-    $('#ul_deploy').append('<li id="addr'+i+'">crap '+i+'</li>');
-    i++;
-  });
-  $("#delete_row").click(function(){
-    if(i>1){
-      $("#addr"+(i-1)).remove();
-      i--;
-    }
-  });
-});
-
-</script>
-
-
-      <ul id="ul_deploy">
-        <li id="addr0">
-          <input name="name0" type="text" placeholder="Name" />
-        </li>
-      </ul>
-
-        <p>
-          <a id="add_row">Add Row</a><a id="delete_row">Delete Row</a>
-
-
-
-<div id="container">
-    <div id="left">
-        left<br />left<br />left<br />left<br />left<br />left<br />
-        leftleftleftleftleftleft
+    <div id="nav_container">
+      <div class="nav_buttons">
+        <a href="/my/link/location/">|<<</a>
+      </div>
+      <div class="nav_buttons">
+        <a href="/my/link/location/"><<</a>
+      </div>
+    
+      <div class="nav_content">1 - 10 of 70</div>
+    
+      <div class="nav_buttons">
+        <a href="/my/link/location/">>></a>
+      </div>
+    
+      <div class="nav_buttons">
+        <a href="/my/link/location/">>>|</a>
+      </div>
     </div>
-    <div id="right">right</div>
-</div>
-
-
-
-
 
   </div>
 </div>

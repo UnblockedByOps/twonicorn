@@ -21,9 +21,6 @@
         </div>
         <div class="nav_bar">
             <span>
-              <a class="nav" href="/">HOME</a>
-            </span>
-            <span>
               <a class="nav" href="/applications">APPLICATIONS</a>
             </span>
             <span>

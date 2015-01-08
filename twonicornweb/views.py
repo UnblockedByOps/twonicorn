@@ -247,14 +247,7 @@ def login(request):
 @view_config(route_name='home', permission='view', renderer='twonicornweb:templates/home.pt')
 def view_home(request):
 
-    page_title = 'Home'
-    user = get_user(request)
-
-    return {'layout': site_layout(),
-            'page_title': page_title,
-            'user': user,
-            'denied': denied
-           }
+    return HTTPFound('/applications')
 
 @view_config(route_name='applications', permission='view', renderer='twonicornweb:templates/applications.pt')
 def view_applications(request):
