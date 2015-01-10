@@ -1,22 +1,21 @@
 <div metal:use-macro="layout">
   <div metal:fill-slot="content">
 
-    <div id="nav_container">
-      <div class="nav_buttons">
-        <a href="/my/link/location/">|<<</a>
+    <div id="pag_container">
+      <div class="pag_buttons disable">
+        <a href="/my/link/location/"><img src='/static/nav-le.gif' border='0'></a>
       </div>
-      <div class="nav_buttons">
-        <a href="/my/link/location/"><<</a>
-      </div>
-    
-      <div class="nav_content">1 - 10 of 70</div>
-    
-      <div class="nav_buttons">
-        <a href="/my/link/location/">>></a>
+      <div class="pag_buttons">
+        <a href="/my/link/location/"><img src='/static/nav-l.gif' border='0'></a>
       </div>
     
-      <div class="nav_buttons">
-        <a href="/my/link/location/">>>|</a>
+      <div class="pag_content">1 - 10 of 70</div>
+    
+      <div class="pag_buttons">
+        <a href="/my/link/location/"><img src='/static/nav-r.gif' border='0'></a>
+      </div>
+      <div class="pag_buttons">
+        <a href="/my/link/location/"><img src='/static/nav-re.gif' border='0'></a>
       </div>
     </div>
 

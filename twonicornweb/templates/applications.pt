@@ -6,21 +6,28 @@
     </p>
       
     <div id="app_main">
-      <div id="results_nav">
-        <!!-- Results navigation -->
-        <a class="nb_disable" disabled tal:condition="offset == 0"><img src='/static/nav-le.gif' border='0'></a>
-        <a class="nb_disable" disabled tal:condition="offset == 0"><img src='/static/nav-l.gif' border='0'></a>
-        <a class="nb" tal:condition="offset &gt; 0" tal:attributes="href '?start=0'"><img src='/static/nav-le.gif' border='0'></a>
-        <a class="nb" tal:condition="offset &gt; 0" tal:attributes="href '?start=%d' % (offset-perpage)"><img src='/static/nav-l.gif' border='0'></a>
-        <span tal:content="'%d-%d of %d' % (offset+1, min((offset+perpage),total), total)">
-          11-20 of 123
-        </span>
-        <a class="nb" tal:condition="(offset+perpage) &lt; total" tal:attributes="href '?start=%d' % (offset+perpage)"><img src='/static/nav-r.gif' border='0'></a>
-        <a class="nb" tal:condition="(offset+perpage) &lt; total" tal:attributes="href '?start=%d' % ((total-1)/perpage*perpage)"><img src='/static/nav-re.gif' border='0'></a>
-        <a class="nb_disable" tal:condition="(offset+perpage) &gt;= total"><img src='/static/nav-r.gif' border='0'></a>
-        <a class="nb_disable" tal:condition="(offset+perpage) &gt;= total" disabled><img src='/static/nav-re.gif' border='0'></a>
+      <!!-- Results navigation -->
+      <div id="pag_container">
+        <div tal:attributes="class 'pag_buttons disable' if offset == 0 else 'pag_buttons'">
+          <a tal:attributes="href '?start=0'"><img src='/static/nav-le.gif' border='0'></a>
+        </div>
+        <div tal:attributes="class 'pag_buttons disable' if offset == 0 else 'pag_buttons'">
+          <a tal:attributes="href '?start=%d' % (offset-perpage)"><img src='/static/nav-l.gif' border='0'></a>
+        </div>
+        <div class="pag_content">
+          <span tal:content="'%d-%d of %d' % (offset+1, min((offset+perpage),total), total)">
+            11-20 of 123
+          </span>
+        </div>
+        <div tal:attributes="class 'pag_buttons disable' if (offset+perpage) &gt;= total else 'pag_buttons'">
+          <a tal:attributes="href '?start=%d' % (offset+perpage)"><img src='/static/nav-r.gif' border='0'></a>
+        </div>
+        <div tal:attributes="class 'pag_buttons disable' if (offset+perpage) &gt;= total else 'pag_buttons'">
+          <a tal:attributes="href '?start=%d' % ((total-1)/perpage*perpage)"><img src='/static/nav-re.gif' border='0'></a>
+        </div>
       </div>
   
+      <!!-- Results -->
       <div id="app_results">
         <table width="100%" tal:condition="applications">
           <tr>
