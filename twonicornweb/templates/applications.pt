@@ -35,6 +35,8 @@
             <th>Application Name</th>
             <th>Node Group</th>
             <th>Created</th>
+            <th>Updated</th>
+            <th>Updated By</th>
           </tr>
           <tbody tal:repeat="item applications">
           <tr tal:attributes="class 'subh_app' if repeat.item.even else 'white'">
@@ -47,7 +49,9 @@
             <td><a href="deploys?application_id=0"
                    tal:attributes="href '/deploys?application_id=%d&nodegroup=%s' % (item.application_id,item.nodegroup)"
                    tal:content="item.nodegroup">Nodegroup Link</a></td>
-            <td tal:content="item.localize_date">1975-09-28 00:00:00</td>
+            <td tal:content="item.localize_date_created">1975-09-28 00:00:00</td>
+            <td tal:content="item.localize_date_updated">1975-09-28 00:00:00</td>
+            <td tal:content="item.user">bandta</td>
           </tr>
           </tbody>
         </table>

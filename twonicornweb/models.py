@@ -28,7 +28,7 @@ DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
 def _localize_date(obj):
-        utc = arrow.get(obj.created)
+        utc = arrow.get(obj)
         zone = 'US/Pacific' # FIXME: This needs to be configurable somehow
         return  utc.to(tz.gettz(zone)).format('YYYY-MM-DD HH:mm:ss ZZ')
 
@@ -38,7 +38,9 @@ class Application(Base):
     application_id   = Column(Integer, primary_key=True, nullable=False)
     application_name = Column(Text, nullable=False)
     nodegroup        = Column(Text, nullable=False)
+    user             = Column(Text, nullable=False)
     created          = Column(TIMESTAMP, nullable=False)
+    updated          = Column(TIMESTAMP, nullable=False)
 
     @hybrid_method
     def get_app_by_deploy_id(self, deploy_id):
@@ -49,8 +51,13 @@ class Application(Base):
         return q.one()
         
     @hybrid_property
-    def localize_date(self):
-        local = _localize_date(self)
+    def localize_date_created(self):
+        local = _localize_date(self.created)
+        return local
+
+    @hybrid_property
+    def localize_date_updated(self):
+        local = _localize_date(self.updated)
         return local
 
 
@@ -75,8 +82,8 @@ class Artifact(Base):
         return q.first()
 
     @hybrid_property
-    def localize_date(self):
-        local = _localize_date(self)
+    def localize_date_created(self):
+        local = _localize_date(self.created)
         return local
 
 
@@ -103,8 +110,8 @@ class ArtifactAssignment(Base):
             return url_location
 
     @hybrid_property
-    def localize_date(self):
-        local = _localize_date(self)
+    def localize_date_created(self):
+        local = _localize_date(self.created)
         return local
 
 
@@ -128,7 +135,9 @@ class Deploy(Base):
     artifact_type_id = Column(Integer, ForeignKey('artifact_types.artifact_type_id'), nullable=False)
     deploy_path      = Column(Text, nullable=False)
     package_name     = Column(Text, nullable=True)
+    user             = Column(Text, nullable=False)
     created          = Column(TIMESTAMP, nullable=False)
+    updated          = Column(TIMESTAMP, nullable=False)
     application      = relationship("Application", backref=backref('deploys'))
     artifact_assignments = relationship("ArtifactAssignment", backref=backref('deploy'),
                                           order_by=ArtifactAssignment.created.desc,

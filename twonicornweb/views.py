@@ -262,7 +262,6 @@ def view_applications(request):
     except:
         pass
 
-
     try:
         q = DBSession.query(Application)
         total = q.count()
@@ -270,7 +269,6 @@ def view_applications(request):
     except Exception, e:
         conn_err_msg = e
         return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
-
 
     return {'layout': site_layout(),
             'page_title': page_title,
@@ -741,24 +739,23 @@ def view_cp_application(request):
 
     mode = params['mode']
     commit = params['commit']
+    app = None
     application_id = None
+    nodegroup = None
     deploy_id = None
     error_msg = None
     artifact_types = None
-    artifact_type = None
-    deploy_path = None
-    package_name = None
+
+    try:
+        q = DBSession.query(ArtifactType)
+        artifact_types = q.all()
+    except Exception, e:
+        log.error("Failed to retrive data on api call (%s)" % (e))
+        # FIXME
+        return log.error
 
     if mode == 'add':
 
-        try:
-            q = DBSession.query(ArtifactType)
-            artifact_types = q.all()
-        except Exception, e:
-            log.error("Failed to retrive data on api call (%s)" % (e))
-            # FIXME
-            return log.error
- 
         subtitle = 'Add an application'
 
         if commit:
@@ -777,38 +774,47 @@ def view_cp_application(request):
                      print "Deploy: %s Type: %s Path: %s Package Name: %s" % (i, artifact_types[i], deploy_paths[i], package_names[i])
 
 
-#                application_name = request.POST['application_name']
-#                nodegroup = request.POST['nodegroup']
-#                artifact_type = request.POST['artifact_type']
-#                deploy_path = request.POST['deploy_path']
-#                package_name = request.POST['package_name']
-#
-#            try:
-#                utcnow = datetime.utcnow()
-#                # FIXME: Add user to Application table or audit table?
-#                # create = Application(application_name=application_name, nodegroup=nodegroup, user=user['ad_login'], created=utcnow)
-#                create = Application(application_name=application_name, nodegroup=nodegroup, created=utcnow)
-#                DBSession.add(create)
-#                DBSession.flush()
-#
-#                application_id = create.application_id
-#                artifact_type_id = ArtifactType.get_artifact_type_id(artifact_type)
-#
-#                create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_path, package_name=package_name, created=utcnow)
-#                DBSession.add(create)
-#                DBSession.flush()
-#
-#                deploy_id = create.deploy_id
-#
-#            except Exception, e:
-#                # FIXME not trapping correctly
-#                DBSession.rollback()
-#                error_msg = ("Failed to create application (%s)" % (e))
-#                log.error(error_msg)
+                 application_name = request.POST['application_name']
+                 nodegroup = request.POST['nodegroup']
+
+            try:
+                utcnow = datetime.utcnow()
+                create = Application(application_name=application_name, nodegroup=nodegroup, user=user['ad_login'], created=utcnow, updated=utcnow)
+                DBSession.add(create)
+                DBSession.flush()
+                application_id = create.application_id
+
+                for i in range(len(deploy_paths)):
+                    artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
+                    create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], user=user['ad_login'], created=utcnow, updated=utcnow)
+                    DBSession.add(create)
+                    deploy_id = create.deploy_id
+
+                DBSession.flush()
+
+            except Exception, e:
+                raise
+                # FIXME not trapping correctly
+                DBSession.rollback()
+                error_msg = ("Failed to create application (%s)" % (e))
+                log.error(error_msg)
 
     if mode == 'edit':
 
        subtitle = 'Edit an application'
+
+       if not commit:
+           # Display the app
+           application_id = request.POST['application_id']
+
+           try:
+               q = DBSession.query(Application)
+               q = q.filter(Application.application_id == application_id)
+               app = q.one()
+           except Exception, e:
+               conn_err_msg = e
+               return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
+
 
        if commit:
 
@@ -821,9 +827,12 @@ def view_cp_application(request):
             'prod_groups': prod_groups,
             'denied': denied,
             'subtitle': subtitle,
+            'app': app,
             'application_id': application_id,
+            'nodegroup': nodegroup,
             'deploy_id': deploy_id,
             'artifact_types': artifact_types,
+            'mode': mode,
             'commit': commit,
             'error_msg': error_msg,
            }

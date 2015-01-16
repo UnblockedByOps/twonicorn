@@ -70,7 +70,7 @@
                    tal:content="aa.artifact.location.split('/')[-1]">Artifacts By nodegroupLink</a></td>
             <td tal:content="aa.artifact_id if aa else 'No Data'">12345</td>
             <td tal:content="aa.artifact_assignment_id if aa else 'No Data'">12345</td>
-            <td tal:content="aa.localize_date if aa else 'No Data'">12345</td>
+            <td tal:content="aa.localize_date_created if aa else 'No Data'">12345</td>
             <td tal:content="aa.user if aa else 'No Data'">12345</td>
             <td tal:condition="not aa">No Data</td>
             <td tal:condition="aa"><a href="http://twonicorn.ctgrd.com/deploys?history=true"
@@ -141,7 +141,7 @@
                      tal:content="item.artifact.location.split('/')[-1]">Artifacts By nodegroupLink</a></td>
               <td tal:content="item.artifact_id">0</td>
               <td tal:content="item.artifact_assignment_id">12345</td>
-              <td tal:content="item.localize_date">12345</td>
+              <td tal:content="item.localize_date_created">12345</td>
               <td tal:content="item.user">McLovin</td>
               <td>
                 <ul tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">

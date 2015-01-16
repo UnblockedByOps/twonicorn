@@ -1,11 +1,10 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
 
-      <div tal:condition="not commit">
-        <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-        <script src="/static/row_expansion.js"></script>
+      <script src="/static/jquery-2.1.3.min.js"></script>
+      <script src="/static/row_expansion.js"></script>
 
-
+      <div tal:condition="not commit and mode == 'add'">
         <p>
           <form class="cp_form" action="/cp/application?mode=add&commit=true" method="POST">
             <input type="hidden" name="form.submitted"/>
@@ -39,12 +38,9 @@
                   <tbody>
                     <tr id='addr0'>
                       <td>
-                      1
-                      </td>
-                      <td>
                         <span for="artifact_type0">Artifact Type:</span><br>
                           <select id="artifact_type0" name="artifact_type" placeholder="Select Something" required>
-                            <option value="" disabled="disabled" selected="selected">Please select an artifact Type</option>
+                            <option value="" disabled="disabled" selected>Please select an artifact Type</option>
                             <option tal:repeat="item artifact_types" tal:content="item.name"></option>
                           </select>
                         <span class="form_hint">Artifact type</span>
@@ -80,8 +76,81 @@
         </p>
       </div>
 
-      <p tal:condition="commit and not error_msg">
-        Successfully created new Application: ${application_id}
+      <div tal:condition="not commit and mode == 'edit'">
+        <p>
+          <form class="cp_form" action="/cp/application?mode=edit&commit=true" method="POST">
+            <input type="hidden" name="form.submitted"/>
+            <ul>
+              <li>
+                <h2>${subtitle}</h2>
+                <span class="required_notification">* Denotes Required Field</span>
+              </li>
+              <li>
+                <h3>Application</h3>
+              </li>
+              <li>
+                <label for="application_name">Name:</label>
+                <input tal:attributes="value app.application_name" type="text" id="application_name" name="application_name" required />
+                <span class="form_hint">Friendly name</span>
+              </li>
+              <li>
+                <label for="nodegroup">Node Group:</label>
+                <input tal:attributes="value app.nodegroup" type="text" id="nodegroup" name="nodegroup" required/>
+                <span class="form_hint">Name of the nodegroup this application lives on</span>
+              </li>
+            <ul id="ul_deploy">
+              <li>
+                <h3>Deploy</h3>
+                <span class="required_notification">An application requires at least one deploy</span>
+              </li>
+              <li>
+
+                <table>
+                  <tbody>
+                    <tr tal:condition="app" tal:repeat="item app.deploys" id='addr0'>
+                      <td>
+                        <span for="artifact_type0">Artifact Type:</span><br>
+                          <select id="artifact_type0" name="artifact_type" required>
+                            <option value="" disabled="disabled" >Please select an artifact Type</option>
+                            <option tal:repeat="types artifact_types" tal:attributes="selected python:item.type.name == types.name" tal:content="types.name"></option>
+                          </select>
+                        <span class="form_hint">Artifact type</span>
+                      </td>
+                      <td>
+                        <span for="deploy_path0">Deploy Path:</span><br>
+                        <input tal:attributes="value item.deploy_path" type="text" id="deploy_path0" name="deploy_path" required/>
+                        <span class="form_hint">Where this deploy gets installed</span>
+                      </td>
+                      <td>
+                        <span for="package_name0">Package Name:</span><br>
+                        <input tal:attributes="value item.package_name" type="text" id="package_name0" name="package_name" placeholder="MyPythonPackage"/>
+                        <span class="form_hint">Required for deploys that are deployed using a native package management tool (python (pip), rpm (yum), etc.)</span>
+                      </td>
+                    </tr>
+
+
+                    <tr id='addr1'></tr>
+                  </tbody>
+                </table>
+
+              </li>
+            </ul>
+            <ul>
+              <li class="exp">
+                <input id="add_row" class="button exp" type="button" value="Add A Deploy"/>
+                <input id="delete_row" class="button exp" type="button" value="Remove Last Row"/>
+              </li>
+              <li>
+                <input class="button" type="submit" name="submit" value="submit"/>
+              </li>
+            </ul>
+          </form>
+
+        </p>
+      </div>
+
+      <p tal:condition="commit and mode == 'add' and not error_msg">
+        Successfully created new Application: <a tal:attributes="href '/deploys?application_id=%s&nodegroup=%s' % (application_id,nodegroup)">${application_id}</a>
       </p>
 
       <p tal:condition="error_msg">

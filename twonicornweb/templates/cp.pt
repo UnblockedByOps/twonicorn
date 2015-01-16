@@ -1,6 +1,5 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
-
       <p>
         <table width="50%">
           <tr>
@@ -10,9 +9,16 @@
             <td><a href="/cp/application?mode=add">Add a new application</a></td>
           </tr>
           <tr tal:attributes="class 'white'">
-            <td><a href="/cp/application?mode=edit">Edit an existing application</a></td>
+            <td>
+              <form class="cp_form" action="/cp/application?mode=edit" method="POST">
+                <input type="hidden" name="form.submitted"/>
+                        <span for="artifact_type0">Edit Application:</span><br>
+                        <input type="text" id="application_id" name="application_id" placeholder="Application ID" required />
+                        <span class="form_hint">Enter the Application ID you wish to edit</span><br><br>
+                        <input class="button" type="submit" name="submit" value="edit"/>
+              </form>
+            </td>
           </tr>
-
           <tr>
             <th>Deploy</th>
           </tr>
@@ -23,5 +29,6 @@
             <td><a href="/cp/deploy?mode=edit">Edit an existing deploy</a></td>
           </tr>
         </table>
+      </p>
   </div>
 </div>

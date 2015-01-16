@@ -50,7 +50,7 @@
                    title="some description"
                    tal:attributes="href promote.artifact_assignments[0].pretty_url; title promote.artifact_assignments[0].pretty_url"
                    tal:content="promote.location.split('/')[-1]">Artifact</a></td>
-            <td tal:content="promote.localize_date">12345</td>
+            <td tal:content="promote.localize_date_created">12345</td>
           </tr>
         </table>
         </p>
