@@ -40,7 +40,7 @@
                       <td>
                         <span for="artifact_type0">Artifact Type:</span><br>
                           <select id="artifact_type0" name="artifact_type" placeholder="Select Something" required>
-                            <option value="" disabled="disabled" selected>Please select an artifact Type</option>
+                            <option value="" disabled="disabled" selected>Please select an artifact type</option>
                             <option tal:repeat="item artifact_types" tal:content="item.name"></option>
                           </select>
                         <span class="form_hint">Artifact type</span>
@@ -65,7 +65,7 @@
             <ul>
               <li class="exp">
                 <input id="add_row" class="button exp" type="button" value="Add A Deploy"/>
-                <input id="delete_row" class="button exp" type="button" value="Remove Last Row"/>
+                <input id="delete_row" class="button exp disable" type="button" value="Remove Last Row"/>
               </li>
               <li>
                 <input class="button" type="submit" name="submit" value="submit"/>
@@ -105,13 +105,13 @@
               </li>
               <li>
 
-                <table>
+                <table id="tab_deploy">
                   <tbody>
                     <tr tal:condition="app" tal:repeat="item app.deploys" id='addr0'>
                       <td>
                         <span for="artifact_type0">Artifact Type:</span><br>
                           <select id="artifact_type0" name="artifact_type" required>
-                            <option value="" disabled="disabled" >Please select an artifact Type</option>
+                            <option value="" disabled="disabled" >Please select an artifact type</option>
                             <option tal:repeat="types artifact_types" tal:attributes="selected python:item.type.name == types.name" tal:content="types.name"></option>
                           </select>
                         <span class="form_hint">Artifact type</span>
@@ -138,7 +138,7 @@
             <ul>
               <li class="exp">
                 <input id="add_row" class="button exp" type="button" value="Add A Deploy"/>
-                <input id="delete_row" class="button exp" type="button" value="Remove Last Row"/>
+                <input id="delete_row" class="button exp disable" type="button" value="Remove Last Row"/>
               </li>
               <li>
                 <input class="button" type="submit" name="submit" value="submit"/>

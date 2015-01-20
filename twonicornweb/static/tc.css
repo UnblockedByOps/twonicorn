@@ -228,7 +228,6 @@ input.button {
     width: 100px;
     position :center;
     background: #CCCCCC;
-    color: #000000;
     height: 20px;
     border-radius: 15px;
     border: 1p solid #999;
@@ -509,7 +508,6 @@ td.glossary {
     width: 100px;
     position :center;
     background: #CCCCCC;
-    color: #000000;
     height: 20px;
     border-radius: 15px;
     border: 1p solid #999;
@@ -525,7 +523,6 @@ td.glossary {
 .cp_form input.button_submit {
     width: 100px;
     background: #CCCCCC;
-    color: #000000;
     height: 20px;
     border-radius: 15px;
     border: 1p solid #999;
@@ -626,8 +623,17 @@ li.exp {
     color: #CEFFFD;
 }
 
-.disable a {
+.disable {
     background: #CCCCCC;
+    color: #F0F0F0;
     pointer-events: none;
     cursor: default;
-} 
+}
+
+.disable a {
+    background: #CCCCCC;
+    color: #FFFFFF;
+    pointer-events: none;
+    cursor: default;
+}
+
