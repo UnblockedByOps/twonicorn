@@ -49,7 +49,7 @@
           <tr tal:attributes="class denv" tal:condition="app">
             <td colspan="12"><b tal:content="denv.upper()">DEV</b></td>
           </tr>
-          <tr tal:repeat="item app.deploys">
+          <tr tal:repeat="item app.deploys" tal:attributes="class denv + '_hover'">
             <?python
                 aa = item.get_assignment(denv, 'current')
                 if ((deploy_id) and int(deploy_id) == item.deploy_id) and (env is not None):
@@ -128,7 +128,7 @@
       
             <tbody tal:repeat="item histassignments">
             <!--! Do some reformatting of the urls to make them useful -->
-            <tr tal:attributes="class '%s' % env if repeat.item.even else 'white'">
+            <tr tal:attributes="class '%s' % env + '_hover'">
               <td tal:content="histdeploy.deploy_path" tal:attributes="title 'Deploy ID: ' + str(item.deploy_id)">/app/something</td>
               <td tal:content="histdeploy.package_name" tal:attributes="title '%s' % histdeploy.package_name">PythonPackage</td>
               <td tal:content="item.artifact.revision[:8]">12345</td>
@@ -144,13 +144,13 @@
               <td tal:content="item.localize_date_created">12345</td>
               <td tal:content="item.user">McLovin</td>
               <td>
-                <ul tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
-                  <li tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
+                <ul tal:attributes="class 'promote'">
+                  <li tal:attributes="class 'promote'">
                     Promote
-                    <ul tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
+                    <ul tal:attributes="class 'promote %s' % env">
                       <li tal:condition="(not (env == 'dev' and repeat.item.start and offset == 0)) 
                                           and (not (histdeploy.type.name == 'conf' and (env == 'qat' or env == 'prd')))"
-                          tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
+                          tal:attributes="class 'promote %s' % env">
                         <a tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=dev&commit=false' %
                                                 (item.deploy_id,
                                                  item.artifact_id,
@@ -160,7 +160,7 @@
                       </li>
                       <li tal:condition="not (env == 'qat' and repeat.item.start and offset == 0) 
                                          and (not (histdeploy.type.name == 'conf' and (env == 'dev' or env == 'prd')))"
-                          tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
+                          tal:attributes="class 'promote %s' % env">
                         <a tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=qat&commit=false' %
                                                 (item.deploy_id,
                                                  item.artifact_id,
@@ -171,7 +171,7 @@
                       <li tal:condition="(not (env == 'prd' and repeat.item.start and offset == 0)) 
                                           and (not (histdeploy.type.name == 'conf' and (env == 'dev' or env == 'qat'))) 
                                           and (user.prod_auth)"
-                          tal:attributes="class 'promote %s' % env if repeat.item.even else 'promote white'">
+                          tal:attributes="class 'promote %s' % env">
                         <a tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=prd&commit=false' %
                                                 (item.deploy_id,
                                                  item.artifact_id,

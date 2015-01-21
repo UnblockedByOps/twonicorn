@@ -80,13 +80,14 @@
         <p>
           <form class="cp_form" action="/cp/application?mode=edit&commit=true" method="POST">
             <input type="hidden" name="form.submitted"/>
+            <input tal:attributes="value app.application_id" type="hidden" name="application_id"/>
             <ul>
               <li>
                 <h2>${subtitle}</h2>
                 <span class="required_notification">* Denotes Required Field</span>
               </li>
               <li>
-                <h3>Application</h3>
+                <h3>Application ID: ${app.application_id}</h3>
               </li>
               <li>
                 <label for="application_name">Name:</label>
@@ -109,6 +110,7 @@
                   <tbody>
                     <tr tal:condition="app" tal:repeat="item app.deploys" id='addr0'>
                       <td>
+                        <input tal:attributes="value item.deploy_id" type="hidden" name="deploy_id"/>
                         <span for="artifact_type0">Artifact Type:</span><br>
                           <select id="artifact_type0" name="artifact_type" required>
                             <option value="" disabled="disabled" >Please select an artifact type</option>

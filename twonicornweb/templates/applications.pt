@@ -39,7 +39,7 @@
             <th>Updated By</th>
           </tr>
           <tbody tal:repeat="item applications">
-          <tr tal:attributes="class 'subh_app' if repeat.item.even else 'white'">
+          <tr>
             <td><a href="deploys?application_id=0"
                    tal:attributes="href '/deploys?application_id=%d&nodegroup=%s' % (item.application_id,item.nodegroup)"
                    tal:content="item.application_id">Application ID Link</a></td>

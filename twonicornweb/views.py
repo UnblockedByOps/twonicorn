@@ -820,6 +820,30 @@ def view_cp_application(request):
 
            subtitle = 'Edit an application'
 
+           if 'form.submitted' in request.POST:
+                print request.POST.dict_of_lists()
+                application_id = request.POST['application_id']
+                application_name = request.POST['application_name']
+                nodegroup = request.POST['nodegroup']
+                artifact_types = request.POST.getall('artifact_type')
+                deploy_ids = request.POST.getall('deploy_id')
+                deploy_paths = request.POST.getall('deploy_path')
+                package_names = request.POST.getall('package_name')
+
+                if len(deploy_paths) != len(artifact_types):
+                    print "you done fucked up son"
+                else:
+
+                    for i in range(len(deploy_paths)):
+                        total = len(deploy_paths)
+                        print "There are %s deploys" % total
+                        deploy_id = None
+                        try:
+                            deploy_id = deploy_ids[i]
+                        except:
+                            pass
+
+                        print "Deploy: %s Deploy ID: %s Type: %s Path: %s Package Name: %s" % (i, deploy_id, artifact_types[i], deploy_paths[i], package_names[i])
 
     return {'layout': site_layout(),
             'page_title': page_title,

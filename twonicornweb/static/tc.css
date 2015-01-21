@@ -59,7 +59,7 @@ th {
     color: #ffffff;
 }
 
-tr:nth-child(even) {
+tr:hover {
     background-color: #CEFFFD;
 }
 
@@ -141,22 +141,6 @@ td.subh {
     color: #FFFFFF;
 }
 
-tr.subh_app, th.subh_app, td.subh_app {
-    background-color: #CEFFFD;
-    color: #000000;
-    width: 100%;
-}
-
-th.subh_app {
-    font-size: 1.1em;
-}
-
-tr.white, td.white, ul.white, li.white {
-    background-color: #FFFFFF;
-    color: #000000;
-    width: 100%;
-}
-
 tr.gray {
     background-color: #E0E0E0;
     color: #000000;
@@ -169,16 +153,28 @@ tr.prd, td.prd, ul.prd, li.prd {
     width: 100%;
 }
 
+tr.prd_hover:hover {
+    background-color: #CAFEB8;
+}
+
 tr.qat, td.qat, ul.qat, li.qat {
     color: #000000;
     background-color: #FFF284;
     width: 100%;
 }
 
+tr.qat_hover:hover {
+    background-color: #FFF284;
+}
+
 tr.dev, td.dev, ul.dev, li.dev {
     color: #000000;
     background-color: #FFC8f2;
     width: 100%;
+}
+
+tr.dev_hover:hover {
+    background-color: #FFC8f2;
 }
 
 /* login/logout */
@@ -626,14 +622,12 @@ li.exp {
 .disable {
     background: #CCCCCC;
     color: #F0F0F0;
+    border-radius: 3px;
     pointer-events: none;
     cursor: default;
 }
 
 .disable a {
     background: #CCCCCC;
-    color: #FFFFFF;
-    pointer-events: none;
-    cursor: default;
 }
 
