@@ -26,9 +26,6 @@
             <span>
               <a class="nav" href="/promote">PROMOTE</a>
             </span>
-            <span tal:condition="user.cp_auth">
-              <a class="nav" href="/cp">CONTROL PANEL</a>
-            </span>
             <span>
               <a class="nav" href="/help">HELP</a>
             </span>
@@ -44,6 +41,12 @@
                          tal:attributes="href '/user';
                                          title 'Display user info'"
                          tal:content="'User Info'">user info</a>
+                    </li>
+                    <li class="user" tal:condition="user.cp_auth">
+                      <a class="nav" href="/cp"
+                         tal:attributes="href '/cp';
+                                         title 'Display Control Panel'"
+                         tal:content="'Control Panel'">Control Panel</a>
                     </li>
                     <li class="user" tal:condition="user.admin_auth">
                       <a class="nav" href="/admin"
