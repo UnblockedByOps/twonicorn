@@ -379,6 +379,7 @@ def view_promote(request):
     artifact_id = params['artifact_id']
     to_env = params['to_env']
     commit = params['commit']
+    referer = request.referer
 
     if not user['prod_auth'] and to_env == 'prd':
         to_state = '3'
@@ -424,6 +425,7 @@ def view_promote(request):
             'to_state': to_state,
             'commit': commit,
             'promote': promote,
+            'referer': referer,
            }
 
 
@@ -730,6 +732,7 @@ def view_cp_application(request):
 
     params = {'mode': None,
               'commit': None,
+              'application_id': None,
              }
     for p in params:
         try:
@@ -739,8 +742,8 @@ def view_cp_application(request):
 
     mode = params['mode']
     commit = params['commit']
+    application_id = params['application_id']
     app = None
-    application_id = None
     nodegroup = None
     deploy_id = None
     error_msg = None
@@ -760,52 +763,53 @@ def view_cp_application(request):
 
         if commit:
 
+            application_name = request.POST['application_name']
+            nodegroup = request.POST['nodegroup']
+            artifact_types = request.POST.getall('artifact_type')
+            deploy_paths = request.POST.getall('deploy_path')
+            package_names = request.POST.getall('package_name')
+
             subtitle = 'Add an application'
+            # FIXME not trapping because length is the same. - Safari only bug
+            if len(deploy_paths) != len(artifact_types):
+               error_msg = "You must select an artifact type and specify a deploy path."
+            else:
 
-            if 'form.submitted' in request.POST:
-                 print request.POST.dict_of_lists()
-                 artifact_types = request.POST.getall('artifact_type')
-                 deploy_paths = request.POST.getall('deploy_path')
-                 package_names = request.POST.getall('package_name')
+#                for i in range(len(deploy_paths)):
+#                    total = len(deploy_paths)
+#                    print "There are %s deploys" % total
+#                    print "Deploy: %s Type: %s Path: %s Package Name: %s" % (i, artifact_types[i], deploy_paths[i], package_names[i])
 
-                 for i in range(len(deploy_paths)):
-                     total = len(deploy_paths)
-                     print "There are %s deploys" % total
-                     print "Deploy: %s Type: %s Path: %s Package Name: %s" % (i, artifact_types[i], deploy_paths[i], package_names[i])
-
-
-                 application_name = request.POST['application_name']
-                 nodegroup = request.POST['nodegroup']
-
-            try:
-                utcnow = datetime.utcnow()
-                create = Application(application_name=application_name, nodegroup=nodegroup, user=user['ad_login'], created=utcnow, updated=utcnow)
-                DBSession.add(create)
-                DBSession.flush()
-                application_id = create.application_id
-
-                for i in range(len(deploy_paths)):
-                    artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
-                    create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], user=user['ad_login'], created=utcnow, updated=utcnow)
+                try:
+                    utcnow = datetime.utcnow()
+                    create = Application(application_name=application_name, nodegroup=nodegroup, user=user['ad_login'], created=utcnow, updated=utcnow)
                     DBSession.add(create)
-                    deploy_id = create.deploy_id
+                    DBSession.flush()
+                    application_id = create.application_id
 
-                DBSession.flush()
+                    for i in range(len(deploy_paths)):
+                        artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
+                        create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], user=user['ad_login'], created=utcnow, updated=utcnow)
+                        DBSession.add(create)
+                        deploy_id = create.deploy_id
 
-            except Exception, e:
-                raise
-                # FIXME not trapping correctly
-                DBSession.rollback()
-                error_msg = ("Failed to create application (%s)" % (e))
-                log.error(error_msg)
+                    DBSession.flush()
+
+                    return_url = '/deploys?application_id=%s&nodegroup=%s' % (application_id, nodegroup)
+                    return HTTPFound(return_url)
+
+                except Exception, e:
+                    raise
+                    # FIXME not trapping correctly
+                    DBSession.rollback()
+                    error_msg = ("Failed to create application (%s)" % (e))
+                    log.error(error_msg)
 
     if mode == 'edit':
 
        subtitle = 'Edit an application'
 
        if not commit:
-           # Display the app
-           application_id = request.POST['application_id']
 
            try:
                q = DBSession.query(Application)
@@ -815,13 +819,11 @@ def view_cp_application(request):
                conn_err_msg = e
                return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
 
-
        if commit:
 
            subtitle = 'Edit an application'
 
            if 'form.submitted' in request.POST:
-                print request.POST.dict_of_lists()
                 application_id = request.POST['application_id']
                 application_name = request.POST['application_name']
                 nodegroup = request.POST['nodegroup']
@@ -831,19 +833,46 @@ def view_cp_application(request):
                 package_names = request.POST.getall('package_name')
 
                 if len(deploy_paths) != len(artifact_types):
-                    print "you done fucked up son"
+                    error_msg = "You must select an artifact type and specify a deploy path."
                 else:
 
+                    # Update the app
+                    app = DBSession.query(Application).filter(Application.application_id==application_id).one()
+                    app.application_name = application_name
+                    app.nodegroup = nodegroup
+                    app.user=user['ad_login']
+                    DBSession.flush()
+
+                    # Add/Update deploys
                     for i in range(len(deploy_paths)):
-                        total = len(deploy_paths)
-                        print "There are %s deploys" % total
                         deploy_id = None
                         try:
                             deploy_id = deploy_ids[i]
                         except:
                             pass
 
-                        print "Deploy: %s Deploy ID: %s Type: %s Path: %s Package Name: %s" % (i, deploy_id, artifact_types[i], deploy_paths[i], package_names[i])
+                        if deploy_id:
+                            print "Updating"
+                            print "Deploy: %s Deploy ID: %s Type: %s Path: %s Package Name: %s" % (i, deploy_id, artifact_types[i], deploy_paths[i], package_names[i])
+                            dep = DBSession.query(Deploy).filter(Deploy.deploy_id==deploy_id).one()
+                            dep.artifact_type = artifact_types[i]
+                            dep.deploy_path = deploy_paths[i]
+                            dep.package_name = package_names[i]
+                            dep.user=user['ad_login'] 
+                            DBSession.flush()
+                            
+                        else:
+                            print "Creating"
+                            print "Deploy: %s Deploy ID: %s Type: %s Path: %s Package Name: %s" % (i, deploy_id, artifact_types[i], deploy_paths[i], package_names[i])
+                            utcnow = datetime.utcnow()
+                            artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
+                            create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], user=user['ad_login'], created=utcnow, updated=utcnow)
+                            DBSession.add(create)
+                            DBSession.flush()
+
+                    return_url = '/deploys?application_id=%s&nodegroup=%s' % (application_id, nodegroup)
+                    return HTTPFound(return_url)
+
 
     return {'layout': site_layout(),
             'page_title': page_title,

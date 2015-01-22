@@ -37,21 +37,24 @@
             <th>Created</th>
             <th>Updated</th>
             <th>Updated By</th>
+            <th tal:condition="user.cp_auth"></th>
           </tr>
           <tbody tal:repeat="item applications">
-          <tr>
-            <td><a href="deploys?application_id=0"
+          <tr class="app">
+            <td><a href="/deploys?application_id=0"
                    tal:attributes="href '/deploys?application_id=%d&nodegroup=%s' % (item.application_id,item.nodegroup)"
                    tal:content="item.application_id">Application ID Link</a></td>
-            <td><a href="deploys?application_id=0"
+            <td><a href="/deploys?application_id=0"
                    tal:attributes="href '/deploys?application_id=%d&nodegroup=%s' % (item.application_id,item.nodegroup)"
                    tal:content="item.application_name">Application Name Link</a></td>
-            <td><a href="deploys?application_id=0"
+            <td><a href="/deploys?application_id=0"
                    tal:attributes="href '/deploys?application_id=%d&nodegroup=%s' % (item.application_id,item.nodegroup)"
                    tal:content="item.nodegroup">Nodegroup Link</a></td>
             <td tal:content="item.localize_date_created">1975-09-28 00:00:00</td>
             <td tal:content="item.localize_date_updated">1975-09-28 00:00:00</td>
             <td tal:content="item.user">bandta</td>
+            <td tal:condition="user.cp_auth"><a href="/cp/application?mode=edit&application_id=0"
+                   tal:attributes="href '/cp/application?mode=edit&application_id=%s' % item.application_id">Edit</a></td>
           </tr>
           </tbody>
         </table>

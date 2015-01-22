@@ -20,12 +20,14 @@
       </div>
 
       <div tal:condition="nodegroup">
-        <p>
 
-        <h2 tal:content="'Deployment summary by env for ' + nodegroup.upper()">Deployment summary by environment</h2>
+        <h2 tal:attributes="title 'Application ID: ' + str(application_id)">Deployment summary by environment</h2>
 
-        </p>
         <table width="100%" tal:condition="(application_id or nodegroup)">
+          <tr class="subh">
+            <td class="subh">Application Name</td>
+            <td class="subh_app" colspan="11" tal:attributes="title 'Application ID: ' + str(application_id)" tal:content="app.application_name">tct</td>
+          </tr>
           <tr class="subh">
             <td class="subh">Node Group</td>
             <td class="subh_app" colspan="11" tal:content="nodegroup.upper() + ' (' + application_id + ')'">tct</td>
@@ -47,7 +49,7 @@
 
           <tbody tal:repeat="denv ['prd','qat','dev']" tal:condition="app">
           <tr tal:attributes="class denv" tal:condition="app">
-            <td colspan="12"><b tal:content="denv.upper()">DEV</b></td>
+            <td tal:attributes="class denv" colspan="12"><b tal:content="denv.upper()">DEV</b></td>
           </tr>
           <tr tal:repeat="item app.deploys" tal:attributes="class denv + '_hover'">
             <?python
@@ -186,11 +188,6 @@
             </tr>
             </tbody>
           </table>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
         </div>
       </div>
 

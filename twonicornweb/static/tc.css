@@ -59,8 +59,22 @@ th {
     color: #ffffff;
 }
 
-tr:hover {
+tr.app:hover td {
     background-color: #CEFFFD;
+}
+
+tr,
+tr td:first-child,
+tr th:first-child {
+    border-top-left-radius:3px;
+    border-bottom-left-radius:3px;
+}
+
+tr,
+tr td:last-child,
+tr th:last-child {
+    border-top-right-radius:3px;
+    border-bottom-right-radius:3px;
 }
 
 /* Shell container */
@@ -125,55 +139,48 @@ a.nav_logout {
     font-size: 0.7em;
 }
 
-/* what is this stuff? */
-table.subh {
-    background-color: #2FAACE;
-    color: #FFFFFF;
-    width: 100%;
-}
-tr.subh {
-    background-color: #2FAACE;
-    color: #FFFFFF;
-}
+/* Row colors */
 td.subh {
     font-size: 1.2em;
     background-color: #2FAACE;
     color: #FFFFFF;
 }
 
-tr.gray {
-    background-color: #E0E0E0;
-    color: #000000;
-    width: 100%;
+td.subh_app {
+    color: #000;
+    background: #CEFFFD;
 }
 
-tr.prd, td.prd, ul.prd, li.prd {
+td.prd, ul.prd, li.prd, td.prd_prom {
     color: #000000;
     background-color: #CAFEB8;
     width: 100%;
 }
 
-tr.prd_hover:hover {
+tr.prd:hover td,
+tr.prd_hover:hover td {
     background-color: #CAFEB8;
 }
 
-tr.qat, td.qat, ul.qat, li.qat {
+td.qat, ul.qat, li.qat, td.qat_prom {
     color: #000000;
     background-color: #FFF284;
     width: 100%;
 }
 
-tr.qat_hover:hover {
+tr.qat:hover td,
+tr.qat_hover:hover td {
     background-color: #FFF284;
 }
 
-tr.dev, td.dev, ul.dev, li.dev {
+td.dev, ul.dev, li.dev, td.dev_prom {
     color: #000000;
     background-color: #FFC8f2;
     width: 100%;
 }
 
-tr.dev_hover:hover {
+tr.dev:hover td,
+tr.dev_hover:hover td {
     background-color: #FFC8f2;
 }
 
@@ -630,4 +637,3 @@ li.exp {
 .disable a {
     background: #CCCCCC;
 }
-

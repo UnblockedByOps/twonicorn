@@ -39,18 +39,18 @@
             <th>Created Date</th>
           </tr>
 
-          <tr tal:attributes="class '%s' % to_env">
-            <td tal:content="promote.artifact_assignments[0].deploy.application.application_name">myapp</td>
-            <td tal:content="promote.artifact_assignments[0].deploy.deploy_path" tal:attributes="title 'Deploy ID: ' + str(deploy_id)">/app/something</td>
-            <td tal:content="promote.revision [:8]">12345</td>
-            <td tal:content="promote.branch">trunk</td>
-            <td tal:content="promote.repo.name">12345</td>
-            <td tal:content="promote.artifact_assignments[0].deploy.type.name">12345</td>
-            <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
+          <tr>
+            <td tal:attributes="class '%s_prom' % to_env" tal:content="promote.artifact_assignments[0].deploy.application.application_name">myapp</td>
+            <td tal:attributes="class '%s_prom' % to_env ; title 'Deploy ID: ' + str(deploy_id)" tal:content="promote.artifact_assignments[0].deploy.deploy_path">/app/something</td>
+            <td tal:attributes="class '%s_prom' % to_env" tal:content="promote.revision [:8]">12345</td>
+            <td tal:attributes="class '%s_prom' % to_env" tal:content="promote.branch">trunk</td>
+            <td tal:attributes="class '%s_prom' % to_env" tal:content="promote.repo.name">12345</td>
+            <td tal:attributes="class '%s_prom' % to_env" tal:content="promote.artifact_assignments[0].deploy.type.name">12345</td>
+            <td tal:attributes="class '%s_prom' % to_env"><a href="http://code.ctgrd.com/my/awesome/artifact.war"
                    title="some description"
                    tal:attributes="href promote.artifact_assignments[0].pretty_url; title promote.artifact_assignments[0].pretty_url"
                    tal:content="promote.location.split('/')[-1]">Artifact</a></td>
-            <td tal:content="promote.localize_date_created">12345</td>
+            <td tal:attributes="class '%s_prom' % to_env" tal:content="promote.localize_date_created">12345</td>
           </tr>
         </table>
         </p>
@@ -70,7 +70,7 @@
                  <input tal:condition="to_state != '3'" class="button_submit" type="submit" name="submit" value="Promote"/>
                </td>
                <td>
-                 <a href="/"><input class="button_submit" type="button" value="Cancel" /></a>
+                 <a tal:attributes="href referer"><input class="button_submit" type="button" value="Cancel" /></a>
                </td>
              </tr>
            </table>
