@@ -79,8 +79,8 @@ tr th:last-child {
 
 /* Shell container */
 .shell {
-    border: none;
-    margin: 10px 50px;
+    border:none;
+    margin:10px 50px;
     clear:both;
 }
 
@@ -281,14 +281,19 @@ input.button_submit:hover {
 }
 
 #app_main {
-    width: 50%;
+    width: 100%;
 }
 
 #history_main, #promote_main {
     width: 100%;
 }
 
-#app_results, #history_results, #promote_results {
+#app_results, #promote_results {
+    position: relative;
+    top: 5px;
+}
+
+#history_results {
     position: relative;
     top: 18px;
 }
@@ -586,7 +591,6 @@ li.exp {
     float:right;
     z-index: 50;
 }
-
 
 /* Testing some stuff */
 #pag_container {
