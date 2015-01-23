@@ -288,14 +288,9 @@ input.button_submit:hover {
     width: 100%;
 }
 
-#app_results, #promote_results {
+#app_results, #promote_results, #history_results {
     position: relative;
     top: 5px;
-}
-
-#history_results {
-    position: relative;
-    top: 18px;
 }
 
 #results_nav {
