@@ -9,6 +9,11 @@ Next Release (TBD)
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+2.7
+~~~~~~~
+* feature: Control panel for admins, allows to create and edit applications
+           and deploys within the UI.
+
 2.6
 ~~~~~~~
 * feature: New PUT API. Injection no longer requires direct DB access.
