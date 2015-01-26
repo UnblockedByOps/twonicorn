@@ -694,19 +694,6 @@ def view_user(request):
             'denied': denied,
            }
 
-@view_config(route_name='admin', permission='view', renderer='twonicornweb:templates/admin.pt')
-def view_admin(request):
-
-    page_title = 'Admin'
-    user = get_user(request)
-    prod_groups = request.registry.settings['tcw.prod_groups'].splitlines()
-
-    return {'layout': site_layout(),
-            'page_title': page_title,
-            'user': user,
-            'prod_groups': prod_groups,
-            'denied': denied,
-           }
 
 @view_config(route_name='cp', permission='cp', renderer='twonicornweb:templates/cp.pt')
 def view_cp(request):

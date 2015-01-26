@@ -48,12 +48,6 @@
                                          title 'Display Control Panel'"
                          tal:content="'Control Panel'">Control Panel</a>
                     </li>
-                    <li class="user" tal:condition="user.admin_auth">
-                      <a class="nav" href="/admin"
-                         tal:attributes="href '/admin';
-                                         title 'Display admin info'"
-                         tal:content="'Administer'">administer</a>
-                    </li>
                   </ul>
                 </li>
               </ul>
