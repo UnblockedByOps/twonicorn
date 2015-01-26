@@ -598,13 +598,23 @@ li.exp {
 
 .pag_buttons {
     display:inline-block;
+    padding: 3px 5px;
+    border-radius: 3px;
+    background: #2FAACE;
+}
+
+.pag_buttons:hover,
+.pag_buttons:hover a {
+    color: #2FAACE;
+    text-decoration: none;
+    background: #FF0099;
+
 }
 
 .pag_buttons a {
     color: #000000;
     background: #2FAACE;
     height: 15px;
-    padding: 0 5px;
     width: 20px;       
     text-decoration: none;       
     font-size: 0.9em;
@@ -628,7 +638,6 @@ li.exp {
 .disable {
     background: #CCCCCC;
     color: #F0F0F0;
-    border-radius: 3px;
     pointer-events: none;
     cursor: default;
 }
