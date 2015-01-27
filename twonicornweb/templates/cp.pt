@@ -34,9 +34,42 @@
                 </tr>
                 </tbody>
               </table>
-
             </td>
           </tr>
+
+
+          <tr>
+            <td>
+              <table width="100%" tal:condition="admin_groups">
+                <tr>
+                  <th>Admin</th>
+                </tr>
+                <tbody tal:repeat="item admin_groups">
+                <tr>
+                  <td tal:content="item.group_name">
+                </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <table width="100%" tal:condition="cp_groups">
+                <tr>
+                  <th>Control Panel</th>
+                </tr>
+                <tbody tal:repeat="item cp_groups">
+                <tr>
+                  <td tal:content="item.group_name">
+                </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+
+
+
         </table>
       </p>
 

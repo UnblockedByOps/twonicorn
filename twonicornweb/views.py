@@ -62,28 +62,25 @@ def get_user(request):
     except:
         return HTTPFound('/logout?message=Your cookie has been tampered with. You have been logged out')
 
-    # Check if the user is authorized to do stuff to prod
+    # Get the groups from the DB
     q = DBSession.query(Group)
-    q = q.filter(Group.perm_name == 'prod')
-    prod_groups = q.all()
+    prod_groups = q.filter(Group.perm_name == 'prod').all()
+    admin_groups = q.filter(Group.perm_name == 'admin').all()
+    cp_groups = q.filter(Group.perm_name == 'cp').all()
+
+    # Check if the user is authorized to do stuff to prod
     for a in prod_groups:
         if a.group_name in groups:
             prod_auth = True
             break
 
     # Check if the user is authorized as an admin
-    q = DBSession.query(Group)
-    q = q.filter(Group.perm_name == 'admin')
-    admin_groups = q.all()
     for a in admin_groups:
         if a.group_name in groups:
             admin_auth = True
             break
 
     # Check if the user is authorized for cp
-    q = DBSession.query(Group)
-    q = q.filter(Group.perm_name == 'cp')
-    cp_groups = q.all()
     for a in cp_groups:
         if a.group_name in groups:
             cp_auth = True
@@ -706,15 +703,18 @@ def view_cp(request):
 
     page_title = 'Control Panel'
     user = get_user(request)
-#    prod_groups = request.registry.settings['tcw.prod_groups'].splitlines()
     q = DBSession.query(Group)
-    prod_groups = q.filter(Group.perm_name == 'prod')
-#    prod_groups = q.all()
+    prod_groups = q.filter(Group.perm_name == 'prod').all()
+    admin_groups = q.filter(Group.perm_name == 'admin').all()
+    cp_groups = q.filter(Group.perm_name == 'cp').all()
+
 
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
             'prod_groups': prod_groups,
+            'admin_groups': admin_groups,
+            'cp_groups': cp_groups,
             'denied': denied,
            }
 
@@ -724,7 +724,8 @@ def view_cp_application(request):
 
     page_title = 'Control Panel - Application'
     user = get_user(request)
-    prod_groups = request.registry.settings['tcw.prod_groups'].splitlines()
+    q = DBSession.query(Group)
+    prod_groups = q.filter(Group.perm_name == 'prod').all()
 
     params = {'mode': None,
               'commit': None,
