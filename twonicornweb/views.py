@@ -26,6 +26,7 @@ from twonicornweb.models import (
     RepoType,
     ArtifactType,
     RepoUrl,
+    Group,
     )
 
 
@@ -49,7 +50,7 @@ def get_user(request):
     try:
         id = request.authenticated_userid
         (first,last) = format_user(id)
-        groups = format_groups(groupfinder(id, request))
+        groups = groupfinder(id, request)
         auth = True
         pretty = "%s %s" % (first, last)
     except Exception, e:
@@ -62,23 +63,29 @@ def get_user(request):
         return HTTPFound('/logout?message=Your cookie has been tampered with. You have been logged out')
 
     # Check if the user is authorized to do stuff to prod
-    prod_groups = request.registry.settings['tcw.prod_groups'].splitlines()
+    q = DBSession.query(Group)
+    q = q.filter(Group.perm_name == 'prod')
+    prod_groups = q.all()
     for a in prod_groups:
-        if a in groups:
+        if a.group_name in groups:
             prod_auth = True
             break
 
     # Check if the user is authorized as an admin
-    admin_groups = request.registry.settings['tcw.admin_groups'].splitlines()
+    q = DBSession.query(Group)
+    q = q.filter(Group.perm_name == 'admin')
+    admin_groups = q.all()
     for a in admin_groups:
-        if a in groups:
+        if a.group_name in groups:
             admin_auth = True
             break
 
     # Check if the user is authorized for cp
-    cp_groups = request.registry.settings['tcw.cp_groups'].splitlines()
+    q = DBSession.query(Group)
+    q = q.filter(Group.perm_name == 'cp')
+    cp_groups = q.all()
     for a in cp_groups:
-        if a in groups:
+        if a.group_name in groups:
             cp_auth = True
             break
 
@@ -215,7 +222,6 @@ def login(request):
         if data is not None:
             dn = data[0]
             encrypted = signed_serialize(login, request.registry.settings['tcw.cookie_token'])
-            #encrypted = signed_serialize(login, 'titspervert')
             headers = remember(request, dn)
             headers.append(('Set-Cookie', 'un=' + str(encrypted) + '; Max-Age=604800; Path=/'))
 
@@ -700,7 +706,10 @@ def view_cp(request):
 
     page_title = 'Control Panel'
     user = get_user(request)
-    prod_groups = request.registry.settings['tcw.prod_groups'].splitlines()
+#    prod_groups = request.registry.settings['tcw.prod_groups'].splitlines()
+    q = DBSession.query(Group)
+    prod_groups = q.filter(Group.perm_name == 'prod')
+#    prod_groups = q.all()
 
     return {'layout': site_layout(),
             'page_title': page_title,
@@ -761,11 +770,6 @@ def view_cp_application(request):
             if len(deploy_paths) != len(artifact_types):
                error_msg = "You must select an artifact type and specify a deploy path."
             else:
-
-#                for i in range(len(deploy_paths)):
-#                    total = len(deploy_paths)
-#                    print "There are %s deploys" % total
-#                    print "Deploy: %s Type: %s Path: %s Package Name: %s" % (i, artifact_types[i], deploy_paths[i], package_names[i])
 
                 try:
                     utcnow = datetime.utcnow()

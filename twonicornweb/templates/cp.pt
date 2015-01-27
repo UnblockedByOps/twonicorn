@@ -24,15 +24,13 @@
           </tr>
           <tr>
             <td>
-              <p>The following groups in Active Directory are allowed to promote to prod:</p>
-              <p>
               <table width="100%" tal:condition="prod_groups">
                 <tr>
-                  <th>Group Name</th>
+                  <th>Promote to prod</th>
                 </tr>
                 <tbody tal:repeat="item prod_groups">
                 <tr>
-                  <td tal:content="item">
+                  <td tal:content="item.group_name">
                 </tr>
                 </tbody>
               </table>

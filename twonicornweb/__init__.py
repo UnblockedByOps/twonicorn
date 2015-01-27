@@ -14,12 +14,14 @@ import os
 from .models import (
     DBSession,
         Base,
+        Group,
             )
 
 
 class RootFactory(object):
-    __acl__ = [(Allow, Authenticated, 'view'),
-               (Allow, 'CN=Unix_Team,OU=Security Groups,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp', 'cp')]
+
+    # Additional ACLs loaded from the DB below
+    __acl__ = [(Allow, Authenticated, 'view')]
     def __init__(self, request):
         pass
 
@@ -105,6 +107,19 @@ def main(global_config, **settings):
         scope = ldap.SCOPE_SUBTREE,
         cache_period = 600,
         )
+
+    # FIXME: Works, but should be easier
+    try:
+        q = DBSession.query(Group.group_name).distinct()
+        groups = q.all()
+        for i in range(len(groups)):
+            perms = []
+            for p in DBSession.query(Group).filter_by(group_name=groups[i].group_name):
+                perms.append(p.perm_name)
+            perms = tuple(perms)
+            RootFactory.__acl__.append([Allow, groups[i].group_name, perms])
+    except Exception, e:
+        raise
 
     config.scan()
     return config.make_wsgi_app()

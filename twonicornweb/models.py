@@ -235,3 +235,13 @@ class RepoUrl(Base):
     url         = Column(Text, nullable=False)
     repo        = relationship("Repo", backref=backref('url'))
 
+
+class Group(Base):
+    __tablename__ = 'groups'
+    id               = Column(Integer, primary_key=True, nullable=False)
+    perm_name        = Column(Text, nullable=False)
+    group_name       = Column(Text, nullable=False)
+    user             = Column(Text, nullable=False)
+    created          = Column(TIMESTAMP, nullable=False)
+    updated          = Column(TIMESTAMP, nullable=False)
+
