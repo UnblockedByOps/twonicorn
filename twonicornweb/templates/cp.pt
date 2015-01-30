@@ -22,54 +22,13 @@
           <tr>
             <th>Groups</th>
           </tr>
-          <tr>
-            <td>
-              <table width="100%" tal:condition="prod_groups">
-                <tr>
-                  <th>Promote to prod</th>
-                </tr>
-                <tbody tal:repeat="item prod_groups">
-                <tr>
-                  <td tal:content="item.group_name">
-                </tr>
-                </tbody>
-              </table>
-            </td>
-          </tr>
-
 
           <tr>
-            <td>
-              <table width="100%" tal:condition="admin_groups">
-                <tr>
-                  <th>Admin</th>
-                </tr>
-                <tbody tal:repeat="item admin_groups">
-                <tr>
-                  <td tal:content="item.group_name">
-                </tr>
-                </tbody>
-              </table>
-            </td>
+            <td><a href="/cp/group?mode=add">Add a new group</a></td>
           </tr>
-
           <tr>
-            <td>
-              <table width="100%" tal:condition="cp_groups">
-                <tr>
-                  <th>Control Panel</th>
-                </tr>
-                <tbody tal:repeat="item cp_groups">
-                <tr>
-                  <td tal:content="item.group_name">
-                </tr>
-                </tbody>
-              </table>
-            </td>
+            <td><a href="/cp/group?mode=edit">Edit group permissions</a></td>
           </tr>
-
-
-
         </table>
       </p>
 

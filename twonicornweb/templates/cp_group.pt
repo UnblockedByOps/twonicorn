@@ -1,0 +1,91 @@
+<div metal:use-macro="layout">
+    <div metal:fill-slot="content">
+      <p>
+        <table width="100%">
+          <tr>
+            <th>Groups</th>
+          </tr>
+
+          <tr>
+            <td>
+              <table width="100%">
+                <tr>
+                  <th>Lettuce Leaf</th>
+                  <th>prod</th>
+                  <th>admin</th>
+                  <th>cp</th>
+                </tr>
+                <tbody tal:repeat="item group_perms['all_groups']">
+                <tr>
+                  <td tal:content="item"></td>
+                  <td ><input tal:attributes="checked True if (item in group_perms['prod_groups']) else False" type="checkbox" name="prod" value="prod"></td>
+                  <td ><input tal:attributes="checked True if (item in group_perms['admin_groups']) else False" type="checkbox" name="admin" value="admin"></td>
+                  <td ><input tal:attributes="checked True if (item in group_perms['cp_groups']) else False" type="checkbox" name="cp" value="cp"></td>
+                </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+
+
+
+
+        </table>
+      </p>
+
+
+      <div tal:condition="not commit and mode == 'edit'">
+        <p>
+          <form class="cp_form_group" action="/cp/application?mode=edit&commit=true" method="POST">
+            <input type="hidden" name="form.submitted"/>
+            <ul>
+              <li>
+                <h2>${subtitle}</h2>
+                <span class="required_notification">* Denotes Required Field</span>
+              </li>
+            <ul>
+              <li>
+                <h3>Group List</h3>
+                <span class="required_notification">Clicking submit updates all groups</span>
+              </li>
+              <li>
+
+                <table>
+                  <tbody>
+                    <tr tal:repeat="item group_perms['all_groups']">
+                      <td>
+                        <span for="group_name">Group Name:</span><br>
+                        <input tal:attributes="value item" type="text" id="group_name" name="group_name" required/>
+                        <span class="form_hint">The full AD name of the group</span>
+                      </td>
+                      <td>
+                        <span for="group_perms">Promote:</span><br>
+                        <input tal:attributes="checked True if (item in group_perms['prod_groups']) else False" type="checkbox" name="prod" value="prod">
+                      </td>
+                      <td>
+                        <span for="group_perms">Admin:</span><br>
+                        <input tal:attributes="checked True if (item in group_perms['admin_groups']) else False" type="checkbox" name="admin" value="admin">
+                      </td>
+                      <td>
+                        <span for="group_perms">Control Panel:</span><br>
+                        <input tal:attributes="checked True if (item in group_perms['cp_groups']) else False" type="checkbox" name="cp" value="cp">
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+              </li>
+            </ul>
+            <ul>
+              <li>
+                <input class="button" type="submit" name="submit" value="submit"/>
+              </li>
+            </ul>
+          </form>
+
+        </p>
+      </div>
+
+
+  </div>
+</div>

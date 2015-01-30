@@ -442,14 +442,27 @@ td.glossary {
     margin:0px;
     padding:0px;
 }
-.cp_form li {
+
+.cp_form_group ul {
+    width:1050px;
+    list-style-type:none;
+    list-style-position:outside;
+    margin:0px;
+    padding:0px;
+}
+
+.cp_form li,
+.cp_form_group li {
     padding:12px;
     border-bottom:1px solid #eee;
     position:relative;
     list-style-type:none;
 }
 
-.cp_form li:first-child, .cp_form li:last-child {
+.cp_form li:first-child,
+.cp_form li:last-child, 
+.cp_form_group li:first-child,
+.cp_form_group li:last-child {
     border-bottom:1px solid #777;
 }
 
@@ -477,11 +490,25 @@ td.glossary {
     left:-6px;
 }
 
-.cp_form input:focus + .form_hint {display: inline;}
-.cp_form input:required:valid + .form_hint {background: #28921f;} /* change form hint color when valid */
-.cp_form input:required:valid + .form_hint::before {color:#28921f;} /* change form hint arrow color when valid */
+.cp_form input:focus + .form_hint, 
+.cp_form_group input:focus + .form_hint {
+    display: inline;
+}
 
-.cp_form h2, .cp_form h3 {
+.cp_form input:required:valid + .form_hint, 
+.cp_form_group input:required:valid + .form_hint {
+    background: #28921f;
+}
+
+.cp_form input:required:valid + .form_hint::before, 
+.cp_form_group input:required:valid + .form_hint::before {
+    color:#28921f;
+}
+
+.cp_form h2,
+.cp_form h3, 
+.cp_form_group h2,
+.cp_form_group h3 {
     margin:0;
     display: inline;
 }
@@ -493,37 +520,57 @@ td.glossary {
     float:right;
 }
 
-.cp_form label {
+.cp_form label, 
+.cp_form_group label {
     width:150px;
     margin-top: 3px;
     display:inline-block;
     float:left;
     padding:3px;
 }
-.cp_form input, .cp_form select {
+
+.cp_form input,
+.cp_form select {
     height:25px;
     width:220px;
     padding:2px;
     display:inline-block;
 }
 
-.cp_form input.button {
+.cp_form_group input[type=text] {
+    height:25px;
+    width:800px;
+    padding:2px;
+    display:inline-block;
+}
+
+.cp_form_group input[type=checkbox] {
+    height:25px;
+    width:20px;
+    padding:2px;
+    display:inline-block;
+}
+
+.cp_form input.button,
+.cp_form_group input.button {
     width: 100px;
     position :center;
     background: #CCCCCC;
     height: 20px;
     border-radius: 15px;
     border: 1p solid #999;
-    margin-left: auto ;
-    margin-right: auto ;
+    margin-left: 0 ;
+    margin-right: 0 ;
     box-shadow: none;
 }
 
-.cp_form input.button:hover {
+.cp_form input.button:hover,
+.cp_form_group input.button:hover {
     background: #FF0099;
 }
 
-.cp_form input.button_submit {
+.cp_form input.button_submit,
+.cp_form_group input.button_submit {
     width: 100px;
     background: #CCCCCC;
     height: 20px;
@@ -531,11 +578,15 @@ td.glossary {
     border: 1p solid #999;
 }
 
-.cp_form input.button_submit:hover {
+.cp_form input.button_submit:hover, 
+.cp_form_group input.button_submit:hover {
     background: #FF0099;
 }
 
-.cp_form input, .cp_form select {
+.cp_form input,
+.cp_form select,
+.cp_form_group input,
+.cp_form_group select {
     border:1px solid #aaa;
     box-shadow: 0px 0px 3px #ccc, 0 10px 15px #eee inset;
     border-radius:2px;
@@ -544,7 +595,13 @@ td.glossary {
     -o-transition: padding .25s;
     transition: padding .25s;
 }
-.cp_form input:focus, .cp_form textarea:focus, .cp_form select:focus {
+
+.cp_form input:focus,
+.cp_form textarea:focus,
+.cp_form select:focus, 
+.cp_form_group input:focus,
+.cp_form_group textarea:focus,
+.cp_form_group select:focus {
     background: #fff;
     border:1px solid #555;
     box-shadow: 0 0 3px #aaa;
@@ -558,19 +615,22 @@ select:required {
     background: #fff url(/static/red_asterisk.png) no-repeat 92% center;
 }
 
-.cp_form input:focus:invalid { /* when a field is considered invalid by the browser */
+.cp_form input:focus:invalid, 
+.cp_form_group input:focus:invalid {
     background: #fff url(/static/invalid.png) no-repeat 98% center;
     box-shadow: 0 0 5px #d45252;
     border-color: #b03535
 }
 
-.cp_form input:required:valid { /* when a field is considered valid by the browser */
+.cp_form input:required:valid, 
+.cp_form_group input:required:valid {
     background: #fff url(/static/valid.png) no-repeat 98% center;
     box-shadow: 0 0 5px #5cd053;
     border-color: #28921f;
 }
 
-.cp_form select:required:valid { /* when a field is considered valid by the browser */
+.cp_form select:required:valid, 
+.cp_form_group select:required:valid {
     background: #fff url(/static/valid.png) no-repeat 90% center;
     box-shadow: 0 0 5px #5cd053;
     border-color: #28921f;
@@ -587,7 +647,7 @@ li.exp {
     z-index: 50;
 }
 
-/* Testing some stuff */
+/* Pagination navigation */
 #pag_container {
     text-align:right;
 }

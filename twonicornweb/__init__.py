@@ -70,11 +70,11 @@ def main(global_config, **settings):
     config.add_route('help', '/help')
     config.add_route('user', '/user')
     config.add_route('cp', '/cp')
-    config.add_route('test', '/test')
     config.add_route('cp_application', '/cp/application')
-    config.add_route('cp_deploy', '/cp/deploy')
+    config.add_route('cp_group', '/cp/group')
     config.add_route('api', '/api/{resource}')
     config.add_route('healthcheck', '/healthcheck')
+    config.add_route('test', '/test')
     config.add_renderer('json', JSON(indent=2))
 
     # FIXME: Need to do a check because this broke in dev env

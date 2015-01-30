@@ -63,26 +63,23 @@ def get_user(request):
         return HTTPFound('/logout?message=Your cookie has been tampered with. You have been logged out')
 
     # Get the groups from the DB
-    q = DBSession.query(Group)
-    prod_groups = q.filter(Group.perm_name == 'prod').all()
-    admin_groups = q.filter(Group.perm_name == 'admin').all()
-    cp_groups = q.filter(Group.perm_name == 'cp').all()
+    group_perms = get_group_permissions()
 
     # Check if the user is authorized to do stuff to prod
-    for a in prod_groups:
-        if a.group_name in groups:
+    for a in group_perms['prod_groups']:
+        if a in groups:
             prod_auth = True
             break
 
     # Check if the user is authorized as an admin
-    for a in admin_groups:
-        if a.group_name in groups:
+    for a in group_perms['admin_groups']:
+        if a in groups:
             admin_auth = True
             break
 
     # Check if the user is authorized for cp
-    for a in cp_groups:
-        if a.group_name in groups:
+    for a in group_perms['cp_groups']:
+        if a in groups:
             cp_auth = True
             break
 
@@ -99,6 +96,43 @@ def get_user(request):
     user['pretty'] = pretty
 
     return (user)
+
+def get_group_permissions():
+    """ Gets all the groups and permissions from the db, 
+        and returns a dict of everything. """
+
+    # Get the groups from the DB
+    q = DBSession.query(Group)
+    prod_obj = q.filter(Group.perm_name == 'prod').all()
+    admin_obj = q.filter(Group.perm_name == 'admin').all()
+    cp_obj = q.filter(Group.perm_name == 'cp').all()
+    all_obj = DBSession.query(Group.group_name).distinct().all()
+
+    prod_groups = []
+    admin_groups = []
+    cp_groups = []
+    all_groups = []
+
+    for i in range(len(prod_obj)):
+        prod_groups.append(prod_obj[i].group_name)
+
+    for i in range(len(admin_obj)):
+        admin_groups.append(admin_obj[i].group_name)
+
+    for i in range(len(cp_obj)):
+        cp_groups.append(cp_obj[i].group_name)
+
+    for i in range(len(all_obj)):
+        all_groups.append(all_obj[i].group_name)
+
+    group_perms = {}
+    group_perms['prod_groups'] = prod_groups
+    group_perms['admin_groups'] = admin_groups
+    group_perms['cp_groups'] = cp_groups
+    group_perms['all_groups'] = all_groups
+
+    return(group_perms)
+
 
 def format_user(user):
     # Make the name readable
@@ -703,18 +737,10 @@ def view_cp(request):
 
     page_title = 'Control Panel'
     user = get_user(request)
-    q = DBSession.query(Group)
-    prod_groups = q.filter(Group.perm_name == 'prod').all()
-    admin_groups = q.filter(Group.perm_name == 'admin').all()
-    cp_groups = q.filter(Group.perm_name == 'cp').all()
-
 
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'prod_groups': prod_groups,
-            'admin_groups': admin_groups,
-            'cp_groups': cp_groups,
             'denied': denied,
            }
 
@@ -724,8 +750,6 @@ def view_cp_application(request):
 
     page_title = 'Control Panel - Application'
     user = get_user(request)
-    q = DBSession.query(Group)
-    prod_groups = q.filter(Group.perm_name == 'prod').all()
 
     params = {'mode': None,
               'commit': None,
@@ -869,7 +893,6 @@ def view_cp_application(request):
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'prod_groups': prod_groups,
             'denied': denied,
             'subtitle': subtitle,
             'app': app,
@@ -877,6 +900,139 @@ def view_cp_application(request):
             'nodegroup': nodegroup,
             'deploy_id': deploy_id,
             'artifact_types': artifact_types,
+            'mode': mode,
+            'commit': commit,
+            'error_msg': error_msg,
+           }
+
+@view_config(route_name='cp_group', permission='cp', renderer='twonicornweb:templates/cp_group.pt')
+def view_cp_group(request):
+
+    page_title = 'Control Panel - Groups'
+    user = get_user(request)
+    group_perms = get_group_permissions()
+
+    params = {'mode': None,
+              'commit': None,
+              'application_id': None,
+             }
+    for p in params:
+        try:
+            params[p] = request.params[p]
+        except:
+            pass
+
+    mode = params['mode']
+    commit = params['commit']
+    application_id = params['application_id']
+    app = None
+    nodegroup = None
+    deploy_id = None
+    error_msg = None
+    artifact_types = None
+
+    if mode == 'add':
+
+        subtitle = 'Add a new group'
+
+        if commit:
+
+            group_names = request.POST.getall('group_name')
+            group_perms = request.POST.getall('group_perm')
+
+            subtitle = 'Add a new group'
+            try:
+                utcnow = datetime.utcnow()
+            #    create = Application(application_name=application_name, nodegroup=nodegroup, user=user['ad_login'], created=utcnow, updated=utcnow)
+            #    DBSession.add(create)
+            #    DBSession.flush()
+            #    application_id = create.application_id
+
+            #    for i in range(len(deploy_paths)):
+            #        artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
+            #        create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], user=user['ad_login'], created=utcnow, updated=utcnow)
+            #        DBSession.add(create)
+            #        deploy_id = create.deploy_id
+
+            #    DBSession.flush()
+
+            #    return_url = '/deploys?application_id=%s&nodegroup=%s' % (application_id, nodegroup)
+            #    return HTTPFound(return_url)
+
+            except Exception, e:
+                raise
+                # FIXME not trapping correctly
+                DBSession.rollback()
+                error_msg = ("Failed to create application (%s)" % (e))
+                log.error(error_msg)
+
+    if mode == 'edit':
+
+       subtitle = 'Edit group permissions'
+
+       if not commit:
+           subtitle = 'Edit group permissions'
+
+          # try:
+          #     q = DBSession.query(Application)
+          #     q = q.filter(Application.application_id == application_id)
+          #     app = q.one()
+          # except Exception, e:
+          #     conn_err_msg = e
+          #     return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
+
+       if commit:
+
+           subtitle = 'Edit group permissions'
+
+           if 'form.submitted' in request.POST:
+                group_names = request.POST.getall('group_name')
+                group_perms = request.POST.getall('group_perm')
+
+                # Update the app
+                # app = DBSession.query(Application).filter(Application.application_id==application_id).one()
+                # app.application_name = application_name
+                # app.nodegroup = nodegroup
+                # app.user=user['ad_login']
+                # DBSession.flush()
+
+                # # Add/Update deploys
+                # for i in range(len(deploy_paths)):
+                #     deploy_id = None
+                #     try:
+                #         deploy_id = deploy_ids[i]
+                #     except:
+                #         pass
+
+                #     if deploy_id:
+                #         print "Updating"
+                #         print "Deploy: %s Deploy ID: %s Type: %s Path: %s Package Name: %s" % (i, deploy_id, artifact_types[i], deploy_paths[i], package_names[i])
+                #         dep = DBSession.query(Deploy).filter(Deploy.deploy_id==deploy_id).one()
+                #         dep.artifact_type = artifact_types[i]
+                #         dep.deploy_path = deploy_paths[i]
+                #         dep.package_name = package_names[i]
+                #         dep.user=user['ad_login']
+                #         DBSession.flush()
+
+                #     else:
+                #         print "Creating"
+                #         print "Deploy: %s Deploy ID: %s Type: %s Path: %s Package Name: %s" % (i, deploy_id, artifact_types[i], deploy_paths[i], package_names[i])
+                #         utcnow = datetime.utcnow()
+                #         artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
+                #         create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], user=user['ad_login'], created=utcnow, updated=utcnow)
+                #         DBSession.add(create)
+                #         DBSession.flush()
+
+                # return_url = '/deploys?application_id=%s&nodegroup=%s' % (application_id, nodegroup)
+                # return HTTPFound(return_url)
+
+
+    return {'layout': site_layout(),
+            'page_title': page_title,
+            'user': user,
+            'group_perms': group_perms,
+            'denied': denied,
+            'subtitle': subtitle,
             'mode': mode,
             'commit': commit,
             'error_msg': error_msg,

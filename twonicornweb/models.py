@@ -244,4 +244,3 @@ class Group(Base):
     user             = Column(Text, nullable=False)
     created          = Column(TIMESTAMP, nullable=False)
     updated          = Column(TIMESTAMP, nullable=False)
-
