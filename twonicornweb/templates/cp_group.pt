@@ -1,41 +1,9 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
-      <p>
-        <table width="100%">
-          <tr>
-            <th>Groups</th>
-          </tr>
-
-          <tr>
-            <td>
-              <table width="100%">
-                <tr>
-                  <th>Lettuce Leaf</th>
-                  <th>prod</th>
-                  <th>admin</th>
-                  <th>cp</th>
-                </tr>
-                <tbody tal:repeat="item group_perms['all_groups']">
-                <tr>
-                  <td tal:content="item"></td>
-                  <td ><input tal:attributes="checked True if (item in group_perms['prod_groups']) else False" type="checkbox" name="prod" value="prod"></td>
-                  <td ><input tal:attributes="checked True if (item in group_perms['admin_groups']) else False" type="checkbox" name="admin" value="admin"></td>
-                  <td ><input tal:attributes="checked True if (item in group_perms['cp_groups']) else False" type="checkbox" name="cp" value="cp"></td>
-                </tr>
-                </tbody>
-              </table>
-            </td>
-          </tr>
-
-
-
-
-        </table>
-      </p>
-
 
       <div tal:condition="not commit and mode == 'edit'">
         <p>
+
           <form class="cp_form_group" action="/cp/application?mode=edit&commit=true" method="POST">
             <input type="hidden" name="form.submitted"/>
             <ul>
