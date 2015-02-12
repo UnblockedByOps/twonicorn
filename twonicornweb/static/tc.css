@@ -640,6 +640,7 @@ input.button.exp {
     width: 100px;
     padding: 0px;
     position: right;
+    display:inline-block;
 }
 
 li.exp {

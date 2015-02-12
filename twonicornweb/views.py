@@ -27,6 +27,8 @@ from twonicornweb.models import (
     ArtifactType,
     RepoUrl,
     Group,
+    GroupPerm,
+    GroupAssignment,
     )
 
 
@@ -101,37 +103,43 @@ def get_group_permissions():
     """ Gets all the groups and permissions from the db, 
         and returns a dict of everything. """
 
-    # Get the groups from the DB
-    q = DBSession.query(Group)
-    prod_obj = q.filter(Group.perm_name == 'prod').all()
-    admin_obj = q.filter(Group.perm_name == 'admin').all()
-    cp_obj = q.filter(Group.perm_name == 'cp').all()
-    all_obj = DBSession.query(Group.group_name).distinct().all()
-
     prod_groups = []
     admin_groups = []
     cp_groups = []
-    all_groups = []
-
-    for i in range(len(prod_obj)):
-        prod_groups.append(prod_obj[i].group_name)
-
-    for i in range(len(admin_obj)):
-        admin_groups.append(admin_obj[i].group_name)
-
-    for i in range(len(cp_obj)):
-        cp_groups.append(cp_obj[i].group_name)
-
-    for i in range(len(all_obj)):
-        all_groups.append(all_obj[i].group_name)
-
     group_perms = {}
+
+    ga = GroupAssignment.get_assignments_by_perm('prod')
+    for a in range(len(ga)):
+        prod_groups.append('CN=' + ga[a].group.group_cn + ',' + ga[a].group.group_suffix)
+
+    ga = GroupAssignment.get_assignments_by_perm('admin')
+    for a in range(len(ga)):
+        admin_groups.append('CN=' + ga[a].group.group_cn + ',' + ga[a].group.group_suffix)
+
+    ga = GroupAssignment.get_assignments_by_perm('cp')
+    for a in range(len(ga)):
+        cp_groups.append('CN=' + ga[a].group.group_cn + ',' + ga[a].group.group_suffix)
+
     group_perms['prod_groups'] = prod_groups
     group_perms['admin_groups'] = admin_groups
     group_perms['cp_groups'] = cp_groups
-    group_perms['all_groups'] = all_groups
 
     return(group_perms)
+
+def get_all_groups():
+    """ Gets all the groups that are configured in
+        the db and returns a dict of everything. """
+
+    all_groups = []
+
+    g = DBSession.query(Group).all()
+    for a in range(len(g)):
+        print  'CN=' + g[a].group_cn + ',' + g[a].group_suffix
+        all_groups.append('CN=' + g[a].group_cn + ',' + g[a].group_suffix)
+
+    print "ALL GROUPS: ", all_groups
+
+    return(all_groups)
 
 
 def format_user(user):
@@ -910,11 +918,20 @@ def view_cp_group(request):
 
     page_title = 'Control Panel - Groups'
     user = get_user(request)
-    group_perms = get_group_permissions()
+
+    group_perms = []
+    r = DBSession.query(Group).all()
+    for g in range(len(r)):
+        ga = r[g].get_all_assignments()
+        if ga:
+            ga = tuple(ga)
+            group_perms.append([r[g].group_cn, r[g].group_suffix, ga])
+ 
+    #if 'cp' in group_perms[0][2]:
+    #    print 'CP!'
 
     params = {'mode': None,
               'commit': None,
-              'application_id': None,
              }
     for p in params:
         try:
@@ -924,12 +941,7 @@ def view_cp_group(request):
 
     mode = params['mode']
     commit = params['commit']
-    application_id = params['application_id']
-    app = None
-    nodegroup = None
-    deploy_id = None
     error_msg = None
-    artifact_types = None
 
     if mode == 'add':
 
@@ -938,11 +950,17 @@ def view_cp_group(request):
         if commit:
 
             group_names = request.POST.getall('group_name')
-            group_perms = request.POST.getall('group_perm')
+            group_perms0 = request.POST.getall('group_perms0')
+            group_perms1 = request.POST.getall('group_perms1')
+
+            print "Group names: ", group_names
+            print "Group perms0: ", group_perms0
+            print "Group perms1: ", group_perms1
 
             subtitle = 'Add a new group'
             try:
                 utcnow = datetime.utcnow()
+            #    create = Application(application_name=application_name, nodegroup=nodegroup, user=user['ad_login'], created=utcnow, updated=utcnow)
             #    create = Application(application_name=application_name, nodegroup=nodegroup, user=user['ad_login'], created=utcnow, updated=utcnow)
             #    DBSession.add(create)
             #    DBSession.flush()
@@ -1043,11 +1061,9 @@ def view_cp_group(request):
 def view_test(request):
 
     page_title = 'Test'
-    user = get_user(request)
+#    user = get_user(request)
 
-    return {'layout': site_layout(),
-            'page_title': page_title,
-            'user': user,
+    return {'page_title': page_title,
             'denied': denied,
            }
 

@@ -1,0 +1,189 @@
+@import url(http://fonts.googleapis.com/css?family=Bilbo+Swash+Caps);
+
+html{
+    min-height:100%;
+    min-width:100%;
+    background: -webkit-linear-gradient(180deg, #bbadd5, #d4cde6, #ffffff) no-repeat; 
+    background: -o-linear-gradient(180deg, #bbadd5, #d4cde6, #ffffff) no-repeat; 
+    background: -moz-linear-gradient(180deg, #bbadd5, #d4cde6, #ffffff) no-repeat; 
+    background: linear-gradient(180deg, #bbadd5, #d4cde6, #ffffff) no-repeat; 
+}
+
+body {
+    font-family: 'Bilbo Swash Caps', cursive;
+    font-size: 28px;
+    font-weight: normal;
+    color: #312f2d;
+}
+
+/* Default link settings */
+a {
+    color: #6A6AFF;
+/*    display: block; */
+}
+a:link {
+    text-decoration: none;
+}
+a:visited {
+    color: #9669FE;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+#tree {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+    z-index: -1;
+}
+
+#flys {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+    width: 1100px;
+    height: 400px;
+    z-index: 10;
+}
+
+#ja {
+    position: absolute;
+    top: 160px;
+    left: 375px;
+    width: 600px;
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+    z-index: 5;
+}
+
+#bannerl {
+    position: absolute;
+    top: 425px;
+    left: 100px;
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+}
+
+#our_story_nav {
+    position: absolute;
+    top: 460px;
+    left: 220px;
+}
+
+#directions_nav {
+    position: absolute;
+    top: 450px;
+    left: 350px;
+}
+
+#accommodations_nav {
+    position: absolute;
+    top: 442px;
+    left: 490px;
+}
+
+#schedule_nav {
+    position: absolute;
+    top: 443px;
+    left: 680px;
+}
+
+#registry_nav {
+    position: absolute;
+    top: 450px;
+    left: 790px;
+}
+
+#our_story_h {
+    position: absolute;
+    top: 555px;
+    left: 480px;
+}
+
+#directions_h {
+    position: absolute;
+    top: 555px;
+    left: 480px;
+}
+
+#accommodations_h {
+    position: absolute;
+    top: 550px;
+    left: 450px;
+}
+
+#schedule_h {
+    position: absolute;
+    top: 558px;
+    left: 500px;
+}
+
+#registry_h {
+    position: absolute;
+    top: 555px;
+    left: 490px;
+}
+
+
+#banners {
+    position: absolute;
+    top: 510px;
+    left: 390px;
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+}
+
+#main_top {
+    position: absolute;
+    top: 690px;
+    left: 79px;
+    width: 911px;
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+    background-image: url("/static/scroll_top.png");
+    z-index: 5;
+}
+
+#main {
+    position: absolute;
+    top: 720px;
+    left: 100px;
+    width: 911px;
+    border: 0px;
+    padding: 10px 0px 0px 0px;
+    margin: 0px;
+    background: #e3d4b8;
+    background-image: url("/static/scroll_fill.png");
+}
+
+
+.center {
+    text-align:center; 
+    display: block;
+    margin-left: auto;
+    margin-right: auto; 
+}
+
+table {
+    font-family: 'Bilbo Swash Caps', cursive;
+    font-size: 28px;
+    font-weight: normal;
+    margin: 0 auto;
+}
+
+td {
+    padding-right: 20px;
+}
+

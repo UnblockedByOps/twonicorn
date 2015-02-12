@@ -238,9 +238,62 @@ class RepoUrl(Base):
 
 class Group(Base):
     __tablename__ = 'groups'
-    id               = Column(Integer, primary_key=True, nullable=False)
-    perm_name        = Column(Text, nullable=False)
-    group_name       = Column(Text, nullable=False)
+    group_id         = Column(Integer, primary_key=True, nullable=False)
+    group_cn         = Column(Text, nullable=False)
+    group_suffix     = Column(Text, nullable=False)
     user             = Column(Text, nullable=False)
     created          = Column(TIMESTAMP, nullable=False)
     updated          = Column(TIMESTAMP, nullable=False)
+
+    @hybrid_method
+    def get_all_assignments(self):
+        ga = []
+        for a in self.group_assignments:
+            ga.append(a.group_perms.perm_name)
+        return ga
+
+
+class GroupAssignment(Base):
+    __tablename__ = 'group_assignments'
+    group_assignment_id     = Column(Integer, primary_key=True, nullable=False)
+    group_id                = Column(Integer, ForeignKey('groups.group_id'), nullable=False)
+    perm_id                 = Column(Integer, ForeignKey('group_perms.perm_id'), nullable=False)
+    user                    = Column(Text, nullable=False)
+    created                 = Column(TIMESTAMP, nullable=False)
+    updated                 = Column(TIMESTAMP, nullable=False)
+    group                   = relationship("Group", backref=backref('group_assignments'))
+
+    @hybrid_method
+    def get_assignments_by_group(self, group_cn):
+        q = DBSession.query(GroupAssignment)
+        q = q.join(Group, GroupAssignment.group_id == Group.group_id)
+        q = q.filter(Group.group_cn==group_cn)
+        return q.all()
+
+    @hybrid_method
+    def get_assignments_by_perm(self, perm_name):
+        q = DBSession.query(GroupAssignment)
+        q = q.join(Group, GroupAssignment.group_id == Group.group_id)
+        q = q.join(GroupPerm, GroupAssignment.perm_id == GroupPerm.perm_id)
+        q = q.filter(GroupPerm.perm_name==perm_name)
+        return q.all()
+
+
+class GroupPerm(Base):
+    __tablename__ = 'group_perms'
+    perm_id          = Column(Integer, primary_key=True, nullable=False)
+    perm_name        = Column(Text, nullable=False)
+    created          = Column(TIMESTAMP, nullable=False)
+    group_assignments = relationship("GroupAssignment", backref=backref('group_perms'),
+                                          lazy="dynamic")
+
+    def __repr__(self):
+        return "GroupPerm(perm_id='%s', perm_name='%s', )" % (
+                      self.perm_id, self.perm_name)
+
+    @hybrid_method
+    def get_all_assignments(self):
+        ga = []
+        for a in self.group_assignments:
+            ga.append(a.group.group_cn)
+        return ga

@@ -2,7 +2,7 @@
     <div metal:fill-slot="content">
 
       <script src="/static/jquery-2.1.3.min.js"></script>
-      <script src="/static/row_expansion.js"></script>
+      <script src="/static/row_expansion_app.js"></script>
 
       <div tal:condition="not commit and mode == 'add'">
         <p>

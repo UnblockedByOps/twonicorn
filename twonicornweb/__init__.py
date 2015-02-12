@@ -15,6 +15,8 @@ from .models import (
     DBSession,
         Base,
         Group,
+        GroupAssignment,
+        GroupPerm,
             )
 
 
@@ -108,16 +110,15 @@ def main(global_config, **settings):
         cache_period = 600,
         )
 
-    # FIXME: Works, but should be easier
+    # Load our groups and perms from the db
     try:
-        q = DBSession.query(Group.group_name).distinct()
-        groups = q.all()
-        for i in range(len(groups)):
-            perms = []
-            for p in DBSession.query(Group).filter_by(group_name=groups[i].group_name):
-                perms.append(p.perm_name)
-            perms = tuple(perms)
-            RootFactory.__acl__.append([Allow, groups[i].group_name, perms])
+        r = DBSession.query(Group).all()
+        for g in range(len(r)):
+            ga = r[g].get_all_assignments()
+            if ga:
+                ga = tuple(ga)
+                RootFactory.__acl__.append([Allow, 'CN=' + r[g].group_cn + ',' + r[g].group_suffix, ga])
+
     except Exception, e:
         raise
 
