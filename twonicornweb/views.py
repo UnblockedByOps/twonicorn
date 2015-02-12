@@ -45,7 +45,7 @@ def get_user(request):
     """ Gets all the user information for an authenticated  user. Checks groups
         and permissions, and returns a dict of everything. """
 
-    prod_auth = False
+    promote_prd_auth = False
     admin_auth = False
     cp_auth = False
 
@@ -67,16 +67,10 @@ def get_user(request):
     # Get the groups from the DB
     group_perms = get_group_permissions()
 
-    # Check if the user is authorized to do stuff to prod
-    for a in group_perms['prod_groups']:
+    # Check if the user is authorized to do stuff to prd
+    for a in group_perms['promote_prd_groups']:
         if a in groups:
-            prod_auth = True
-            break
-
-    # Check if the user is authorized as an admin
-    for a in group_perms['admin_groups']:
-        if a in groups:
-            admin_auth = True
+            promote_prd_auth = True
             break
 
     # Check if the user is authorized for cp
@@ -92,7 +86,7 @@ def get_user(request):
     user['first'] = first
     user['last'] = last
     user['loggedin'] = auth
-    user['prod_auth'] = prod_auth
+    user['promote_prd_auth'] = promote_prd_auth
     user['admin_auth'] = admin_auth
     user['cp_auth'] = cp_auth
     user['pretty'] = pretty
@@ -103,25 +97,20 @@ def get_group_permissions():
     """ Gets all the groups and permissions from the db, 
         and returns a dict of everything. """
 
-    prod_groups = []
-    admin_groups = []
+    promote_prd_groups = []
     cp_groups = []
     group_perms = {}
 
-    ga = GroupAssignment.get_assignments_by_perm('prod')
-    for a in range(len(ga)):
-        prod_groups.append('CN=' + ga[a].group.group_cn + ',' + ga[a].group.group_suffix)
+    ga = GroupAssignment.get_assignments_by_perm('promote_prd')
 
-    ga = GroupAssignment.get_assignments_by_perm('admin')
     for a in range(len(ga)):
-        admin_groups.append('CN=' + ga[a].group.group_cn + ',' + ga[a].group.group_suffix)
+        promote_prd_groups.append(ga[a].group.group_name)
 
     ga = GroupAssignment.get_assignments_by_perm('cp')
     for a in range(len(ga)):
-        cp_groups.append('CN=' + ga[a].group.group_cn + ',' + ga[a].group.group_suffix)
+        cp_groups.append(ga[a].group.group_name)
 
-    group_perms['prod_groups'] = prod_groups
-    group_perms['admin_groups'] = admin_groups
+    group_perms['promote_prd_groups'] = promote_prd_groups
     group_perms['cp_groups'] = cp_groups
 
     return(group_perms)
@@ -130,16 +119,16 @@ def get_all_groups():
     """ Gets all the groups that are configured in
         the db and returns a dict of everything. """
 
-    all_groups = []
+    # Get the groups from the db
+    group_perms = []
+    r = DBSession.query(Group).all()
+    for g in range(len(r)):
+        ga = r[g].get_all_assignments()
+        if ga:
+            ga = tuple(ga)
+            group_perms.append([r[g].group_name, ga])
 
-    g = DBSession.query(Group).all()
-    for a in range(len(g)):
-        print  'CN=' + g[a].group_cn + ',' + g[a].group_suffix
-        all_groups.append('CN=' + g[a].group_cn + ',' + g[a].group_suffix)
-
-    print "ALL GROUPS: ", all_groups
-
-    return(all_groups)
+    return(group_perms)
 
 
 def format_user(user):
@@ -426,7 +415,7 @@ def view_promote(request):
     commit = params['commit']
     referer = request.referer
 
-    if not user['prod_auth'] and to_env == 'prd':
+    if not user['promote_prd_auth'] and to_env == 'prd':
         to_state = '3'
     else:
         to_state = '2'
@@ -438,7 +427,7 @@ def view_promote(request):
         return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
 
     if artifact_id and commit == 'true':
-        if not user['prod_auth'] and to_env == 'prd' and to_state == '2':
+        if not user['promote_prd_auth'] and to_env == 'prd' and to_state == '2':
             denied = True
             message = 'You do not have permission to perform the promote action on production!'
         else:
@@ -739,6 +728,22 @@ def view_user(request):
             'denied': denied,
            }
 
+@view_config(route_name='group', permission='view', renderer='twonicornweb:templates/group.pt')
+def view_group(request):
+
+    page_title = 'Group Data'
+    user = get_user(request)
+    groups = DBSession.query(Group).all()
+    all_perms = DBSession.query(GroupPerm).all()
+
+    return {'layout': site_layout(),
+            'page_title': page_title,
+            'user': user,
+            'groups': groups,
+            'all_perms': all_perms,
+            'denied': denied,
+           }
+
 
 @view_config(route_name='cp', permission='cp', renderer='twonicornweb:templates/cp.pt')
 def view_cp(request):
@@ -919,19 +924,9 @@ def view_cp_group(request):
     page_title = 'Control Panel - Groups'
     user = get_user(request)
 
-    group_perms = []
-    r = DBSession.query(Group).all()
-    for g in range(len(r)):
-        ga = r[g].get_all_assignments()
-        if ga:
-            ga = tuple(ga)
-            group_perms.append([r[g].group_cn, r[g].group_suffix, ga])
- 
-    #if 'cp' in group_perms[0][2]:
-    #    print 'CP!'
-
     params = {'mode': None,
               'commit': None,
+              'group_id': None,
              }
     for p in params:
         try:
@@ -941,7 +936,10 @@ def view_cp_group(request):
 
     mode = params['mode']
     commit = params['commit']
+    group_id = params['group_id']
     error_msg = None
+    group_perms = None
+    group = None
 
     if mode == 'add':
 
@@ -949,40 +947,49 @@ def view_cp_group(request):
 
         if commit:
 
-            group_names = request.POST.getall('group_name')
-            group_perms0 = request.POST.getall('group_perms0')
-            group_perms1 = request.POST.getall('group_perms1')
-
-            print "Group names: ", group_names
-            print "Group perms0: ", group_perms0
-            print "Group perms1: ", group_perms1
-
             subtitle = 'Add a new group'
+
+            group_names = request.POST.getall('group_name')
+            print "Group names: ", group_names
+
             try:
                 utcnow = datetime.utcnow()
-            #    create = Application(application_name=application_name, nodegroup=nodegroup, user=user['ad_login'], created=utcnow, updated=utcnow)
-            #    create = Application(application_name=application_name, nodegroup=nodegroup, user=user['ad_login'], created=utcnow, updated=utcnow)
-            #    DBSession.add(create)
-            #    DBSession.flush()
-            #    application_id = create.application_id
+                for g in range(len(group_names)):
+                    create = Group(group_name=group_names[g], user=user['ad_login'], created=utcnow, updated=utcnow)
+                    DBSession.add(create)
+                    DBSession.flush()
+                    group_id = create.group_id
 
-            #    for i in range(len(deploy_paths)):
-            #        artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
-            #        create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], user=user['ad_login'], created=utcnow, updated=utcnow)
-            #        DBSession.add(create)
-            #        deploy_id = create.deploy_id
+                    i = 'group_perms' + str(g)
+                    group_perms = request.POST.getall(i)
+                    print "Group perms: ", group_perms
 
-            #    DBSession.flush()
+                    for p in group_perms:
+                        print "What is the perm name: ", p
+                        perm = GroupPerm.get_group_perm_id(p)
+                        print "Perm ID: ", perm.perm_id
+                        create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, user=user['ad_login'], created=utcnow, updated=utcnow)
+                        DBSession.add(create)
+                        group_assignment_id = create.group_assignment_id
 
-            #    return_url = '/deploys?application_id=%s&nodegroup=%s' % (application_id, nodegroup)
-            #    return HTTPFound(return_url)
+                        DBSession.flush()
 
-            except Exception, e:
-                raise
-                # FIXME not trapping correctly
-                DBSession.rollback()
-                error_msg = ("Failed to create application (%s)" % (e))
-                log.error(error_msg)
+                return_url = '/group'
+                return HTTPFound(return_url)
+
+            except Exception as ex:
+                if type(ex).__name__ == 'IntegrityError':
+                    logging.info('Group already exists in the db, please edit instead.')
+                    # Rollback
+                    DBSession.rollback()
+                    # FIXME: Return a nice page
+                    return HTTPConflict('Group already exists in the db, please edit instead.')
+                else:
+                    raise
+                    # FIXME not trapping correctly
+                    DBSession.rollback()
+                    error_msg = ("Failed to create application (%s)" % (ex))
+                    log.error(error_msg)
 
     if mode == 'edit':
 
@@ -991,13 +998,13 @@ def view_cp_group(request):
        if not commit:
            subtitle = 'Edit group permissions'
 
-          # try:
-          #     q = DBSession.query(Application)
-          #     q = q.filter(Application.application_id == application_id)
-          #     app = q.one()
-          # except Exception, e:
-          #     conn_err_msg = e
-          #     return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
+           try:
+               q = DBSession.query(Group)
+               q = q.filter(Group.group_id == group_id)
+               group = q.one()
+           except Exception, e:
+               conn_err_msg = e
+               return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
 
        if commit:
 
@@ -1006,8 +1013,9 @@ def view_cp_group(request):
            if 'form.submitted' in request.POST:
                 group_names = request.POST.getall('group_name')
                 group_perms = request.POST.getall('group_perm')
+                group_id = request.POST.get('group_id')
 
-                # Update the app
+                # Update the group
                 # app = DBSession.query(Application).filter(Application.application_id==application_id).one()
                 # app.application_name = application_name
                 # app.nodegroup = nodegroup
@@ -1048,6 +1056,8 @@ def view_cp_group(request):
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
+            'group': group,
+            'group_id': group_id,
             'group_perms': group_perms,
             'denied': denied,
             'subtitle': subtitle,

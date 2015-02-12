@@ -39,9 +39,8 @@ INSERT INTO repo_urls VALUES (10,4, 'lax1','http://pip.ctgrd.com/simple/');
 INSERT INTO repo_urls VALUES (11,4, 'vir1','http://pip.ctgrd.com/simple/');
 INSERT INTO repo_urls VALUES (12,4, 'aws1','http://pip.ctgrd.com/simple/');
 
-INSERT INTO group_perms VALUES (1,'prod',NOW());
-INSERT INTO group_perms VALUES (2,'admin',NOW());
-INSERT INTO group_perms VALUES (3,'cp',NOW());
+INSERT INTO group_perms VALUES (1,'promote_prd',NOW(),NOW());
+INSERT INTO group_perms VALUES (2,'cp',NOW(),NOW());
 
 
 
@@ -87,13 +86,11 @@ INSERT INTO group_perms VALUES (3,'cp',NOW());
 
 # GROUPS
 #
-# INSERT INTO groups VALUES (1,'Unix_Team','OU=Security Groups,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp','bandta',NOW(),NOW());
-# INSERT INTO groups VALUES (2,'CM_Team','OU=Security Groups,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp','bandta',NOW(),NOW());
-# INSERT INTO groups VALUES (3,'Foobar','OU=Security Groups,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp','bandta',NOW(),NOW());
+# INSERT INTO groups VALUES (1,'CN=Unix_Team,OU=Security Groups,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp','bandta',NOW(),NOW());
+# INSERT INTO groups VALUES (2,'CN=CM_Team,OU=Security Groups,OU=CGM Accounts Security Groups and Distribution Lists,DC=cs,DC=iac,DC=corp','bandta',NOW(),NOW());
 # 
 # 
 # INSERT INTO group_assignments (group_id,perm_id,user) VALUES (1,1,'bandta');
 # INSERT INTO group_assignments (group_id,perm_id,user) VALUES (1,2,'bandta');
-# INSERT INTO group_assignments (group_id,perm_id,user) VALUES (1,3,'bandta');
-# INSERT INTO group_assignments (group_id,perm_id,user) VALUES (2,3,'bandta');
+# INSERT INTO group_assignments (group_id,perm_id,user) VALUES (2,2,'bandta');
 

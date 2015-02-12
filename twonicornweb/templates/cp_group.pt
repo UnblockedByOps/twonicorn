@@ -29,12 +29,8 @@
                         <span class="form_hint">The full AD name of the group</span>
                       </td>
                       <td>
-                        <span for="group_perms0">Promote:</span><br>
-                        <input type="checkbox" name="group_perms0" value="promote">
-                      </td>
-                      <td>
-                        <span for="group_perms0">Admin:</span><br>
-                        <input type="checkbox" name="group_perms0" value="admin">
+                        <span for="group_perms0">Promote to prd:</span><br>
+                        <input type="checkbox" name="group_perms0" value="promote_prd">
                       </td>
                       <td>
                         <span for="group_perms0">Control Panel:</span><br>
@@ -67,6 +63,7 @@
 
           <form class="cp_form_group" action="/cp/group?mode=edit&commit=true" method="POST">
             <input type="hidden" name="form.submitted"/>
+            <input tal:attributes="value group.group_id" type="hidden" name="group_id"/>
             <ul>
               <li>
                 <h2>${subtitle}</h2>
@@ -74,30 +71,25 @@
               </li>
             <ul>
               <li>
-                <h3>Group List</h3>
-                <span class="required_notification">Clicking submit updates all groups</span>
+                <h3>Group</h3>
               </li>
               <li>
 
                 <table>
                   <tbody>
-                    <tr tal:repeat="item group_perms['all_groups']">
+                    <tr>
                       <td>
                         <span for="group_name">Group Name:</span><br>
-                        <input tal:attributes="value item" type="text" id="group_name" name="group_name" required/>
+                        <input tal:attributes="value group.group_name" type="text" id="group_name" name="group_name" required/>
                         <span class="form_hint">The full AD name of the group</span>
                       </td>
                       <td>
                         <span for="group_perms">Promote:</span><br>
-                        <input tal:attributes="checked True if (item in group_perms['prod_groups']) else False" type="checkbox" name="prod" value="prod">
-                      </td>
-                      <td>
-                        <span for="group_perms">Admin:</span><br>
-                        <input tal:attributes="checked True if (item in group_perms['admin_groups']) else False" type="checkbox" name="admin" value="admin">
+                        <input tal:attributes="checked True if ('promote_prd' in group.get_all_assignments()) else False" type="checkbox" name="prod" value="prod">
                       </td>
                       <td>
                         <span for="group_perms">Control Panel:</span><br>
-                        <input tal:attributes="checked True if (item in group_perms['cp_groups']) else False" type="checkbox" name="cp" value="cp">
+                        <input tal:attributes="checked True if ('cp' in group.get_all_assignments()) else False" type="checkbox" name="cp" value="cp">
                       </td>
                     </tr>
                   </tbody>

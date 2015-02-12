@@ -239,8 +239,7 @@ class RepoUrl(Base):
 class Group(Base):
     __tablename__ = 'groups'
     group_id         = Column(Integer, primary_key=True, nullable=False)
-    group_cn         = Column(Text, nullable=False)
-    group_suffix     = Column(Text, nullable=False)
+    group_name       = Column(Text, nullable=False)
     user             = Column(Text, nullable=False)
     created          = Column(TIMESTAMP, nullable=False)
     updated          = Column(TIMESTAMP, nullable=False)
@@ -251,6 +250,16 @@ class Group(Base):
         for a in self.group_assignments:
             ga.append(a.group_perms.perm_name)
         return ga
+
+    @hybrid_property
+    def localize_date_created(self):
+        local = _localize_date(self.created)
+        return local
+
+    @hybrid_property
+    def localize_date_updated(self):
+        local = _localize_date(self.updated)
+        return local
 
 
 class GroupAssignment(Base):
@@ -264,10 +273,10 @@ class GroupAssignment(Base):
     group                   = relationship("Group", backref=backref('group_assignments'))
 
     @hybrid_method
-    def get_assignments_by_group(self, group_cn):
+    def get_assignments_by_group(self, group_name):
         q = DBSession.query(GroupAssignment)
         q = q.join(Group, GroupAssignment.group_id == Group.group_id)
-        q = q.filter(Group.group_cn==group_cn)
+        q = q.filter(Group.group_name==group_name)
         return q.all()
 
     @hybrid_method
@@ -295,5 +304,13 @@ class GroupPerm(Base):
     def get_all_assignments(self):
         ga = []
         for a in self.group_assignments:
-            ga.append(a.group.group_cn)
+            ga.append(a.group.group_name)
         return ga
+
+    @hybrid_method
+    def get_group_perm_id(self, perm_name):
+        # Convert the perm name to the id
+        q = DBSession.query(GroupPerm)
+        q = q.filter(GroupPerm.perm_name == '%s' % perm_name)
+        return q.one()
+

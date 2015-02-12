@@ -27,7 +27,17 @@
             <td><a href="/cp/group?mode=add">Add a new group</a></td>
           </tr>
           <tr>
-            <td><a href="/cp/group?mode=edit">Edit group permissions</a></td>
+
+            <td>
+              <form class="cp_form" action="/cp/group?mode=edit" method="POST">
+                <input type="hidden" name="form.submitted"/>
+                        <span for="group_id">Edit Group:</span><br>
+                        <input type="text" id="group_id" name="group_id" placeholder="Group ID" required />
+                        <span class="form_hint">Enter the Group ID you wish to edit</span><br><br>
+                        <input class="button" type="submit" name="submit" value="edit"/>
+              </form>
+            </td>
+
           </tr>
         </table>
       </p>

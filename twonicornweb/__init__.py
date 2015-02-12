@@ -71,6 +71,7 @@ def main(global_config, **settings):
     config.add_route('promote', '/promote')
     config.add_route('help', '/help')
     config.add_route('user', '/user')
+    config.add_route('group', '/group')
     config.add_route('cp', '/cp')
     config.add_route('cp_application', '/cp/application')
     config.add_route('cp_group', '/cp/group')
@@ -117,7 +118,7 @@ def main(global_config, **settings):
             ga = r[g].get_all_assignments()
             if ga:
                 ga = tuple(ga)
-                RootFactory.__acl__.append([Allow, 'CN=' + r[g].group_cn + ',' + r[g].group_suffix, ga])
+                RootFactory.__acl__.append([Allow, r[g].group_name, ga])
 
     except Exception, e:
         raise
