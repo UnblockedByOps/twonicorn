@@ -63,6 +63,10 @@ tr.app:hover td {
     background-color: #CEFFFD;
 }
 
+tr.group:hover td {
+    background-color: #CEFFFD;
+}
+
 tr,
 tr td:first-child,
 tr th:first-child {
@@ -225,6 +229,15 @@ input {
     display: block;
     border: 1px solid #999;
     height: 25px;
+}
+
+input[type=checkbox] {
+    height:20px;
+    width:20px;
+    padding:2px;
+    display:inline-block;
+    text-align: center; /* center checkbox horizontally */
+    vertical-align: middle; /* center checkbox vertically */
 }
 
 input.button {
@@ -540,13 +553,6 @@ td.glossary {
 .cp_form_group input[type=text] {
     height:25px;
     width:800px;
-    padding:2px;
-    display:inline-block;
-}
-
-.cp_form_group input[type=checkbox] {
-    height:25px;
-    width:20px;
     padding:2px;
     display:inline-block;
 }

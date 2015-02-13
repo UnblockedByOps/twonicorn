@@ -483,15 +483,11 @@ def view_api(request):
     lifecycle = params['lifecycle']
     results = []
 
-#    if application_id and deploy_id:
-#        return HTTPBadRequest()
-
     if request.matchdict['resource'] == 'application':
         try:
             q = DBSession.query(Application)
             q = q.filter(Application.application_id == id)
             app = q.one()
-            print "******************** APPP IS: ", app
         except Exception, e:
             log.error("Failed to retrive data on api call (%s)" % (e))
             return results
@@ -1012,8 +1008,18 @@ def view_cp_group(request):
 
            if 'form.submitted' in request.POST:
                 group_names = request.POST.getall('group_name')
-                group_perms = request.POST.getall('group_perm')
-                group_id = request.POST.get('group_id')
+                promote_prd = request.POST.get('promote_prd')
+                cp = request.POST.get('cp')
+             
+                print "Promote: ", promote_prd
+                print "cp: ", cp
+
+
+            
+#            utcnow = datetime.utcnow()
+#            assign = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=lifecycle_id, user=user, created=utcnow)
+#            DBSession.add(assign)
+
 
                 # Update the group
                 # app = DBSession.query(Application).filter(Application.application_id==application_id).one()

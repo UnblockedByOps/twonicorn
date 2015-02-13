@@ -15,10 +15,10 @@
         <th tal:condition="user.cp_auth"></th>
       </tr>
       <tbody tal:repeat="item groups">
-      <tr>
+      <tr class="group">
         <td tal:content="item.group_id">
         <td tal:content="item.group_name">
-        <td><span tal:repeat="ass item.group_assignments" tal:content="ass.group_perms.perm_name"></td>
+        <td tal:repeat="perm all_perms"><input tal:attributes="checked True if (perm.perm_name in item.get_all_assignments()) else False; name perm.perm_name" type="checkbox" disabled/></td>
         <td tal:content="item.localize_date_created">1975-09-28 00:00:00</td>
         <td tal:content="item.localize_date_updated">1975-09-28 00:00:00</td>
         <td tal:content="item.user">bandta</td>

@@ -85,11 +85,13 @@
                       </td>
                       <td>
                         <span for="group_perms">Promote:</span><br>
-                        <input tal:attributes="checked True if ('promote_prd' in group.get_all_assignments()) else False" type="checkbox" name="prod" value="prod">
+                        <input type="hidden" name="promote_prd" value="">
+                        <input tal:attributes="checked True if ('promote_prd' in group.get_all_assignments()) else False" type="checkbox" name="promote_prd" value="true">
                       </td>
                       <td>
                         <span for="group_perms">Control Panel:</span><br>
-                        <input tal:attributes="checked True if ('cp' in group.get_all_assignments()) else False" type="checkbox" name="cp" value="cp">
+                        <input type="hidden" name="cp" value="">
+                        <input tal:attributes="checked True if ('cp' in group.get_all_assignments()) else False" type="checkbox" name="cp" value="true">
                       </td>
                     </tr>
                   </tbody>

@@ -294,6 +294,7 @@ class GroupPerm(Base):
     perm_name        = Column(Text, nullable=False)
     created          = Column(TIMESTAMP, nullable=False)
     group_assignments = relationship("GroupAssignment", backref=backref('group_perms'),
+                                          order_by=GroupAssignment.created.desc,
                                           lazy="dynamic")
 
     def __repr__(self):
