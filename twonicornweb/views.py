@@ -946,7 +946,6 @@ def view_cp_group(request):
             subtitle = 'Add a new group'
 
             group_names = request.POST.getall('group_name')
-            print "Group names: ", group_names
 
             try:
                 utcnow = datetime.utcnow()
@@ -958,12 +957,9 @@ def view_cp_group(request):
 
                     i = 'group_perms' + str(g)
                     group_perms = request.POST.getall(i)
-                    print "Group perms: ", group_perms
 
                     for p in group_perms:
-                        print "What is the perm name: ", p
                         perm = GroupPerm.get_group_perm_id(p)
-                        print "Perm ID: ", perm.perm_id
                         create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, user=user['ad_login'], created=utcnow, updated=utcnow)
                         DBSession.add(create)
                         group_assignment_id = create.group_assignment_id
@@ -1007,57 +1003,41 @@ def view_cp_group(request):
            subtitle = 'Edit group permissions'
 
            if 'form.submitted' in request.POST:
-                group_names = request.POST.getall('group_name')
-                promote_prd = request.POST.get('promote_prd')
-                cp = request.POST.get('cp')
+                group_id = request.POST.get('group_id')
+                group_name = request.POST.get('group_name')
+                perms = request.POST.getall('perms')
              
-                print "Promote: ", promote_prd
-                print "cp: ", cp
-
-
-            
-#            utcnow = datetime.utcnow()
-#            assign = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=lifecycle_id, user=user, created=utcnow)
-#            DBSession.add(assign)
-
-
                 # Update the group
-                # app = DBSession.query(Application).filter(Application.application_id==application_id).one()
-                # app.application_name = application_name
-                # app.nodegroup = nodegroup
-                # app.user=user['ad_login']
-                # DBSession.flush()
+                utcnow = datetime.utcnow()
+                group = DBSession.query(Group).filter(Group.group_id==group_id).one()
+                group.group_name = group_name
+                group.user=user['ad_login']
+                DBSession.flush()
 
-                # # Add/Update deploys
-                # for i in range(len(deploy_paths)):
-                #     deploy_id = None
-                #     try:
-                #         deploy_id = deploy_ids[i]
-                #     except:
-                #         pass
+                all_perms = DBSession.query(GroupPerm)
+                # Update the perms
+                for p in all_perms:
+                    # insert
+                    if p.perm_name in perms:
+                        print "Adding perm: ", p.perm_name
+                        log.info("Adding permission %s for group %s" % (p.perm_name, group_name))
+                        perm = GroupPerm.get_group_perm_id(p.perm_name)
+                        utcnow = datetime.utcnow()
+                        create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, user=user['ad_login'], created=utcnow, updated=utcnow)
+                        DBSession.add(create)
+                        group_assignment_id = create.group_assignment_id
+                        DBSession.flush()
+    
+                    # delete
+                    else:
+                        log.info("Deleting permission %s for group %s" % (p.perm_name, group_name))
+                        perm = GroupPerm.get_group_perm_id(p.perm_name)
+                        assignment = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id).one()
+                        DBSession.delete(assignment)
+                        DBSession.flush()
 
-                #     if deploy_id:
-                #         print "Updating"
-                #         print "Deploy: %s Deploy ID: %s Type: %s Path: %s Package Name: %s" % (i, deploy_id, artifact_types[i], deploy_paths[i], package_names[i])
-                #         dep = DBSession.query(Deploy).filter(Deploy.deploy_id==deploy_id).one()
-                #         dep.artifact_type = artifact_types[i]
-                #         dep.deploy_path = deploy_paths[i]
-                #         dep.package_name = package_names[i]
-                #         dep.user=user['ad_login']
-                #         DBSession.flush()
-
-                #     else:
-                #         print "Creating"
-                #         print "Deploy: %s Deploy ID: %s Type: %s Path: %s Package Name: %s" % (i, deploy_id, artifact_types[i], deploy_paths[i], package_names[i])
-                #         utcnow = datetime.utcnow()
-                #         artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
-                #         create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], user=user['ad_login'], created=utcnow, updated=utcnow)
-                #         DBSession.add(create)
-                #         DBSession.flush()
-
-                # return_url = '/deploys?application_id=%s&nodegroup=%s' % (application_id, nodegroup)
-                # return HTTPFound(return_url)
-
+                return_url = '/group'
+                return HTTPFound(return_url)
 
     return {'layout': site_layout(),
             'page_title': page_title,
@@ -1077,9 +1057,11 @@ def view_cp_group(request):
 def view_test(request):
 
     page_title = 'Test'
-#    user = get_user(request)
+    user = get_user(request)
 
-    return {'page_title': page_title,
+    return {'layout': site_layout(),
+            'page_title': page_title,
+            'user': user,
             'denied': denied,
            }
 
