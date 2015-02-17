@@ -9,6 +9,7 @@ from pyramid.security import remember, forget
 from pyramid.session import signed_serialize, signed_deserialize
 from pyramid_ldap import get_ldap_connector, groupfinder
 from pyramid.response import Response
+from sqlalchemy.sql import exists
 from datetime import datetime
 import logging
 import os.path
@@ -1014,27 +1015,31 @@ def view_cp_group(request):
                 group.user=user['ad_login']
                 DBSession.flush()
 
-                all_perms = DBSession.query(GroupPerm)
                 # Update the perms
+                all_perms = DBSession.query(GroupPerm)
                 for p in all_perms:
                     # insert
                     if p.perm_name in perms:
-                        print "Adding perm: ", p.perm_name
-                        log.info("Adding permission %s for group %s" % (p.perm_name, group_name))
                         perm = GroupPerm.get_group_perm_id(p.perm_name)
-                        utcnow = datetime.utcnow()
-                        create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, user=user['ad_login'], created=utcnow, updated=utcnow)
-                        DBSession.add(create)
-                        group_assignment_id = create.group_assignment_id
-                        DBSession.flush()
+                        q = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id)
+                        check = DBSession.query(q.exists()).scalar()
+                        if not check:
+                            log.info("Adding permission %s for group %s" % (p.perm_name, group_name))
+                            utcnow = datetime.utcnow()
+                            create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, user=user['ad_login'], created=utcnow, updated=utcnow)
+                            DBSession.add(create)
+                            DBSession.flush()
     
                     # delete
                     else:
-                        log.info("Deleting permission %s for group %s" % (p.perm_name, group_name))
                         perm = GroupPerm.get_group_perm_id(p.perm_name)
-                        assignment = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id).one()
-                        DBSession.delete(assignment)
-                        DBSession.flush()
+                        q = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id)
+                        check = DBSession.query(q.exists()).scalar()
+                        if check:
+                            log.info("Deleting permission %s for group %s" % (p.perm_name, group_name))
+                            assignment = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id).one()
+                            DBSession.delete(assignment)
+                            DBSession.flush()
 
                 return_url = '/group'
                 return HTTPFound(return_url)
