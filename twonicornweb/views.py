@@ -1024,6 +1024,7 @@ def view_cp_group(request):
                         q = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id)
                         check = DBSession.query(q.exists()).scalar()
                         if not check:
+                            print ("Adding permission %s for group %s" % (p.perm_name, group_name))
                             log.info("Adding permission %s for group %s" % (p.perm_name, group_name))
                             utcnow = datetime.utcnow()
                             create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, user=user['ad_login'], created=utcnow, updated=utcnow)
@@ -1036,6 +1037,7 @@ def view_cp_group(request):
                         q = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id)
                         check = DBSession.query(q.exists()).scalar()
                         if check:
+                            print ("Deleting permission %s for group %s" % (p.perm_name, group_name))
                             log.info("Deleting permission %s for group %s" % (p.perm_name, group_name))
                             assignment = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id).one()
                             DBSession.delete(assignment)
