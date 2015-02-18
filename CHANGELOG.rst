@@ -9,6 +9,11 @@ Next Release (TBD)
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+2.8
+~~~~~~~
+* feature: Moving group management to the db. Additions to the control
+           panel to manage them.
+
 2.7
 ~~~~~~~
 * feature: Control panel for admins, allows to create and edit applications
