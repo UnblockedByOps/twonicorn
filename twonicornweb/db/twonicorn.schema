@@ -260,3 +260,38 @@ CREATE TABLE `group_assignments` (
   `updated`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+###
+### TABLE: group_assignments_audit
+###   This audit trail for group_assignments
+###
+DROP TABLE IF EXISTS `group_assignments_audit`;
+CREATE TABLE `group_assignments_audit` (
+  `id`                     mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `group_assignment_id`    mediumint(9) UNSIGNED NOT NULL,
+  `group_id`               mediumint(9) UNSIGNED NOT NULL,
+  `perm_id`                mediumint(9) UNSIGNED NOT NULL,
+  `user`                   varchar(30) NOT NULL,
+  `updated`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted`                tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+DELIMITER //
+CREATE TRIGGER ga_trigger_insert AFTER INSERT ON group_assignments
+FOR EACH ROW BEGIN
+INSERT INTO group_assignments_audit(group_assignment_id,group_id,perm_id,user,updated,deleted) VALUES (NEW.group_assignment_id,NEW.group_id,NEW.perm_id,NEW.user,NEW.updated, '0');
+END //
+
+CREATE TRIGGER ga_trigger_update AFTER UPDATE ON group_assignments
+FOR EACH ROW BEGIN
+   IF NEW.updated <> OLD.updated THEN
+      INSERT INTO group_assignments_audit(group_assignment_id,group_id,perm_id,user,updated,deleted) VALUES (NEW.group_assignment_id,NEW.group_id,NEW.perm_id,NEW.user,NEW.updated, '0');
+   END IF;
+END //
+
+DELIMITER //
+CREATE TRIGGER ga_trigger_delete BEFORE DELETE ON group_assignments
+FOR EACH ROW BEGIN
+INSERT INTO group_assignments_audit(group_assignment_id,group_id,perm_id,user,updated,deleted) VALUES (OLD.group_assignment_id,OLD.group_id,OLD.perm_id,OLD.user,NOW(), '1');
+END //
+
+DELIMITER ;
