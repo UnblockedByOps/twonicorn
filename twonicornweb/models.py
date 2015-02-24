@@ -127,6 +127,13 @@ class ArtifactType(Base):
         q = q.filter(ArtifactType.name == '%s' % name)
         return q.one()
 
+    @hybrid_method
+    def get_artifact_type_name(self, id):
+        # Convert the id to the name
+        q = DBSession.query(ArtifactType)
+        q = q.filter(ArtifactType.artifact_type_id == '%s' % id)
+        return q.one()
+
 
 class Deploy(Base):
     __tablename__ = 'deploys'

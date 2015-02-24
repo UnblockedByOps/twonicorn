@@ -471,6 +471,7 @@ def view_api(request):
               'env': None,
               'loc': None,
               'lifecycle': None,
+              'deploy_id': None,
              }
     for p in params:
         try:
@@ -482,6 +483,7 @@ def view_api(request):
     env = params['env']
     loc = params['loc']
     lifecycle = params['lifecycle']
+    deploy_id = params['deploy_id']
     results = []
 
     if request.matchdict['resource'] == 'application':
@@ -568,18 +570,29 @@ def view_api(request):
             results.append(each)
 
     if request.matchdict['resource'] == 'artifact_types':
-        try:
-            q = DBSession.query(ArtifactType)
-            artifact_types = q.all()
-        except Exception, e:
-            log.error("Failed to retrive data on api call (%s)" % (e))
-            return results
+        if deploy_id:
+            try:
+                q = DBSession.query(ArtifactType)
+                q = q.join(Deploy, ArtifactType.artifact_type_id == Deploy.artifact_type_id)
+                q = q.filter(Deploy.deploy_id==deploy_id)
+                r = q.one()
+                results.append({'artifact_type':  r.name})
+            except Exception, e:
+                log.error("Failed to retrive data on api call (%s)" % (e))
+                return results
+        else:
+            try:
+                q = DBSession.query(ArtifactType)
+                artifact_types = q.all()
+            except Exception, e:
+                log.error("Failed to retrive data on api call (%s)" % (e))
+                return results
 
-        for a in artifact_types:
-            each = {}
-            each['artifact_type_id'] = a.artifact_type_id
-            each['name'] = a.name
-            results.append(each)
+            for a in artifact_types:
+                each = {}
+                each['artifact_type_id'] = a.artifact_type_id
+                each['name'] = a.name
+                results.append(each)
 
     if request.matchdict['resource'] == 'lifecycles':
         try:
@@ -595,7 +608,21 @@ def view_api(request):
             each['name'] = l.name
             results.append(each)
 
-    # FIXME: Need repo/repo_urls still
+    if request.matchdict['resource'] == 'repo_urls':
+        try:
+            q = DBSession.query(RepoUrl)
+            repo_urls = q.all()
+        except Exception, e:
+            log.error("Failed to retrive data on api call (%s)" % (e))
+            return results
+
+        for r in repo_urls:
+            each = {}
+            each['ct_loc'] = r.ct_loc
+            each['repo_id'] = r.repo_id
+            each['repo_url_id'] = r.repo_url_id
+            each['url'] = r.url
+            results.append(each)
 
     return results
 
