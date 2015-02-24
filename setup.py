@@ -27,7 +27,7 @@ requires = [
     ]
 
 setup(name='TwonicornWeb',
-      version='2.8',
+      version='2.8.1',
       description='TwonicornWeb',
       long_description=README + '\n\n' + CHANGELOG,
       classifiers=[
