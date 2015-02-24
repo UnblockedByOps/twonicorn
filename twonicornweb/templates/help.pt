@@ -30,6 +30,9 @@
     <p>
       Configured lifecycles:<br>
     <a tal:attributes="href host_url + '/api/lifecycles'" tal:content="host_url + '/api/lifecycles'">/api</a>
+    <p>
+      Configured repo urls:<br>
+    <a tal:attributes="href host_url + '/api/repo_urls'" tal:content="host_url + '/api/repo_urls'">/api</a>
 
     <h3>HTTP PUT Examples</h3>
 
