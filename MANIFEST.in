@@ -1,2 +1,2 @@
 include *.rst *.cfg
-recursive-include twonicornweb *.png *.css *.gif *.jpg *.pt *.js
+recursive-include twonicornweb *.png *.css *.gif *.jpg *.pt *.js *.sql
