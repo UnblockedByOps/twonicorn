@@ -9,6 +9,12 @@ Next Release (TBD)
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+2.8.1
+~~~~~~~
+* bugfix: Chaging the artifact type for a deploy not updating db.
+* bugfix: Unable to get artifact type from db if there is not
+          an existing artifact assignment.
+
 2.8
 ~~~~~~~
 * feature: Moving group management to the db. Additions to the control
