@@ -890,6 +890,11 @@ def view_cp_application(request):
                 else:
 
                     # Update the app
+                    logging.info('UPDATE: application_id=%s,application_name=%s,nodegroup=%s,user=%s'
+                                 % (application_id,
+                                    application_name,
+                                    nodegroup,
+                                    user['ad_login']))
                     app = DBSession.query(Application).filter(Application.application_id==application_id).one()
                     app.application_name = application_name
                     app.nodegroup = nodegroup
@@ -905,18 +910,27 @@ def view_cp_application(request):
                             pass
 
                         if deploy_id:
-                            print "Updating"
-                            print "Deploy: %s Deploy ID: %s Type: %s Path: %s Package Name: %s" % (i, deploy_id, artifact_types[i], deploy_paths[i], package_names[i])
+                            logging.info('UPDATE: deploy=%s,deploy_id=%s,artifact_type=%s,deploy_path=%s,package_name=%s'
+                                         % (i,
+                                            deploy_id,
+                                            artifact_types[i],
+                                            deploy_paths[i],
+                                            package_names[i]))
                             dep = DBSession.query(Deploy).filter(Deploy.deploy_id==deploy_id).one()
-                            dep.artifact_type = artifact_types[i]
+                            artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
+                            dep.artifact_type_id = artifact_type_id.artifact_type_id
                             dep.deploy_path = deploy_paths[i]
                             dep.package_name = package_names[i]
                             dep.user=user['ad_login'] 
                             DBSession.flush()
                             
                         else:
-                            print "Creating"
-                            print "Deploy: %s Deploy ID: %s Type: %s Path: %s Package Name: %s" % (i, deploy_id, artifact_types[i], deploy_paths[i], package_names[i])
+                            logging.info('CREATE: deploy=%s,deploy_id=%s,artifact_type=%s,deploy_path=%s,package_name=%s'
+                                         % (i,
+                                            deploy_id,
+                                            artifact_types[i],
+                                            deploy_paths[i],
+                                            package_names[i]))
                             utcnow = datetime.utcnow()
                             artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
                             create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], user=user['ad_login'], created=utcnow, updated=utcnow)
