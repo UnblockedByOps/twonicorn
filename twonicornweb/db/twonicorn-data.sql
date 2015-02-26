@@ -25,6 +25,7 @@ INSERT INTO artifact_types VALUES (1,'conf');
 INSERT INTO artifact_types VALUES (2,'war');
 INSERT INTO artifact_types VALUES (3,'jar');
 INSERT INTO artifact_types VALUES (4,'python');
+INSERT INTO artifact_types VALUES (5,'tar');
 
 INSERT INTO repo_urls VALUES (1,1, 'lax1','http://nexus.prod.cs:8081');
 INSERT INTO repo_urls VALUES (2,1, 'vir1','http://nexus.prod.cs:8081');
