@@ -5,6 +5,7 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import Allow, Authenticated
 from pyramid.renderers import JSON
 import ldap
+import logging
 import ConfigParser
 from sqlalchemy import engine_from_config
 from sqlalchemy import event
@@ -34,6 +35,12 @@ def getSettings(settings):
     cp.read(settings['tcw.secrets_file'])
     for k,v in cp.items("app:main"):
         settings[k] = v
+
+    scp = ConfigParser.SafeConfigParser()
+    scp.read('/Users/bandta/venvs/twonicorn_web/conf/twonicorn-web.ini')
+    for k,v in scp.items("app:safe"):
+        settings[k] = v
+
     return settings
 
 
@@ -80,36 +87,40 @@ def main(global_config, **settings):
     config.add_route('test', '/test')
     config.add_renderer('json', JSON(indent=2))
 
-    # FIXME: Need to do a check because this broke in dev env
-    cert = '/etc/pki/CA/certs/ny-dc1.iac.corp.crt'
-    if os.path.isfile(cert):
-        ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, cert)
-
     config.set_authentication_policy(
         AuthTktAuthenticationPolicy(settings['tcw.cookie_token'], callback=groupfinder, max_age=604800)
         )
     config.set_authorization_policy(
         ACLAuthorizationPolicy()
         )
-    config.ldap_setup(
-        settings['tcw.ldap_server'] + ':' + settings['tcw.ldap_port'],
-        bind = settings['tcw.ldap_bind'],
-        passwd = settings['tcw.ldap_password'],
-        )
+
+    if settings['tcw.auth_mode'] == 'ldap':
+        logging.info('Configuring ldap users and groups')
+        # Load the cert if it's defined and exists
+        if os.path.isfile(settings['tcw.ldap_cert']):
+            ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, settings['tcw.ldap_cert'])
     
-    config.ldap_set_login_query(
-        base_dn = settings['tcw.login_base_dn'],
-        filter_tmpl = '(&(objectClass=user)(sAMAccountName=%(login)s))',
-        scope = ldap.SCOPE_SUBTREE,
-        cache_period = 600,
-        )
-    
-    config.ldap_set_groups_query(
-        base_dn = settings['tcw.group_base_dn'],
-        filter_tmpl='(&(objectCategory=group)(member=%(userdn)s))',
-        scope = ldap.SCOPE_SUBTREE,
-        cache_period = 600,
-        )
+        config.ldap_setup(
+            settings['tcw.ldap_server'] + ':' + settings['tcw.ldap_port'],
+            bind = settings['tcw.ldap_bind'],
+            passwd = settings['tcw.ldap_password'],
+            )
+        
+        config.ldap_set_login_query(
+            base_dn = settings['tcw.login_base_dn'],
+            filter_tmpl = settings['tcw.login_filter'],
+            scope = ldap.SCOPE_SUBTREE,
+            cache_period = 600,
+            )
+        
+        config.ldap_set_groups_query(
+            base_dn = settings['tcw.group_base_dn'],
+            filter_tmpl= settings['tcw.group_filter'],
+            scope = ldap.SCOPE_SUBTREE,
+            cache_period = 600,
+            )
+    else:
+        logging.info('Configuring local users and groups')
 
     # Load our groups and perms from the db
     try:
