@@ -20,6 +20,8 @@ from .models import (
         GroupPerm,
             )
 
+log = logging.getLogger(__name__)
+
 
 class RootFactory(object):
 
@@ -95,7 +97,7 @@ def main(global_config, **settings):
         )
 
     if settings['tcw.auth_mode'] == 'ldap':
-        logging.info('Configuring ldap users and groups')
+        log.info('Configuring ldap users and groups')
         # Load the cert if it's defined and exists
         if os.path.isfile(settings['tcw.ldap_cert']):
             ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, settings['tcw.ldap_cert'])
@@ -120,7 +122,7 @@ def main(global_config, **settings):
             cache_period = 600,
             )
     else:
-        logging.info('Configuring local users and groups')
+        log.info('Configuring local users and groups')
 
     # Load our groups and perms from the db
     try:
