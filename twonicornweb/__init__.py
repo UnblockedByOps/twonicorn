@@ -14,11 +14,9 @@ import os
 
 from .models import (
     DBSession,
-        Base,
-        Group,
-        GroupAssignment,
-        GroupPerm,
-            )
+    Base,
+    Group,
+    )
 
 
 class RootFactory(object):
@@ -68,7 +66,6 @@ def main(global_config, **settings):
     Base.metadata.bind = engine
 
     config = Configurator(settings=settings, root_factory=RootFactory)
-    print global_config
     config.include('pyramid_chameleon')
     config.include('pyramid_ldap')
     config.add_static_view('static', 'static', cache_max_age=3600)
@@ -122,9 +119,9 @@ def main(global_config, **settings):
             cache_period = 600,
             )
     else:
-        log.info('Configuring local users and groups')
+        log.info('Configuring local users and groups. Not really but soon.')
 
-    # Load our groups and perms from the db
+    # Load our groups and perms from the db and load them into the ACL
     try:
         r = DBSession.query(Group).all()
         for g in range(len(r)):

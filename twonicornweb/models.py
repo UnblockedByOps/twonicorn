@@ -1,18 +1,13 @@
-import datetime
 import arrow
 from dateutil import tz
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy import (
     Column,
-    Index,
     Integer,
     Text,
-    DATETIME,
-    Float,
     TIMESTAMP,
     ForeignKey,
-    Boolean,
     )
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.orm import (
@@ -20,10 +15,8 @@ from sqlalchemy.orm import (
     sessionmaker,
     )
 from zope.sqlalchemy import ZopeTransactionExtension
-import re
 
 
-cleanse_re = re.compile("[^A-Za-z0-9_]")
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
