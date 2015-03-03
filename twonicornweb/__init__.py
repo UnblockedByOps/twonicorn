@@ -29,7 +29,7 @@ class RootFactory(object):
         pass
 
 
-def getSettings(settings):
+def getSettings(global_config, settings):
     # Secrets
     cp = ConfigParser.ConfigParser()
     cp.read(settings['tcw.secrets_file'])
@@ -37,7 +37,7 @@ def getSettings(settings):
         settings[k] = v
 
     scp = ConfigParser.SafeConfigParser()
-    scp.read('/Users/bandta/venvs/twonicorn_web/conf/twonicorn-web.ini')
+    scp.read(global_config)
     for k,v in scp.items("app:safe"):
         settings[k] = v
 
@@ -59,7 +59,7 @@ def checkout_listener(dbapi_con, con_record, con_proxy):
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
-    settings = getSettings(settings)
+    settings = getSettings(global_config['__file__'], settings)
     log = logging.getLogger(__name__)
 
     engine = engine_from_config(settings, 'sqlalchemy.')
@@ -68,6 +68,7 @@ def main(global_config, **settings):
     Base.metadata.bind = engine
 
     config = Configurator(settings=settings, root_factory=RootFactory)
+    print global_config
     config.include('pyramid_chameleon')
     config.include('pyramid_ldap')
     config.add_static_view('static', 'static', cache_max_age=3600)
