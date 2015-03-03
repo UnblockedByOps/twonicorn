@@ -32,9 +32,7 @@ from twonicornweb.models import (
     GroupAssignment,
     )
 
-
 log = logging.getLogger(__name__)
-denied = ''
 
 
 def site_layout():
@@ -224,7 +222,6 @@ def login(request):
     page_title = 'Login'
 
     user = get_user(request)
-    denied = ''
 
     if request.referer:
         referer_host = request.referer.split('/')[2]
@@ -263,11 +260,9 @@ def login(request):
         if request.path == '/login':
           error = 'You are already logged in'
           page_title = 'Already Logged In'
-          denied = True
         else:
           error = 'You do not have permission to access this page'
           page_title = 'Access Denied'
-          denied = True
 
     return {'layout': site_layout(),
             'page_title': page_title,
@@ -276,7 +271,6 @@ def login(request):
             'login': login,
             'password': password,
             'error': error,
-            'denied': denied,
            }
 
 @view_config(route_name='home', permission='view', renderer='twonicornweb:templates/home.pt')
@@ -312,7 +306,6 @@ def view_applications(request):
             'offset': offset,
             'total': total,
             'applications': applications,
-            'denied': denied,
            }
 
 @view_config(route_name='deploys', permission='view', renderer='twonicornweb:templates/deploys.pt')
@@ -385,7 +378,6 @@ def view_deploys(request):
             'to_state': to_state,
             'commit': commit,
             'artifact_id': artifact_id,
-            'denied': denied,
            }
 
 
@@ -395,7 +387,7 @@ def view_promote(request):
     page_title = 'Promote'
     user = get_user(request)
 
-    denied = ''
+    error = ''
     message = ''
     promote = ''
 
@@ -429,7 +421,7 @@ def view_promote(request):
 
     if artifact_id and commit == 'true':
         if not user['promote_prd_auth'] and to_env == 'prd' and to_state == '2':
-            denied = True
+            error = True
             message = 'You do not have permission to perform the promote action on production!'
         else:
             # Actually promoting
@@ -452,7 +444,7 @@ def view_promote(request):
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'denied': denied,
+            'error': error,
             'message': message,
             'deploy_id': deploy_id,
             'artifact_id': artifact_id,
@@ -737,7 +729,6 @@ def view_help(request):
             'page_title': page_title,
             'user': user,
             'host_url': request.host_url,
-            'denied': denied
            }
 
 @view_config(route_name='user', permission='view', renderer='twonicornweb:templates/user.pt')
@@ -749,7 +740,6 @@ def view_user(request):
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'denied': denied,
            }
 
 @view_config(route_name='group', permission='view', renderer='twonicornweb:templates/group.pt')
@@ -765,7 +755,6 @@ def view_group(request):
             'user': user,
             'groups': groups,
             'all_perms': all_perms,
-            'denied': denied,
            }
 
 
@@ -778,7 +767,6 @@ def view_cp(request):
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'denied': denied,
            }
 
 
@@ -944,7 +932,6 @@ def view_cp_application(request):
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'denied': denied,
             'subtitle': subtitle,
             'app': app,
             'application_id': application_id,
@@ -1093,7 +1080,6 @@ def view_cp_group(request):
             'group': group,
             'group_id': group_id,
             'group_perms': group_perms,
-            'denied': denied,
             'subtitle': subtitle,
             'mode': mode,
             'commit': commit,
@@ -1110,6 +1096,5 @@ def view_test(request):
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'denied': denied,
            }
 

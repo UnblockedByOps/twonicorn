@@ -20,8 +20,6 @@ from .models import (
         GroupPerm,
             )
 
-log = logging.getLogger(__name__)
-
 
 class RootFactory(object):
 
@@ -62,6 +60,7 @@ def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
     settings = getSettings(settings)
+    log = logging.getLogger(__name__)
 
     engine = engine_from_config(settings, 'sqlalchemy.')
     event.listen(engine, 'checkout', checkout_listener)

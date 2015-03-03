@@ -17,7 +17,7 @@
 
       <div tal:condition="page_title is not 'Login'" class="nav_shell">
         <div class="nav_logo">
-              <img tal:condition="not denied" src="/static/logo_mini.gif">
+              <img src="/static/logo_mini.gif">
         </div>
         <div class="nav_bar">
             <span>
@@ -63,7 +63,7 @@
       </div>
 
       <div class="shell">
-        <h1 tal:condition="not denied and page_title is not 'Login'">${page_title}</h1>
+        <h1 tal:condition="page_title is not 'Login'">${page_title}</h1>
 
         <div metal:define-slot="content"> </div>
 

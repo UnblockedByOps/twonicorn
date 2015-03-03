@@ -7,7 +7,7 @@
   <div metal:fill-slot="content">
     <div>
 
-      <div tal:condition="not denied and commit == 'true'">
+      <div tal:condition="commit == 'true'">
         <p id="promote">
         <table width="100%">
           <tr class="subh">
@@ -26,14 +26,19 @@
         <table width="100%" tal:condition="(application_id or nodegroup)">
           <tr class="subh">
             <td class="subh">Application Name</td>
-            <td class="subh_app" colspan="11" tal:attributes="title 'Application ID: ' + str(application_id)" tal:content="app.application_name">tct</td>
+            <td class="subh_app" colspan="12" tal:content="app.application_name">tct</td>
+          </tr>
+          <tr class="subh">
+            <td class="subh">Application ID</td>
+            <td class="subh_app" colspan="12" tal:content="str(application_id)">tct</td>
           </tr>
           <tr class="subh">
             <td class="subh">Node Group</td>
-            <td class="subh_app" colspan="11" tal:content="nodegroup.upper() + ' (' + application_id + ')'">tct</td>
+            <td class="subh_app" colspan="12" tal:content="nodegroup.upper()">tct</td>
           </tr>
           <tr>
             <th>Deploy Path</th>
+            <th>Deploy ID</th>
             <th>Package Name</th>
             <th>Revision</th>
             <th>Branch/Tag</th>
@@ -49,7 +54,7 @@
 
           <tbody tal:repeat="denv ['prd','qat','dev']" tal:condition="app">
           <tr tal:attributes="class denv" tal:condition="app">
-            <td tal:attributes="class denv" colspan="12"><b tal:content="denv.upper()">DEV</b></td>
+            <td tal:attributes="class denv" colspan="13"><b tal:content="denv.upper()">DEV</b></td>
           </tr>
           <tr tal:repeat="item app.deploys" tal:attributes="class denv + '_hover'">
             <?python
@@ -60,6 +65,7 @@
                     total = item.get_assignment_count(env)
             ?>
             <td tal:content="item.deploy_path" tal:attributes="title 'Deploy ID: ' + str(item.deploy_id)">/app/something</td>
+            <td tal:content="item.deploy_id">0</td>
             <td tal:content="item.package_name" tal:attributes="title '%s' % item.package_name">PythonPackage</td>
             <td tal:content="aa.artifact.revision[:8] if aa else 'No Data'">12345</td>
             <td tal:content="aa.artifact.branch if aa else 'No Data'">trunk</td>

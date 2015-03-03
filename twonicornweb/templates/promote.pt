@@ -3,11 +3,11 @@
 
     <div id="promote_main">
 
-      <p tal:condition="not denied and not artifact_id">
+      <p tal:condition="not error and not artifact_id">
         This page should display paginated list of promotions. For now you must select a deploy to promote from the deploys page.
       </p>
   
-      <div id="error" tal:condition="denied">
+      <div id="error" tal:condition="error">
           <p class="error">
           <img src="static/logo_medium.gif">
           </p>
@@ -16,7 +16,7 @@
   
       </div>
 
-      <div id="promote_results" tal:condition="not denied and artifact_id">
+      <div id="promote_results" tal:condition="not error and artifact_id">
  
         <h1 tal:condition="to_state == '3'">
         Stage artifact ID for ${to_env}? ${artifact_id}
