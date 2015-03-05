@@ -86,15 +86,16 @@ def main(global_config, **settings):
     config.add_route('test', '/test')
     config.add_renderer('json', JSON(indent=2))
 
-    config.set_authentication_policy(
-        AuthTktAuthenticationPolicy(settings['tcw.cookie_token'], callback=groupfinder, max_age=604800)
-        )
-    config.set_authorization_policy(
-        ACLAuthorizationPolicy()
-        )
-
     if settings['tcw.auth_mode'] == 'ldap':
         log.info('Configuring ldap users and groups')
+
+        config.set_authentication_policy(
+            AuthTktAuthenticationPolicy(settings['tcw.cookie_token'], callback=groupfinder, max_age=604800)
+            )
+        config.set_authorization_policy(
+            ACLAuthorizationPolicy()
+            )
+
         # Load the cert if it's defined and exists
         if os.path.isfile(settings['tcw.ldap_cert']):
             ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, settings['tcw.ldap_cert'])
@@ -120,6 +121,12 @@ def main(global_config, **settings):
             )
     else:
         log.info('Configuring local users and groups. Not really but soon.')
+        config.set_authentication_policy(
+            AuthTktAuthenticationPolicy(settings['tcw.cookie_token'])
+            )
+        config.set_authorization_policy(
+            ACLAuthorizationPolicy()
+            )
 
     # Load our groups and perms from the db and load them into the ACL
     try:

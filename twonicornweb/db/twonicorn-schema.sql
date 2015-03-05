@@ -216,7 +216,7 @@ CREATE UNIQUE INDEX idx_repo_url_unique on repo_urls (repo_id, ct_loc);
 
 ### 
 ### TABLE: groups
-###   This maps groups to roles
+###   This is the primary groups table. 
 ###
 DROP TABLE IF EXISTS `groups`;
 CREATE TABLE `groups` (
@@ -231,7 +231,7 @@ CREATE UNIQUE INDEX idx_group_name_unique on groups (group_name);
 
 ###
 ### TABLE: group_permissions
-###   This contains metadata for the actual artifact files.
+###   This is the reference table for the list of permissions.
 ###
 DROP TABLE IF EXISTS `group_perms`;
 CREATE TABLE `group_perms` (
@@ -245,10 +245,8 @@ CREATE UNIQUE INDEX idx_group_perms_unique on group_perms (perm_name);
 
 ###
 ### TABLE: group_assignments
-###   This is the central table. It is the central join table, as well as the log of
-###   promotion activity. Sorting it by date desc and filtering by application, lifecycle
-###   and env (where the artifact is still active) allows you to determine the current
-###   (row 1) and rollback (row 2).
+###   This table assigns groups to permissions, controlling
+###   what group memebers are able to do in the interface.
 ###
 DROP TABLE IF EXISTS `group_assignments`;
 CREATE TABLE `group_assignments` (
@@ -295,3 +293,39 @@ INSERT INTO group_assignments_audit(group_assignment_id,group_id,perm_id,user,up
 END //
 
 DELIMITER ;
+
+###
+### TABLE: users
+###   This is the local users table for installs that do not
+###   wish to use AD/LDAP
+###
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+  `user_id`                mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `user_name`              varchar(250) COLLATE utf8_bin NOT NULL,
+  `first_name`             varchar(250) COLLATE utf8_bin NOT NULL,
+  `last_name`              varchar(250) COLLATE utf8_bin NOT NULL,
+  `email_address`          varchar(250) COLLATE utf8_bin NOT NULL,
+  `salt`                   varchar(50) COLLATE utf8_bin NOT NULL,
+  `password`               varchar(250) COLLATE utf8_bin NOT NULL,
+  `user`                   varchar(200) COLLATE utf8_bin NOT NULL,
+  `created`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+CREATE UNIQUE INDEX idx_user_name_unique on users (user_name);
+
+###
+### TABLE: user_group_assignments
+###   This table assigns local users to groups.
+###
+DROP TABLE IF EXISTS `user_group_assignments`;
+CREATE TABLE `user_group_assignments` (
+  `user_group_assignment_id`    mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `group_id`                    mediumint(9) UNSIGNED NOT NULL,
+  `user_id`                     mediumint(9) UNSIGNED NOT NULL,
+  `user`                        varchar(30) NOT NULL, # this could be/become a FK
+  `created`                     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated`                     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+

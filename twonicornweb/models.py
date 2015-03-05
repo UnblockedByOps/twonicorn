@@ -315,3 +315,63 @@ class GroupPerm(Base):
         q = q.filter(GroupPerm.perm_name == '%s' % perm_name)
         return q.one()
 
+
+class User(Base):
+    __tablename__ = 'users'
+    user_id          = Column(Integer, primary_key=True, nullable=False)
+    user_name        = Column(Text, nullable=False)
+    first_name       = Column(Text, nullable=False)
+    last_name        = Column(Text, nullable=False)
+    email_address    = Column(Text, nullable=False)
+    salt             = Column(Text, nullable=False)
+    password         = Column(Text, nullable=False)
+    user             = Column(Text, nullable=False)
+    created          = Column(TIMESTAMP, nullable=False)
+    updated          = Column(TIMESTAMP, nullable=False)
+
+    @hybrid_method
+    def get_all_assignments(self):
+        ga = []
+        for a in self.group_assignments:
+            ga.append(a.group_perms.perm_name)
+        return ga
+
+    @hybrid_property
+    def localize_date_created(self):
+        local = _localize_date(self.created)
+        return local
+
+    @hybrid_property
+    def localize_date_updated(self):
+        local = _localize_date(self.updated)
+        return local
+
+
+class UserGroupAssignment(Base):
+    __tablename__ = 'user_group_assignments'
+    user_group_assignment_id = Column(Integer, primary_key=True, nullable=False)
+    group_id                = Column(Integer, ForeignKey('groups.group_id'), nullable=False)
+    user_id                 = Column(Integer, ForeignKey('user.user_id'), nullable=False)
+    user                    = Column(Text, nullable=False)
+    created                 = Column(TIMESTAMP, nullable=False)
+    updated                 = Column(TIMESTAMP, nullable=False)
+    group                   = relationship("Group", backref=backref('user_group_assignments'))
+
+# Need to update these
+#    @hybrid_method
+#    def get_assignments_by_group(self, group_name):
+#        q = DBSession.query(GroupAssignment)
+#        q = q.join(Group, GroupAssignment.group_id == Group.group_id)
+#        q = q.filter(Group.group_name==group_name)
+#        return q.all()
+#
+#    @hybrid_method
+#    def get_assignments_by_perm(self, perm_name):
+#        q = DBSession.query(GroupAssignment)
+#        q = q.join(Group, GroupAssignment.group_id == Group.group_id)
+#        q = q.join(GroupPerm, GroupAssignment.perm_id == GroupPerm.perm_id)
+#        q = q.filter(GroupPerm.perm_name==perm_name)
+#        return q.all()
+
+
+

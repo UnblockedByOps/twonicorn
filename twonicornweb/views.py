@@ -14,6 +14,7 @@ from datetime import datetime
 import logging
 import os.path
 import binascii
+import crypt
 from twonicornweb.models import (
     DBSession,
     Application,
@@ -27,6 +28,8 @@ from twonicornweb.models import (
     RepoType,
     ArtifactType,
     RepoUrl,
+    User,
+    UserGroupAssignment,
     Group,
     GroupPerm,
     GroupAssignment,
@@ -40,6 +43,35 @@ def site_layout():
     layout = renderer.implementation().macros['layout']
     return layout
 
+def local_authenticate(login, password):
+    """ Checks the validity of a username/password against what
+        is stored in the database. """
+
+    db_user = None
+
+    try: 
+        q = DBSession.query(User)
+        q = q.filter(User.user_name == login)
+        db_user = q.one()
+        print "DB USER: ", db_user.__dict__
+    except Exception, e:
+        raise
+        log.error("%s (%s)" % (Exception, e))
+    print "SALT IS: ", db_user.salt
+    print "Input password is: ", password
+
+    input_hashed = crypt.crypt(password, db_user.salt)
+
+    print "DB hash: ", db_user.password
+    print "Inpput Hashed: ", input_hashed
+
+    if db_user.password == input_hashed:
+        return db_user.user_name
+
+    return None
+
+
+
 def get_user(request):
     """ Gets all the user information for an authenticated  user. Checks groups
         and permissions, and returns a dict of everything. """
@@ -48,18 +80,27 @@ def get_user(request):
     admin_auth = False
     cp_auth = False
 
-    try:
-        id = request.authenticated_userid
-        (first,last) = format_user(id)
-        groups = groupfinder(id, request)
-        auth = True
-        pretty = "%s %s" % (first, last)
-    except Exception, e:
-        log.error("%s (%s)" % (Exception, e))
-        (pretty, id, ad_login, groups, first, last, auth, prd_auth, admin_auth, cp_auth) = ('', '', '', '', '', '', False, False, False, False)
+    if request.registry.settings['tcw.auth_mode'] == 'ldap':
+        try:
+            id = request.authenticated_userid
+            (first,last) = format_user(id)
+            groups = groupfinder(id, request)
+            first_last = "%s %s" % (first, last)
+            auth = True
+        except Exception, e:
+            log.error("%s (%s)" % (Exception, e))
+            (first_last, id, login, groups, first, last, auth, prd_auth, admin_auth, cp_auth) = ('', '', '', '', '', '', False, False, False, False)
+    else:
+            id = request.authenticated_userid
+            # This stuff needs to come from the db
+            #(first,last) = format_user(id)
+            #groups = groupfinder(id, request)
+            #first_last = "%s %s" % (first, last)
+            #auth = True
+
 
     try:
-        ad_login = validate_username_cookie(request.cookies['un'], request.registry.settings['tcw.cookie_token'])
+        login = validate_username_cookie(request.cookies['un'], request.registry.settings['tcw.cookie_token'])
     except:
         return HTTPFound('/logout?message=Your cookie has been tampered with. You have been logged out')
 
@@ -80,7 +121,7 @@ def get_user(request):
 
     user = {}
     user['id'] = id
-    user['ad_login'] = ad_login
+    user['login'] = login
     user['groups'] = groups
     user['first'] = first
     user['last'] = last
@@ -88,7 +129,7 @@ def get_user(request):
     user['promote_prd_auth'] = promote_prd_auth
     user['admin_auth'] = admin_auth
     user['cp_auth'] = cp_auth
-    user['pretty'] = pretty
+    user['first_last'] = first_last
 
     return (user)
 
@@ -242,8 +283,18 @@ def login(request):
     if 'form.submitted' in request.POST:
         login = request.POST['login']
         password = request.POST['password']
-        connector = get_ldap_connector(request)
-        data = connector.authenticate(login, password)
+
+        # AD/LDAP
+        if request.registry.settings['tcw.auth_mode'] == 'ldap':
+            connector = get_ldap_connector(request)
+            data = connector.authenticate(login, password)
+            print "Data IS: ", data
+        # LOCAL
+        else:
+            # Do stuff with LOCAL
+            data = local_authenticate(login, password)
+            print "DATA IS: ", data
+            
 
         if data is not None:
             dn = data[0]
@@ -431,7 +482,7 @@ def view_promote(request):
 
                 # Assign
                 utcnow = datetime.utcnow()
-                promote = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=to_state, user=user['ad_login'], created=utcnow)
+                promote = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=to_state, user=user['login'], created=utcnow)
                 DBSession.add(promote)
                 DBSession.flush()
                 
@@ -823,14 +874,14 @@ def view_cp_application(request):
 
                 try:
                     utcnow = datetime.utcnow()
-                    create = Application(application_name=application_name, nodegroup=nodegroup, user=user['ad_login'], created=utcnow, updated=utcnow)
+                    create = Application(application_name=application_name, nodegroup=nodegroup, user=user['login'], created=utcnow, updated=utcnow)
                     DBSession.add(create)
                     DBSession.flush()
                     application_id = create.application_id
 
                     for i in range(len(deploy_paths)):
                         artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
-                        create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], user=user['ad_login'], created=utcnow, updated=utcnow)
+                        create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], user=user['login'], created=utcnow, updated=utcnow)
                         DBSession.add(create)
                         deploy_id = create.deploy_id
 
@@ -882,11 +933,11 @@ def view_cp_application(request):
                                  % (application_id,
                                     application_name,
                                     nodegroup,
-                                    user['ad_login']))
+                                    user['login']))
                     app = DBSession.query(Application).filter(Application.application_id==application_id).one()
                     app.application_name = application_name
                     app.nodegroup = nodegroup
-                    app.user=user['ad_login']
+                    app.user=user['login']
                     DBSession.flush()
 
                     # Add/Update deploys
@@ -909,7 +960,7 @@ def view_cp_application(request):
                             dep.artifact_type_id = artifact_type_id.artifact_type_id
                             dep.deploy_path = deploy_paths[i]
                             dep.package_name = package_names[i]
-                            dep.user=user['ad_login'] 
+                            dep.user=user['login'] 
                             DBSession.flush()
                             
                         else:
@@ -921,7 +972,7 @@ def view_cp_application(request):
                                             package_names[i]))
                             utcnow = datetime.utcnow()
                             artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
-                            create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], user=user['ad_login'], created=utcnow, updated=utcnow)
+                            create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], user=user['login'], created=utcnow, updated=utcnow)
                             DBSession.add(create)
                             DBSession.flush()
 
@@ -979,7 +1030,7 @@ def view_cp_group(request):
             try:
                 utcnow = datetime.utcnow()
                 for g in range(len(group_names)):
-                    create = Group(group_name=group_names[g], user=user['ad_login'], created=utcnow, updated=utcnow)
+                    create = Group(group_name=group_names[g], user=user['login'], created=utcnow, updated=utcnow)
                     DBSession.add(create)
                     DBSession.flush()
                     group_id = create.group_id
@@ -989,7 +1040,7 @@ def view_cp_group(request):
 
                     for p in group_perms:
                         perm = GroupPerm.get_group_perm_id(p)
-                        create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, user=user['ad_login'], created=utcnow, updated=utcnow)
+                        create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, user=user['login'], created=utcnow, updated=utcnow)
                         DBSession.add(create)
                         group_assignment_id = create.group_assignment_id
 
@@ -1040,7 +1091,7 @@ def view_cp_group(request):
                 utcnow = datetime.utcnow()
                 group = DBSession.query(Group).filter(Group.group_id==group_id).one()
                 group.group_name = group_name
-                group.user=user['ad_login']
+                group.user=user['login']
                 DBSession.flush()
 
                 # Update the perms
@@ -1055,7 +1106,7 @@ def view_cp_group(request):
                             print ("Adding permission %s for group %s" % (p.perm_name, group_name))
                             log.info("Adding permission %s for group %s" % (p.perm_name, group_name))
                             utcnow = datetime.utcnow()
-                            create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, user=user['ad_login'], created=utcnow, updated=utcnow)
+                            create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, user=user['login'], created=utcnow, updated=utcnow)
                             DBSession.add(create)
                             DBSession.flush()
     

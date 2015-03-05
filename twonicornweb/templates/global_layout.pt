@@ -33,7 +33,7 @@
               <ul class="user">
                 <li class="user">
                   <span tal:content="'Welcome ' + user.first + '!'"
-                        tal:attributes="title 'Logged in as: ' + user.ad_login">
+                        tal:attributes="title 'Logged in as: ' + user.login">
                   </span>
                   <ul class="user">
                     <li class="user">

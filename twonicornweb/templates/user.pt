@@ -1,7 +1,7 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
 
-    <p>${user.pretty} (${user.ad_login}) is a member of the following groups in Active Directory:</p>
+    <p>${user.first_last} (${user.login}) is a member of the following groups in Active Directory:</p>
 
     <p>
     <table width="100%" tal:condition="user.groups">

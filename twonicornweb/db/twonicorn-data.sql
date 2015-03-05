@@ -27,6 +27,9 @@ INSERT INTO artifact_types VALUES (3,'jar');
 INSERT INTO artifact_types VALUES (4,'python');
 INSERT INTO artifact_types VALUES (5,'tar');
 
+INSERT INTO group_perms VALUES (1,'promote_prd',NOW(),NOW());
+INSERT INTO group_perms VALUES (2,'cp',NOW(),NOW());
+
 INSERT INTO repo_urls VALUES (1,1, 'lax1','http://nexus.prod.cs:8081');
 INSERT INTO repo_urls VALUES (2,1, 'vir1','http://nexus.prod.cs:8081');
 INSERT INTO repo_urls VALUES (3,1, 'aws1','https://nexus-prd-aws1.ctgrd.com:4001');
@@ -40,10 +43,8 @@ INSERT INTO repo_urls VALUES (10,4, 'lax1','http://pip.ctgrd.com/simple/');
 INSERT INTO repo_urls VALUES (11,4, 'vir1','http://pip.ctgrd.com/simple/');
 INSERT INTO repo_urls VALUES (12,4, 'aws1','http://pip.ctgrd.com/simple/');
 
-INSERT INTO group_perms VALUES (1,'promote_prd',NOW(),NOW());
-INSERT INTO group_perms VALUES (2,'cp',NOW(),NOW());
-
-
+# Initial Admin password is 'password'
+INSERT INTO users VALUES (1, 'Admin', 'admin@yourcompany.com', 'Morgan', 'Freeman', '$6$Vf7ZmjQarLus/TqT', '$6$Vf7ZmjQarLus/TqT$l5qsqY4ntpX8nEzbm33n5StF5D.93yV3uoh8ucthwFf8mEJBitnGLr5SWhzD2vpkpnAJnUiLl40d0hH24qPOq1', 'Admin', NOW(),NOW());
 
 # This is just test data for screwing around in dev/qa and should NOT
 # be applied to prod
