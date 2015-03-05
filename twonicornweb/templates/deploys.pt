@@ -79,7 +79,7 @@
             <td tal:content="aa.artifact_id if aa else 'No Data'">12345</td>
             <td tal:content="aa.artifact_assignment_id if aa else 'No Data'">12345</td>
             <td tal:content="aa.localize_date_created if aa else 'No Data'">12345</td>
-            <td tal:content="aa.user if aa else 'No Data'">12345</td>
+            <td tal:content="aa.updated_by if aa else 'No Data'">12345</td>
             <td tal:condition="not aa">No Data</td>
             <td tal:condition="aa"><a href="http://twonicorn.ctgrd.com/deploys?history=true"
                    title="Show History"
@@ -156,7 +156,7 @@
               <td tal:content="item.artifact_id">0</td>
               <td tal:content="item.artifact_assignment_id">12345</td>
               <td tal:content="item.localize_date_created">12345</td>
-              <td tal:content="item.user">McLovin</td>
+              <td tal:content="item.updated_by">McLovin</td>
               <td>
                 <ul tal:attributes="class 'promote'">
                   <li tal:attributes="class 'promote'">

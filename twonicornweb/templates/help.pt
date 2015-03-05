@@ -59,7 +59,7 @@
 
     <p>
       telnet twonicorn.mydomain.com 80<br>
-      PUT /api/artifact_assignment?deploy_id=3&artifact_id=352&env=dev&user=bandta HTTP/1.1<br>
+      PUT /api/artifact_assignment?deploy_id=3&artifact_id=352&env=dev&updated_by=bandta HTTP/1.1<br>
       Host: twonicorn.mydomain.com<br>
       Authorization: Basic fXBps3VzZXg6Y4JjMDIz<br>
 

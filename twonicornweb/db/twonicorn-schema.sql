@@ -12,7 +12,9 @@ CREATE TABLE `applications` (
   `application_id`         mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `application_name`       varchar(200) COLLATE utf8_bin NOT NULL,
   `nodegroup`              char(20) COLLATE utf8_bin NOT NULL,
-  `created`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_by`             varchar(200) COLLATE utf8_bin NOT NULL,
+  `created`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 ###
@@ -25,20 +27,20 @@ CREATE TABLE `applications_audit` (
   `application_id`         mediumint(9) UNSIGNED NOT NULL,
   `application_name`       varchar(200) COLLATE utf8_bin NOT NULL,
   `nodegroup`              char(20) COLLATE utf8_bin NOT NULL,
-  `user`                   varchar(200) COLLATE utf8_bin NOT NULL,
+  `updated_by`             varchar(200) COLLATE utf8_bin NOT NULL,
   `updated`                timestamp NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 DELIMITER //
 CREATE TRIGGER applications_trigger_insert AFTER INSERT ON applications
 FOR EACH ROW BEGIN
-INSERT INTO applications_audit(application_id,application_name,nodegroup,user,updated) VALUES (NEW.application_id,NEW.application_name,NEW.nodegroup,NEW.user,NEW.updated);
+INSERT INTO applications_audit(application_id,application_name,nodegroup,updated_by,updated) VALUES (NEW.application_id,NEW.application_name,NEW.nodegroup,NEW.updated_by,NEW.updated);
 END //
 
 CREATE TRIGGER applications_trigger_update AFTER UPDATE ON applications
 FOR EACH ROW BEGIN
    IF NEW.updated <> OLD.updated THEN
-      INSERT INTO applications_audit(application_id,application_name,nodegroup,user,updated) VALUES (NEW.application_id,NEW.application_name,NEW.nodegroup,NEW.user,NEW.updated);
+      INSERT INTO applications_audit(application_id,application_name,nodegroup,updated_by,updated) VALUES (NEW.application_id,NEW.application_name,NEW.nodegroup,NEW.updated_by,NEW.updated);
    END IF;
 END //
 
@@ -55,7 +57,9 @@ CREATE TABLE `deploys` (
   `artifact_type_id`       mediumint(9) UNSIGNED NOT NULL,
   `package_name`           char(100) COLLATE utf8_bin,    # Required for deploys that are deployed using a native package management tool (yum, pip, apt, etc.)
   `deploy_path`            char(100) COLLATE utf8_bin NOT NULL,    # this also stands in for human-readable name!
-  `created`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_by`             varchar(200) COLLATE utf8_bin NOT NULL,
+  `created`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 ###
@@ -70,20 +74,20 @@ CREATE TABLE `deploys_audit` (
   `artifact_type_id`       mediumint(9) UNSIGNED NOT NULL,
   `package_name`           char(100) COLLATE utf8_bin,    # Required for deploys that are deployed using a native package management tool (yum, pip, apt, etc.)
   `deploy_path`            char(100) COLLATE utf8_bin NOT NULL,    # this also stands in for human-readable name!
-  `user`                   varchar(200) COLLATE utf8_bin NOT NULL,
+  `updated_by`             varchar(200) COLLATE utf8_bin NOT NULL,
   `updated`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 DELIMITER //
 CREATE TRIGGER deploys_trigger_insert AFTER INSERT ON deploys
 FOR EACH ROW BEGIN
-INSERT INTO deploys_audit(deploy_id,application_id,artifact_type_id,package_name,deploy_path,user,updated) VALUES (NEW.deploy_id,NEW.application_id,NEW.artifact_type_id,NEW.package_name,NEW.deploy_path,NEW.user,NEW.updated);
+INSERT INTO deploys_audit(deploy_id,application_id,artifact_type_id,package_name,deploy_path,updated_by,updated) VALUES (NEW.deploy_id,NEW.application_id,NEW.artifact_type_id,NEW.package_name,NEW.deploy_path,NEW.updated_by,NEW.updated);
 END //
 
 CREATE TRIGGER deploys_trigger_update AFTER UPDATE ON deploys
 FOR EACH ROW BEGIN
    IF NEW.updated <> OLD.updated THEN
-      INSERT INTO deploys_audit(deploy_id,application_id,artifact_type_id,package_name,deploy_path,user,updated) VALUES (NEW.deploy_id,NEW.application_id,NEW.artifact_type_id,NEW.package_name,NEW.deploy_path,NEW.user,NEW.updated);
+      INSERT INTO deploys_audit(deploy_id,application_id,artifact_type_id,package_name,deploy_path,updated_by,updated) VALUES (NEW.deploy_id,NEW.application_id,NEW.artifact_type_id,NEW.package_name,NEW.deploy_path,NEW.updated_by,NEW.updated);
    END IF;
 END //
 
@@ -120,7 +124,7 @@ CREATE TABLE `artifact_assignments` (
   `env_id`                 mediumint(9) UNSIGNED NOT NULL,
   `lifecycle_id`           mediumint(9) UNSIGNED NOT NULL,
   `artifact_id`            mediumint(9) UNSIGNED NOT NULL,
-  `user`                   varchar(30) NOT NULL, # this could be/become a FK
+  `updated_by`             varchar(30) NOT NULL, # this could be/become a FK
   `created`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
@@ -137,7 +141,7 @@ DROP TABLE IF EXISTS `artifact_notes`;
 CREATE TABLE `artifact_notes` (
   `artifact_note_id`       mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `artifact_id`            mediumint(9) UNSIGNED NOT NULL,
-  `user`                   varchar(30) NOT NULL, # this could be/become a FK
+  `updated_by`             varchar(30) NOT NULL, # this could be/become a FK
   `note`                   varchar(255) NOT NULL,
   `created`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -222,7 +226,7 @@ DROP TABLE IF EXISTS `groups`;
 CREATE TABLE `groups` (
   `group_id`               mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `group_name`             varchar(250) COLLATE utf8_bin NOT NULL,
-  `user`                   varchar(200) COLLATE utf8_bin NOT NULL,
+  `updated_by`             varchar(200) COLLATE utf8_bin NOT NULL,
   `created`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -253,7 +257,7 @@ CREATE TABLE `group_assignments` (
   `group_assignment_id`    mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `group_id`               mediumint(9) UNSIGNED NOT NULL,
   `perm_id`                mediumint(9) UNSIGNED NOT NULL,
-  `user`                   varchar(30) NOT NULL, # this could be/become a FK
+  `updated_by`             varchar(30) NOT NULL, # this could be/become a FK
   `created`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -268,7 +272,7 @@ CREATE TABLE `group_assignments_audit` (
   `group_assignment_id`    mediumint(9) UNSIGNED NOT NULL,
   `group_id`               mediumint(9) UNSIGNED NOT NULL,
   `perm_id`                mediumint(9) UNSIGNED NOT NULL,
-  `user`                   varchar(30) NOT NULL,
+  `updated_by`             varchar(30) NOT NULL,
   `updated`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted`                tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -276,20 +280,20 @@ CREATE TABLE `group_assignments_audit` (
 DELIMITER //
 CREATE TRIGGER ga_trigger_insert AFTER INSERT ON group_assignments
 FOR EACH ROW BEGIN
-INSERT INTO group_assignments_audit(group_assignment_id,group_id,perm_id,user,updated,deleted) VALUES (NEW.group_assignment_id,NEW.group_id,NEW.perm_id,NEW.user,NEW.updated, '0');
+INSERT INTO group_assignments_audit(group_assignment_id,group_id,perm_id,updated_by,updated,deleted) VALUES (NEW.group_assignment_id,NEW.group_id,NEW.perm_id,NEW.updated_by,NEW.updated, '0');
 END //
 
 CREATE TRIGGER ga_trigger_update AFTER UPDATE ON group_assignments
 FOR EACH ROW BEGIN
    IF NEW.updated <> OLD.updated THEN
-      INSERT INTO group_assignments_audit(group_assignment_id,group_id,perm_id,user,updated,deleted) VALUES (NEW.group_assignment_id,NEW.group_id,NEW.perm_id,NEW.user,NEW.updated, '0');
+      INSERT INTO group_assignments_audit(group_assignment_id,group_id,perm_id,updated_by,updated,deleted) VALUES (NEW.group_assignment_id,NEW.group_id,NEW.perm_id,NEW.updated_by,NEW.updated, '0');
    END IF;
 END //
 
 DELIMITER //
 CREATE TRIGGER ga_trigger_delete BEFORE DELETE ON group_assignments
 FOR EACH ROW BEGIN
-INSERT INTO group_assignments_audit(group_assignment_id,group_id,perm_id,user,updated,deleted) VALUES (OLD.group_assignment_id,OLD.group_id,OLD.perm_id,OLD.user,NOW(), '1');
+INSERT INTO group_assignments_audit(group_assignment_id,group_id,perm_id,updated_by,updated,deleted) VALUES (OLD.group_assignment_id,OLD.group_id,OLD.perm_id,OLD.updated_by,NOW(), '1');
 END //
 
 DELIMITER ;
@@ -308,7 +312,7 @@ CREATE TABLE `users` (
   `email_address`          varchar(250) COLLATE utf8_bin NOT NULL,
   `salt`                   varchar(50) COLLATE utf8_bin NOT NULL,
   `password`               varchar(250) COLLATE utf8_bin NOT NULL,
-  `user`                   varchar(200) COLLATE utf8_bin NOT NULL,
+  `updated_by`             varchar(200) COLLATE utf8_bin NOT NULL,
   `created`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated`                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -324,7 +328,7 @@ CREATE TABLE `user_group_assignments` (
   `user_group_assignment_id`    mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `group_id`                    mediumint(9) UNSIGNED NOT NULL,
   `user_id`                     mediumint(9) UNSIGNED NOT NULL,
-  `user`                        varchar(30) NOT NULL, # this could be/become a FK
+  `updated_by`                  varchar(200) COLLATE utf8_bin NOT NULL,
   `created`                     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated`                     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;

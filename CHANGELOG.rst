@@ -5,9 +5,15 @@ Next Release (TBD)
 ------------------
 
 * feature: Support for listing all staged promotions by application.
-* feature: Support for jars as an artifact type.
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
+
+2.8.2
+~~~~~~~
+* feature: Adding support for local users/groups
+* feature: Support for jars as an artifact type.
+* feature: Support for tars as an artifact type.
+* bugfix: Renaming ambiguous 'users' columns to 'updated_by.
 
 2.8.1
 ~~~~~~~

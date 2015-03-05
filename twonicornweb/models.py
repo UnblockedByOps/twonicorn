@@ -31,7 +31,7 @@ class Application(Base):
     application_id   = Column(Integer, primary_key=True, nullable=False)
     application_name = Column(Text, nullable=False)
     nodegroup        = Column(Text, nullable=False)
-    user             = Column(Text, nullable=False)
+    updated_by       = Column(Text, nullable=False)
     created          = Column(TIMESTAMP, nullable=False)
     updated          = Column(TIMESTAMP, nullable=False)
 
@@ -87,7 +87,7 @@ class ArtifactAssignment(Base):
     env_id                 = Column(Integer, ForeignKey('envs.env_id'), nullable=False)
     lifecycle_id           = Column(Integer, ForeignKey('lifecycles.lifecycle_id'), nullable=False)
     artifact_id            = Column(Integer, ForeignKey('artifacts.artifact_id'), nullable=False)
-    user                   = Column(Text, nullable=False)
+    updated_by             = Column(Text, nullable=False)
     created                = Column(TIMESTAMP, nullable=False)
     artifact               = relationship("Artifact", backref=backref('artifact_assignments'))
 
@@ -135,7 +135,7 @@ class Deploy(Base):
     artifact_type_id = Column(Integer, ForeignKey('artifact_types.artifact_type_id'), nullable=False)
     deploy_path      = Column(Text, nullable=False)
     package_name     = Column(Text, nullable=True)
-    user             = Column(Text, nullable=False)
+    updated_by       = Column(Text, nullable=False)
     created          = Column(TIMESTAMP, nullable=False)
     updated          = Column(TIMESTAMP, nullable=False)
     application      = relationship("Application", backref=backref('deploys'))
@@ -178,7 +178,7 @@ class ArtifactNote(Base):
     __tablename__ = 'artifact_notes'
     artifact_note_id = Column(Integer, primary_key=True, nullable=False)
     artifact_id      = Column(Integer, ForeignKey('artifacts.artifact_id'), nullable=False)
-    user             = Column(Text, nullable=False)
+    updated_by       = Column(Text, nullable=False)
     note             = Column(Text, nullable=False)
     created          = Column(TIMESTAMP, nullable=False)
     artifact         = relationship("Artifact", backref=backref('notes'))
@@ -240,7 +240,7 @@ class Group(Base):
     __tablename__ = 'groups'
     group_id         = Column(Integer, primary_key=True, nullable=False)
     group_name       = Column(Text, nullable=False)
-    user             = Column(Text, nullable=False)
+    updated_by       = Column(Text, nullable=False)
     created          = Column(TIMESTAMP, nullable=False)
     updated          = Column(TIMESTAMP, nullable=False)
 
@@ -267,7 +267,7 @@ class GroupAssignment(Base):
     group_assignment_id     = Column(Integer, primary_key=True, nullable=False)
     group_id                = Column(Integer, ForeignKey('groups.group_id'), nullable=False)
     perm_id                 = Column(Integer, ForeignKey('group_perms.perm_id'), nullable=False)
-    user                    = Column(Text, nullable=False)
+    updated_by              = Column(Text, nullable=False)
     created                 = Column(TIMESTAMP, nullable=False)
     updated                 = Column(TIMESTAMP, nullable=False)
     group                   = relationship("Group", backref=backref('group_assignments'))
@@ -325,7 +325,7 @@ class User(Base):
     email_address    = Column(Text, nullable=False)
     salt             = Column(Text, nullable=False)
     password         = Column(Text, nullable=False)
-    user             = Column(Text, nullable=False)
+    updated_by       = Column(Text, nullable=False)
     created          = Column(TIMESTAMP, nullable=False)
     updated          = Column(TIMESTAMP, nullable=False)
 
@@ -352,9 +352,9 @@ class UserGroupAssignment(Base):
     user_group_assignment_id = Column(Integer, primary_key=True, nullable=False)
     group_id                = Column(Integer, ForeignKey('groups.group_id'), nullable=False)
     user_id                 = Column(Integer, ForeignKey('users.user_id'), nullable=False)
-    user                    = Column(Text, nullable=False)
+    updated_by              = Column(Text, nullable=False)
     created                 = Column(TIMESTAMP, nullable=False)
     updated                 = Column(TIMESTAMP, nullable=False)
-    local_user              = relationship("User", backref=backref('user_group_assignments'))
+    user                    = relationship("User", backref=backref('user_group_assignments'))
     group                   = relationship("Group", backref=backref('user_group_assignments'))
 

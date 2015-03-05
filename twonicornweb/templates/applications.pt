@@ -52,7 +52,7 @@
                    tal:content="item.nodegroup">Nodegroup Link</a></td>
             <td tal:content="item.localize_date_created">1975-09-28 00:00:00</td>
             <td tal:content="item.localize_date_updated">1975-09-28 00:00:00</td>
-            <td tal:content="item.user">bandta</td>
+            <td tal:content="item.updated_by">bandta</td>
             <td tal:condition="user.cp_auth"><a href="/cp/application?mode=edit&application_id=0"
                    tal:attributes="href '/cp/application?mode=edit&application_id=%s' % item.application_id">Edit</a></td>
           </tr>

@@ -488,7 +488,7 @@ def view_promote(request):
 
                 # Assign
                 utcnow = datetime.utcnow()
-                promote = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=to_state, user=user['login'], created=utcnow)
+                promote = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=to_state, updated_by=user['login'], created=utcnow)
                 DBSession.add(promote)
                 DBSession.flush()
                 
@@ -750,7 +750,7 @@ def write_api(request):
 
         try:
             utcnow = datetime.utcnow()
-            assign = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=lifecycle_id, user=user, created=utcnow)
+            assign = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=lifecycle_id, updated_by=user, created=utcnow)
             DBSession.add(assign)
             DBSession.flush()
             artifact_assignment_id = assign.artifact_assignment_id
@@ -880,14 +880,14 @@ def view_cp_application(request):
 
                 try:
                     utcnow = datetime.utcnow()
-                    create = Application(application_name=application_name, nodegroup=nodegroup, user=user['login'], created=utcnow, updated=utcnow)
+                    create = Application(application_name=application_name, nodegroup=nodegroup, updated_by=user['login'], created=utcnow, updated=utcnow)
                     DBSession.add(create)
                     DBSession.flush()
                     application_id = create.application_id
 
                     for i in range(len(deploy_paths)):
                         artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
-                        create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], user=user['login'], created=utcnow, updated=utcnow)
+                        create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], updated_by=user['login'], created=utcnow, updated=utcnow)
                         DBSession.add(create)
                         deploy_id = create.deploy_id
 
@@ -935,7 +935,7 @@ def view_cp_application(request):
                 else:
 
                     # Update the app
-                    logging.info('UPDATE: application_id=%s,application_name=%s,nodegroup=%s,user=%s'
+                    logging.info('UPDATE: application_id=%s,application_name=%s,nodegroup=%s,updated_by=%s'
                                  % (application_id,
                                     application_name,
                                     nodegroup,
@@ -943,7 +943,7 @@ def view_cp_application(request):
                     app = DBSession.query(Application).filter(Application.application_id==application_id).one()
                     app.application_name = application_name
                     app.nodegroup = nodegroup
-                    app.user=user['login']
+                    app.updated_by=user['login']
                     DBSession.flush()
 
                     # Add/Update deploys
@@ -966,7 +966,7 @@ def view_cp_application(request):
                             dep.artifact_type_id = artifact_type_id.artifact_type_id
                             dep.deploy_path = deploy_paths[i]
                             dep.package_name = package_names[i]
-                            dep.user=user['login'] 
+                            dep.updated_by=user['login'] 
                             DBSession.flush()
                             
                         else:
@@ -978,7 +978,7 @@ def view_cp_application(request):
                                             package_names[i]))
                             utcnow = datetime.utcnow()
                             artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
-                            create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], user=user['login'], created=utcnow, updated=utcnow)
+                            create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], updated_by=user['login'], created=utcnow, updated=utcnow)
                             DBSession.add(create)
                             DBSession.flush()
 
@@ -1036,7 +1036,7 @@ def view_cp_group(request):
             try:
                 utcnow = datetime.utcnow()
                 for g in range(len(group_names)):
-                    create = Group(group_name=group_names[g], user=user['login'], created=utcnow, updated=utcnow)
+                    create = Group(group_name=group_names[g], updated_by=user['login'], created=utcnow, updated=utcnow)
                     DBSession.add(create)
                     DBSession.flush()
                     group_id = create.group_id
@@ -1046,7 +1046,7 @@ def view_cp_group(request):
 
                     for p in group_perms:
                         perm = GroupPerm.get_group_perm_id(p)
-                        create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, user=user['login'], created=utcnow, updated=utcnow)
+                        create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, updated_by=user['login'], created=utcnow, updated=utcnow)
                         DBSession.add(create)
                         group_assignment_id = create.group_assignment_id
 
@@ -1097,7 +1097,7 @@ def view_cp_group(request):
                 utcnow = datetime.utcnow()
                 group = DBSession.query(Group).filter(Group.group_id==group_id).one()
                 group.group_name = group_name
-                group.user=user['login']
+                group.updated_by=user['login']
                 DBSession.flush()
 
                 # Update the perms
@@ -1111,7 +1111,7 @@ def view_cp_group(request):
                         if not check:
                             log.info("Adding permission %s for group %s" % (p.perm_name, group_name))
                             utcnow = datetime.utcnow()
-                            create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, user=user['login'], created=utcnow, updated=utcnow)
+                            create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, updated_by=user['login'], created=utcnow, updated=utcnow)
                             DBSession.add(create)
                             DBSession.flush()
     
