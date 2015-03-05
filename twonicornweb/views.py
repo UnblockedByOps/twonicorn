@@ -14,7 +14,7 @@ from datetime import datetime
 import logging
 import os.path
 import binascii
-import crypt
+from passlib.hash import sha512_crypt
 from twonicornweb.models import (
     DBSession,
     Application,
@@ -43,33 +43,39 @@ def site_layout():
     layout = renderer.implementation().macros['layout']
     return layout
 
+
+def local_groupfinder(userid, request):
+    """ queries the db for a list of groups the user belongs to.
+        Returns either a list of groups (empty if no groups) or None
+        if the user doesn't exist. """
+
+    groups = None
+    try:
+        user = DBSession.query(User).filter(User.user_name==userid).one()
+        groups = user.get_all_assignments()
+    except Exception, e:
+        pass
+        log.info("%s (%s)" % (Exception, e))
+
+    return groups
+
+
 def local_authenticate(login, password):
     """ Checks the validity of a username/password against what
         is stored in the database. """
-
-    db_user = None
 
     try: 
         q = DBSession.query(User)
         q = q.filter(User.user_name == login)
         db_user = q.one()
-        print "DB USER: ", db_user.__dict__
     except Exception, e:
-        raise
-        log.error("%s (%s)" % (Exception, e))
-    print "SALT IS: ", db_user.salt
-    print "Input password is: ", password
+        pass
+        log.info("%s (%s)" % (Exception, e))
 
-    input_hashed = crypt.crypt(password, db_user.salt)
-
-    print "DB hash: ", db_user.password
-    print "Inpput Hashed: ", input_hashed
-
-    if db_user.password == input_hashed:
-        return db_user.user_name
+    if sha512_crypt.verify(password, db_user.password):
+        return [login]
 
     return None
-
 
 
 def get_user(request):
@@ -91,13 +97,17 @@ def get_user(request):
             log.error("%s (%s)" % (Exception, e))
             (first_last, id, login, groups, first, last, auth, prd_auth, admin_auth, cp_auth) = ('', '', '', '', '', '', False, False, False, False)
     else:
+        try:
             id = request.authenticated_userid
-            # This stuff needs to come from the db
-            #(first,last) = format_user(id)
-            #groups = groupfinder(id, request)
-            #first_last = "%s %s" % (first, last)
-            #auth = True
-
+            user = DBSession.query(User).filter(User.user_name==id).one()
+            first = user.first_name
+            last = user.last_name
+            groups = local_groupfinder(id, request)
+            first_last = "%s %s" % (first, last)
+            auth = True
+        except Exception, e:
+            log.error("%s (%s)" % (Exception, e))
+            (first_last, id, login, groups, first, last, auth, prd_auth, admin_auth, cp_auth) = ('', '', '', '', '', '', False, False, False, False)
 
     try:
         login = validate_username_cookie(request.cookies['un'], request.registry.settings['tcw.cookie_token'])
@@ -288,14 +298,10 @@ def login(request):
         if request.registry.settings['tcw.auth_mode'] == 'ldap':
             connector = get_ldap_connector(request)
             data = connector.authenticate(login, password)
-            print "Data IS: ", data
         # LOCAL
         else:
-            # Do stuff with LOCAL
             data = local_authenticate(login, password)
-            print "DATA IS: ", data
             
-
         if data is not None:
             dn = data[0]
             encrypted = signed_serialize(login, request.registry.settings['tcw.cookie_token'])
@@ -1103,7 +1109,6 @@ def view_cp_group(request):
                         q = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id)
                         check = DBSession.query(q.exists()).scalar()
                         if not check:
-                            print ("Adding permission %s for group %s" % (p.perm_name, group_name))
                             log.info("Adding permission %s for group %s" % (p.perm_name, group_name))
                             utcnow = datetime.utcnow()
                             create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, user=user['login'], created=utcnow, updated=utcnow)
@@ -1116,7 +1121,6 @@ def view_cp_group(request):
                         q = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id)
                         check = DBSession.query(q.exists()).scalar()
                         if check:
-                            print ("Deleting permission %s for group %s" % (p.perm_name, group_name))
                             log.info("Deleting permission %s for group %s" % (p.perm_name, group_name))
                             assignment = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id).one()
                             DBSession.delete(assignment)

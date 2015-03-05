@@ -1,5 +1,6 @@
 from pyramid.config import Configurator
 from pyramid_ldap import groupfinder
+from .views import local_groupfinder
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import Allow, Authenticated
@@ -92,9 +93,6 @@ def main(global_config, **settings):
         config.set_authentication_policy(
             AuthTktAuthenticationPolicy(settings['tcw.cookie_token'], callback=groupfinder, max_age=604800)
             )
-        config.set_authorization_policy(
-            ACLAuthorizationPolicy()
-            )
 
         # Load the cert if it's defined and exists
         if os.path.isfile(settings['tcw.ldap_cert']):
@@ -120,13 +118,14 @@ def main(global_config, **settings):
             cache_period = 600,
             )
     else:
-        log.info('Configuring local users and groups. Not really but soon.')
+        log.info('Configuring local users and groups.')
         config.set_authentication_policy(
-            AuthTktAuthenticationPolicy(settings['tcw.cookie_token'])
+            AuthTktAuthenticationPolicy(settings['tcw.cookie_token'], callback=local_groupfinder, max_age=604800)
             )
-        config.set_authorization_policy(
-            ACLAuthorizationPolicy()
-            )
+
+    config.set_authorization_policy(
+        ACLAuthorizationPolicy()
+        )
 
     # Load our groups and perms from the db and load them into the ACL
     try:
