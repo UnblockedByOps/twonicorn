@@ -24,6 +24,7 @@ requires = [
     'ldappool==1.0',
     'requests==2.3.0',
     'arrow==0.4.4',
+    'passlib',
     ]
 
 setup(name='TwonicornWeb',
