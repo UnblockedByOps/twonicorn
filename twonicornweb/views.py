@@ -691,7 +691,7 @@ def write_api(request):
               'location': None,
               'branch': None,
               'revision': None,
-              'user': None,
+              'updated_by': None,
              }
     for p in params:
         try:
@@ -706,7 +706,7 @@ def write_api(request):
     location = params['location']
     revision = params['revision']
     branch = params['branch']
-    user = params['user']
+    updated_by = params['updated_by']
 
     # Dev and qat go live immediately, prd goes to init
     if env == 'prd':
@@ -750,7 +750,7 @@ def write_api(request):
 
         try:
             utcnow = datetime.utcnow()
-            assign = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=lifecycle_id, updated_by=user, created=utcnow)
+            assign = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=lifecycle_id, updated_by=updated_by, created=utcnow)
             DBSession.add(assign)
             DBSession.flush()
             artifact_assignment_id = assign.artifact_assignment_id

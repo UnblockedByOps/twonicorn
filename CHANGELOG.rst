@@ -8,6 +8,10 @@ Next Release (TBD)
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+2.8.3
+~~~~~~~
+* bugfix: Forgot to rename parameter of api.
+
 2.8.2
 ~~~~~~~
 * feature: Adding support for local users/groups
