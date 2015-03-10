@@ -1,19 +1,73 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
 
-    <p>${user.first_last} (${user.login}) is a member of the following groups:</p>
+    <div tal:condition="user.auth_mode != 'ldap'">
+        <p>
+          <form class="cp_form" action="/user" method="POST">
+            <input type="hidden" name="form.submitted"/>
+            <ul>
+              <li>
+                <h2>${subtitle}</h2>
+                <span class="required_notification">* Denotes Required Field</span>
+              </li>
+              <li>
+                <label for="user_name">User Name:</label>
+                <input tal:attributes="value user['login']" type="text" id="disp_user_name" name="disp_user_name" disabled />
+                <input tal:attributes="value user['login']" type="hidden" id="user_name" name="user_name" />
+                <span class="form_hint">Your user name</span>
+              </li>
+              <li>
+                <label for="first_name">First name:</label>
+                <input tal:attributes="value user['first']" type="text" id="first_name" name="first_name" required />
+                <span class="form_hint">First name</span>
+              </li>
+              <li>
+                <label for="last_name">Last name:</label>
+                <input tal:attributes="value user['last']" type="text" id="last_name" name="last_name" required />
+                <span class="form_hint">First name</span>
+              </li>
+              <li>
+                <label for="email_address">Email address:</label>
+                <input tal:attributes="value user['email_address']" type="text" id="email_address" name="email_address" required />
+                <span class="form_hint">Your email address</span>
+              </li>
+              <li>
+                <label for="email_address">Password:</label>
+                <input type="password" id="password" name="password" />
+                <span class="form_hint">Change your password</span>
+              </li>
+            </ul>
+            <ul>
+              <li>
+                <input class="button" type="submit" name="submit" value="submit"/>
+              </li>
+              <li>
+                <h2>Groups</h2>
+                <span class="required_notification">You are a member of the following local groups</span>
+              </li>
+              <li tal:repeat="item user.groups" tal:content="item"/>
+            </ul>
+          </form>
 
-    <p>
-    <table width="100%" tal:condition="user.groups">
-      <tr>
-        <th>Group Name</th>
-      </tr>
-      <tbody tal:repeat="item user.groups">
-      <tr>
-        <td tal:content="item">
-      </tr>
-      </tbody>
-    </table>
+        </p>
+
+    </div>
+
+    <div tal:condition="user.auth_mode == 'ldap'">
+      <p>${user.first_last} (${user.login}) is a member of the following AD groups:</p>
+
+      <p>
+      <table width="100%" tal:condition="user.groups">
+        <tr>
+          <th>Group Name</th>
+        </tr>
+        <tbody tal:repeat="item user.groups">
+        <tr>
+          <td tal:content="item">
+        </tr>
+        </tbody>
+      </table>
+    </div>
 
   </div>
 </div>

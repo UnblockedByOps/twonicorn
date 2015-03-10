@@ -85,6 +85,8 @@ def get_user(request):
     promote_prd_auth = False
     admin_auth = False
     cp_auth = False
+    email_address = None
+    auth_mode = 'ldap'
 
     if request.registry.settings['tcw.auth_mode'] == 'ldap':
         try:
@@ -102,9 +104,11 @@ def get_user(request):
             user = DBSession.query(User).filter(User.user_name==id).one()
             first = user.first_name
             last = user.last_name
+            email_address = user.email_address
             groups = local_groupfinder(id, request)
             first_last = "%s %s" % (first, last)
             auth = True
+            auth_mode = 'local'
         except Exception, e:
             log.error("%s (%s)" % (Exception, e))
             (first_last, id, login, groups, first, last, auth, prd_auth, admin_auth, cp_auth) = ('', '', '', '', '', '', False, False, False, False)
@@ -140,6 +144,8 @@ def get_user(request):
     user['admin_auth'] = admin_auth
     user['cp_auth'] = cp_auth
     user['first_last'] = first_last
+    user['email_address'] = email_address
+    user['auth_mode'] = auth_mode
 
     return (user)
 
@@ -791,27 +797,60 @@ def view_help(request):
 @view_config(route_name='user', permission='view', renderer='twonicornweb:templates/user.pt')
 def view_user(request):
 
+    user = get_user(request)
     page_title = 'User Data'
-    user = get_user(request)
+    subtitle = user['first_last']
+    change_pw = False
+
+    if user['auth_mode'] != 'ldap':
+
+        if 'form.submitted' in request.POST:
+            user_name = request.POST['user_name']
+            first_name = request.POST['first_name']
+            last_name = request.POST['last_name']
+            email_address = request.POST['email_address']
+            password = request.POST['password']
+
+            # Need some security checking here
+            if user_name != user['login']:
+                print "Naughty monkey"
+            else:
+
+                # Update
+                logging.info('UPDATE: user_name=%s,first_name=%s,last_name=%s,email_address=%s,password=%s'
+                             % (user_name,
+                                first_name,
+                                last_name,
+                                email_address,
+                                'pass'))
+                try:
+                    user = DBSession.query(User).filter(User.user_name==user_name).one()
+                    user.first_name = first_name
+                    user.last_name = last_name
+                    user.email_address = email_address
+                    if password:
+                        print "changing password"
+                        salt = sha512_crypt.genconfig()[17:33]
+                        encrypted_password = sha512_crypt.encrypt(password, salt=salt)
+                        user.salt = salt
+                        user.password = encrypted_password
+                        DBSession.flush()
+                        return_url = '/logout?message=Your password has been changed successfully. Please log in again.'
+                        return HTTPFound(return_url)
+
+                    DBSession.flush()
+
+                except Exception, e:
+                    pass
+                    log.info("%s (%s)" % (Exception, e))
+
+        user = get_user(request)
 
     return {'layout': site_layout(),
             'page_title': page_title,
+            'subtitle': subtitle,
             'user': user,
-           }
-
-@view_config(route_name='group', permission='view', renderer='twonicornweb:templates/group.pt')
-def view_group(request):
-
-    page_title = 'Group Data'
-    user = get_user(request)
-    groups = DBSession.query(Group).all()
-    all_perms = DBSession.query(GroupPerm).all()
-
-    return {'layout': site_layout(),
-            'page_title': page_title,
-            'user': user,
-            'groups': groups,
-            'all_perms': all_perms,
+            'change_pw': change_pw,
            }
 
 
@@ -1000,11 +1039,14 @@ def view_cp_application(request):
             'error_msg': error_msg,
            }
 
-@view_config(route_name='cp_group', permission='cp', renderer='twonicornweb:templates/cp_group.pt')
-def view_cp_group(request):
 
-    page_title = 'Control Panel - Groups'
+@view_config(route_name='cp_user', permission='cp', renderer='twonicornweb:templates/cp_user.pt')
+def view_cp_user(request):
+
+    page_title = 'Control Panel - Users'
     user = get_user(request)
+    all_perms = DBSession.query(GroupPerm).all()
+    groups = DBSession.query(Group).all()
 
     params = {'mode': None,
               'commit': None,
@@ -1022,6 +1064,7 @@ def view_cp_group(request):
     error_msg = None
     group_perms = None
     group = None
+    subtitle = 'Groups'
 
     if mode == 'add':
 
@@ -1052,7 +1095,7 @@ def view_cp_group(request):
 
                         DBSession.flush()
 
-                return_url = '/group'
+                return_url = '/cp/group'
                 return HTTPFound(return_url)
 
             except Exception as ex:
@@ -1126,7 +1169,7 @@ def view_cp_group(request):
                             DBSession.delete(assignment)
                             DBSession.flush()
 
-                return_url = '/group'
+                return_url = '/cp/group'
                 return HTTPFound(return_url)
 
     return {'layout': site_layout(),
@@ -1135,6 +1178,154 @@ def view_cp_group(request):
             'group': group,
             'group_id': group_id,
             'group_perms': group_perms,
+            'groups': groups,
+            'all_perms': all_perms,
+            'subtitle': subtitle,
+            'mode': mode,
+            'commit': commit,
+            'error_msg': error_msg,
+           }
+
+@view_config(route_name='cp_group', permission='cp', renderer='twonicornweb:templates/cp_group.pt')
+def view_cp_group(request):
+
+    page_title = 'Control Panel - Groups'
+    user = get_user(request)
+    all_perms = DBSession.query(GroupPerm).all()
+    groups = DBSession.query(Group).all()
+
+    params = {'mode': None,
+              'commit': None,
+              'group_id': None,
+             }
+    for p in params:
+        try:
+            params[p] = request.params[p]
+        except:
+            pass
+
+    mode = params['mode']
+    commit = params['commit']
+    group_id = params['group_id']
+    error_msg = None
+    group_perms = None
+    group = None
+    subtitle = 'Groups'
+
+    if mode == 'add':
+
+        subtitle = 'Add a new group'
+
+        if commit:
+
+            subtitle = 'Add a new group'
+
+            group_names = request.POST.getall('group_name')
+
+            try:
+                utcnow = datetime.utcnow()
+                for g in range(len(group_names)):
+                    create = Group(group_name=group_names[g], updated_by=user['login'], created=utcnow, updated=utcnow)
+                    DBSession.add(create)
+                    DBSession.flush()
+                    group_id = create.group_id
+
+                    i = 'group_perms' + str(g)
+                    group_perms = request.POST.getall(i)
+
+                    for p in group_perms:
+                        perm = GroupPerm.get_group_perm_id(p)
+                        create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, updated_by=user['login'], created=utcnow, updated=utcnow)
+                        DBSession.add(create)
+                        group_assignment_id = create.group_assignment_id
+
+                        DBSession.flush()
+
+                return_url = '/cp/group'
+                return HTTPFound(return_url)
+
+            except Exception as ex:
+                if type(ex).__name__ == 'IntegrityError':
+                    logging.info('Group already exists in the db, please edit instead.')
+                    # Rollback
+                    DBSession.rollback()
+                    # FIXME: Return a nice page
+                    return HTTPConflict('Group already exists in the db, please edit instead.')
+                else:
+                    raise
+                    # FIXME not trapping correctly
+                    DBSession.rollback()
+                    error_msg = ("Failed to create application (%s)" % (ex))
+                    log.error(error_msg)
+
+    if mode == 'edit':
+
+       subtitle = 'Edit group permissions'
+
+       if not commit:
+           subtitle = 'Edit group permissions'
+
+           try:
+               q = DBSession.query(Group)
+               q = q.filter(Group.group_id == group_id)
+               group = q.one()
+           except Exception, e:
+               conn_err_msg = e
+               return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
+
+       if commit:
+
+           subtitle = 'Edit group permissions'
+
+           if 'form.submitted' in request.POST:
+                group_id = request.POST.get('group_id')
+                group_name = request.POST.get('group_name')
+                perms = request.POST.getall('perms')
+             
+                # Update the group
+                utcnow = datetime.utcnow()
+                group = DBSession.query(Group).filter(Group.group_id==group_id).one()
+                group.group_name = group_name
+                group.updated_by=user['login']
+                DBSession.flush()
+
+                # Update the perms
+                all_perms = DBSession.query(GroupPerm)
+                for p in all_perms:
+                    # insert
+                    if p.perm_name in perms:
+                        perm = GroupPerm.get_group_perm_id(p.perm_name)
+                        q = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id)
+                        check = DBSession.query(q.exists()).scalar()
+                        if not check:
+                            log.info("Adding permission %s for group %s" % (p.perm_name, group_name))
+                            utcnow = datetime.utcnow()
+                            create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, updated_by=user['login'], created=utcnow, updated=utcnow)
+                            DBSession.add(create)
+                            DBSession.flush()
+    
+                    # delete
+                    else:
+                        perm = GroupPerm.get_group_perm_id(p.perm_name)
+                        q = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id)
+                        check = DBSession.query(q.exists()).scalar()
+                        if check:
+                            log.info("Deleting permission %s for group %s" % (p.perm_name, group_name))
+                            assignment = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id).one()
+                            DBSession.delete(assignment)
+                            DBSession.flush()
+
+                return_url = '/cp/group'
+                return HTTPFound(return_url)
+
+    return {'layout': site_layout(),
+            'page_title': page_title,
+            'user': user,
+            'group': group,
+            'group_id': group_id,
+            'group_perms': group_perms,
+            'groups': groups,
+            'all_perms': all_perms,
             'subtitle': subtitle,
             'mode': mode,
             'commit': commit,

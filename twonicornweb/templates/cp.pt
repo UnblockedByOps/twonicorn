@@ -2,43 +2,72 @@
     <div metal:fill-slot="content">
       <p>
         <table width="100%">
-          <tr>
-            <th>Application</th>
-          </tr>
-          <tr>
-            <td><a href="/cp/application?mode=add">Add a new application</a></td>
-          </tr>
-          <tr>
-            <td>
-              <form class="cp_form" action="/cp/application?mode=edit" method="POST">
-                <input type="hidden" name="form.submitted"/>
-                        <span for="artifact_type0">Edit Application:</span><br>
-                        <input type="text" id="application_id" name="application_id" placeholder="Application ID" required />
-                        <span class="form_hint">Enter the Application ID you wish to edit</span><br><br>
-                        <input class="button" type="submit" name="submit" value="edit"/>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <th>Groups</th>
-          </tr>
+          <tbody>
+            <tr>
+              <th>Application</th>
+            </tr>
+            <tr>
+              <td><a href="/cp/application?mode=add">Add a new application</a></td>
+            </tr>
+            <tr>
+              <td>
+                <form class="cp_form" action="/cp/application?mode=edit" method="POST">
+                  <input type="hidden" name="form.submitted"/>
+                          <span for="artifact_type0">Edit Application:</span><br>
+                          <input type="text" id="application_id" name="application_id" placeholder="Application ID" required />
+                          <span class="form_hint">Enter the Application ID you wish to edit</span><br><br>
+                          <input class="button" type="submit" name="submit" value="edit"/>
+                </form>
+              </td>
+            </tr>
+          </tbody>
 
-          <tr>
-            <td><a href="/cp/group?mode=add">Add a new group</a></td>
-          </tr>
-          <tr>
+          <tbody tal:condition="user.auth_mode != 'ldap'">
+            <tr>
+              <th>Users</th>
+            </tr>
+            <tr>
+              <td><a href="/cp/user">List users</a></td>
+            </tr>
+            <tr>
+              <td><a href="/cp/user?mode=add">Add a new user</a></td>
+            </tr>
+            <tr>
+              <td>
+                <form class="cp_form" action="/cp/user?mode=edit" method="POST">
+                  <input type="hidden" name="form.submitted"/>
+                          <span for="user_id">Edit User:</span><br>
+                          <input type="text" id="user_id" name="user_id" placeholder="User ID" required />
+                          <span class="form_hint">Enter the User ID you wish to edit</span><br><br>
+                          <input class="button" type="submit" name="submit" value="edit"/>
+                </form>
+              </td>
+            </tr>
+          </tbody>
 
-            <td>
-              <form class="cp_form" action="/cp/group?mode=edit" method="POST">
-                <input type="hidden" name="form.submitted"/>
-                        <span for="group_id">Edit Group:</span><br>
-                        <input type="text" id="group_id" name="group_id" placeholder="Group ID" required />
-                        <span class="form_hint">Enter the Group ID you wish to edit</span><br><br>
-                        <input class="button" type="submit" name="submit" value="edit"/>
-              </form>
-            </td>
+          <tbody>
+            <tr>
+              <th>Groups</th>
+            </tr>
+            <tr>
+              <td><a href="/cp/group">List groups</a></td>
+            </tr>
+            <tr>
+              <td><a href="/cp/group?mode=add">Add a new group</a></td>
+            </tr>
+            <tr>
+              <td>
+                <form class="cp_form" action="/cp/group?mode=edit" method="POST">
+                  <input type="hidden" name="form.submitted"/>
+                          <span for="group_id">Edit Group:</span><br>
+                          <input type="text" id="group_id" name="group_id" placeholder="Group ID" required />
+                          <span class="form_hint">Enter the Group ID you wish to edit</span><br><br>
+                          <input class="button" type="submit" name="submit" value="edit"/>
+                </form>
+              </td>
+            </tr>
+          </tbody>
 
-          </tr>
         </table>
       </p>
 

@@ -42,12 +42,6 @@
                                          title 'Display user info'"
                          tal:content="'User Info'">user info</a>
                     </li>
-                    <li class="user">
-                      <a class="nav" href="/group"
-                         tal:attributes="href '/group';
-                                         title 'Display group info'"
-                         tal:content="'Group Info'">group info</a>
-                    </li>
                     <li class="user" tal:condition="user.cp_auth">
                       <a class="nav" href="/cp"
                          tal:attributes="href '/cp';
