@@ -69,11 +69,15 @@ def local_authenticate(login, password):
         q = q.filter(User.user_name == login)
         db_user = q.one()
     except Exception, e:
-        pass
         log.info("%s (%s)" % (Exception, e))
+        pass
 
-    if sha512_crypt.verify(password, db_user.password):
-        return [login]
+    try: 
+        if sha512_crypt.verify(password, db_user.password):
+            return [login]
+    except Exception, e:
+        log.info("%s (%s)" % (Exception, e))
+        pass
 
     return None
 
@@ -1045,12 +1049,12 @@ def view_cp_user(request):
 
     page_title = 'Control Panel - Users'
     user = get_user(request)
-    all_perms = DBSession.query(GroupPerm).all()
+    users = DBSession.query(User).all()
     groups = DBSession.query(Group).all()
 
     params = {'mode': None,
               'commit': None,
-              'group_id': None,
+              'user_id': None,
              }
     for p in params:
         try:
@@ -1060,114 +1064,131 @@ def view_cp_user(request):
 
     mode = params['mode']
     commit = params['commit']
-    group_id = params['group_id']
+    user_id = params['user_id']
     error_msg = None
-    group_perms = None
-    group = None
-    subtitle = 'Groups'
+    this_user = None
+    this_groups = None
+    subtitle = 'Users'
 
     if mode == 'add':
 
-        subtitle = 'Add a new group'
+        subtitle = 'Add a new user'
 
         if commit:
 
-            subtitle = 'Add a new group'
-
-            group_names = request.POST.getall('group_name')
+            user_names = request.POST.getall('user_name')
+            first_names = request.POST.getall('first_name')
+            last_names= request.POST.getall('last_name')
+            email_addresses = request.POST.getall('email_address')
+            passwords = request.POST.getall('password')
 
             try:
                 utcnow = datetime.utcnow()
-                for g in range(len(group_names)):
-                    create = Group(group_name=group_names[g], updated_by=user['login'], created=utcnow, updated=utcnow)
+                for u in range(len(user_names)):
+                    salt = sha512_crypt.genconfig()[17:33]
+                    encrypted_password = sha512_crypt.encrypt(passwords[u], salt=salt)
+                    create = User(user_name=user_names[u], first_name=first_names[u], last_name=last_names[u], email_address=email_addresses[u], salt=salt, password=encrypted_password, updated_by=user['login'], created=utcnow, updated=utcnow)
                     DBSession.add(create)
                     DBSession.flush()
-                    group_id = create.group_id
+                    user_id = create.user_id
 
-                    i = 'group_perms' + str(g)
-                    group_perms = request.POST.getall(i)
+                    group_assingments = request.POST.getall('group_assingments')
 
-                    for p in group_perms:
-                        perm = GroupPerm.get_group_perm_id(p)
-                        create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, updated_by=user['login'], created=utcnow, updated=utcnow)
+                    for a in group_assingments:
+                        g = DBSession.query(Group).filter(Group.group_name==a).one()
+                        create = UserGroupAssignment(group_id=g.group_id, user_id=user_id, updated_by=user['login'], created=utcnow, updated=utcnow)
                         DBSession.add(create)
-                        group_assignment_id = create.group_assignment_id
 
                         DBSession.flush()
 
-                return_url = '/cp/group'
+                return_url = '/cp/user'
                 return HTTPFound(return_url)
 
             except Exception as ex:
                 if type(ex).__name__ == 'IntegrityError':
-                    logging.info('Group already exists in the db, please edit instead.')
+                    logging.info('User already exists in the db, please edit instead.')
                     # Rollback
                     DBSession.rollback()
                     # FIXME: Return a nice page
-                    return HTTPConflict('Group already exists in the db, please edit instead.')
+                    return HTTPConflict('User already exists in the db, please edit instead.')
                 else:
                     raise
                     # FIXME not trapping correctly
                     DBSession.rollback()
-                    error_msg = ("Failed to create application (%s)" % (ex))
+                    error_msg = ("Failed to create user (%s)" % (ex))
                     log.error(error_msg)
 
     if mode == 'edit':
 
-       subtitle = 'Edit group permissions'
+       subtitle = 'Edit user'
 
        if not commit:
-           subtitle = 'Edit group permissions'
-
            try:
+               q = DBSession.query(User)
+               q = q.filter(User.user_id == user_id)
+               this_user = q.one()
+
                q = DBSession.query(Group)
-               q = q.filter(Group.group_id == group_id)
-               group = q.one()
+               q = q.join(UserGroupAssignment, Group.group_id== UserGroupAssignment.group_id)
+               q = q.filter(UserGroupAssignment.user_id==this_user.user_id)
+               results = q.all()
+               this_groups = []
+               for r in results:
+                   this_groups.append(r.group_name) 
            except Exception, e:
                conn_err_msg = e
                return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
 
        if commit:
 
-           subtitle = 'Edit group permissions'
-
            if 'form.submitted' in request.POST:
-                group_id = request.POST.get('group_id')
-                group_name = request.POST.get('group_name')
-                perms = request.POST.getall('perms')
+                user_id = request.POST.get('user_id')
+                user_name = request.POST.get('user_name')
+                first_name = request.POST.get('first_name')
+                last_name = request.POST.get('last_name')
+                email_address = request.POST.get('email_address')
+                password = request.POST.get('password')
              
                 # Update the group
                 utcnow = datetime.utcnow()
-                group = DBSession.query(Group).filter(Group.group_id==group_id).one()
-                group.group_name = group_name
-                group.updated_by=user['login']
+                user = DBSession.query(User).filter(User.user_id==user_id).one()
+                user.user_name = user_name
+                user.first_name = first_name
+                user.last_name = last_name
+                user.email_address = email_address
+                if password:
+                    salt = sha512_crypt.genconfig()[17:33]
+                    encrypted_password = sha512_crypt.encrypt(password, salt=salt)
+                    user.salt = salt
+                    user.password = encrypted_password
+                user.updated_by=user['login']
                 DBSession.flush()
 
-                # Update the perms
-                all_perms = DBSession.query(GroupPerm)
-                for p in all_perms:
-                    # insert
-                    if p.perm_name in perms:
-                        perm = GroupPerm.get_group_perm_id(p.perm_name)
-                        q = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id)
-                        check = DBSession.query(q.exists()).scalar()
-                        if not check:
-                            log.info("Adding permission %s for group %s" % (p.perm_name, group_name))
-                            utcnow = datetime.utcnow()
-                            create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, updated_by=user['login'], created=utcnow, updated=utcnow)
-                            DBSession.add(create)
-                            DBSession.flush()
-    
-                    # delete
-                    else:
-                        perm = GroupPerm.get_group_perm_id(p.perm_name)
-                        q = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id)
-                        check = DBSession.query(q.exists()).scalar()
-                        if check:
-                            log.info("Deleting permission %s for group %s" % (p.perm_name, group_name))
-                            assignment = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id).one()
-                            DBSession.delete(assignment)
-                            DBSession.flush()
+#                # Update the perms
+#                all_perms = DBSession.query(GroupPerm)
+#                for p in all_perms:
+#                    # insert
+#                    if p.perm_name in perms:
+#                        perm = GroupPerm.get_group_perm_id(p.perm_name)
+#                        q = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id)
+#                        check = DBSession.query(q.exists()).scalar()
+#                        if not check:
+#                            log.info("Adding permission %s for group %s" % (p.perm_name, group_name))
+#                            utcnow = datetime.utcnow()
+#                            create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, updated_by=user['login'], created=utcnow, updated=utcnow)
+#                            DBSession.add(create)
+#                            DBSession.flush()
+#    
+#                    # delete
+#                    else:
+#                        perm = GroupPerm.get_group_perm_id(p.perm_name)
+#                        q = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id)
+#                        check = DBSession.query(q.exists()).scalar()
+#                        if check:
+#                            log.info("Deleting permission %s for group %s" % (p.perm_name, group_name))
+#                            assignment = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id).one()
+#                            DBSession.delete(assignment)
+#                            DBSession.flush()
 
                 return_url = '/cp/group'
                 return HTTPFound(return_url)
@@ -1175,11 +1196,11 @@ def view_cp_user(request):
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'group': group,
-            'group_id': group_id,
-            'group_perms': group_perms,
+            'this_user': this_user,
+            'this_groups': this_groups,
+            'user_id': user_id,
+            'users': users,
             'groups': groups,
-            'all_perms': all_perms,
             'subtitle': subtitle,
             'mode': mode,
             'commit': commit,

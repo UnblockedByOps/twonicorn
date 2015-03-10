@@ -433,11 +433,11 @@ td.glossary {
 
 /* Control Panel */
 ::-moz-placeholder {
-    color: blue;
+    color: #8D8D8D;
 }
  
 ::-webkit-input-placeholder {
-    color: blue;
+    color: #8D8D8D;
 }
 
 ::-webkit-validation-bubble-message {
@@ -456,6 +456,7 @@ td.glossary {
     padding:0px;
 }
 
+.cp_form_user ul,
 .cp_form_group ul {
     width:1050px;
     list-style-type:none;
@@ -465,6 +466,7 @@ td.glossary {
 }
 
 .cp_form li,
+.cp_form_user li,
 .cp_form_group li {
     padding:12px;
     border-bottom:1px solid #eee;
@@ -474,6 +476,8 @@ td.glossary {
 
 .cp_form li:first-child,
 .cp_form li:last-child, 
+.cp_form_user li:first-child,
+.cp_form_user li:last-child, 
 .cp_form_group li:first-child,
 .cp_form_group li:last-child {
     border-bottom:1px solid #777;
@@ -504,22 +508,27 @@ td.glossary {
 }
 
 .cp_form input:focus + .form_hint, 
+.cp_form_user input:focus + .form_hint, 
 .cp_form_group input:focus + .form_hint {
     display: inline;
 }
 
 .cp_form input:required:valid + .form_hint, 
+.cp_form_user input:required:valid + .form_hint, 
 .cp_form_group input:required:valid + .form_hint {
     background: #28921f;
 }
 
 .cp_form input:required:valid + .form_hint::before, 
+.cp_form_user input:required:valid + .form_hint::before, 
 .cp_form_group input:required:valid + .form_hint::before {
     color:#28921f;
 }
 
 .cp_form h2,
 .cp_form h3, 
+.cp_form_user h2,
+.cp_form_user h3, 
 .cp_form_group h2,
 .cp_form_group h3 {
     margin:0;
@@ -534,6 +543,7 @@ td.glossary {
 }
 
 .cp_form label, 
+.cp_form_user label, 
 .cp_form_group label {
     width:150px;
     margin-top: 3px;
@@ -558,6 +568,7 @@ td.glossary {
 }
 
 .cp_form input.button,
+.cp_form_user input.button,
 .cp_form_group input.button {
     width: 100px;
     position :center;
@@ -571,11 +582,13 @@ td.glossary {
 }
 
 .cp_form input.button:hover,
+.cp_form_user input.button:hover,
 .cp_form_group input.button:hover {
     background: #FF0099;
 }
 
 .cp_form input.button_submit,
+.cp_form_user input.button_submit,
 .cp_form_group input.button_submit {
     width: 100px;
     background: #CCCCCC;
@@ -585,12 +598,15 @@ td.glossary {
 }
 
 .cp_form input.button_submit:hover, 
+.cp_form_user input.button_submit:hover, 
 .cp_form_group input.button_submit:hover {
     background: #FF0099;
 }
 
 .cp_form input,
 .cp_form select,
+.cp_form_user input,
+.cp_form_user select,
 .cp_form_group input,
 .cp_form_group select {
     border:1px solid #aaa;
@@ -605,6 +621,9 @@ td.glossary {
 .cp_form input:focus,
 .cp_form textarea:focus,
 .cp_form select:focus, 
+.cp_form_user input:focus,
+.cp_form_user textarea:focus,
+.cp_form_user select:focus, 
 .cp_form_group input:focus,
 .cp_form_group textarea:focus,
 .cp_form_group select:focus {
@@ -622,6 +641,7 @@ select:required {
 }
 
 .cp_form input:focus:invalid, 
+.cp_form_user input:focus:invalid, 
 .cp_form_group input:focus:invalid {
     background: #fff url(/static/invalid.png) no-repeat 98% center;
     box-shadow: 0 0 5px #d45252;
@@ -629,6 +649,7 @@ select:required {
 }
 
 .cp_form input:required:valid, 
+.cp_form_user input:required:valid, 
 .cp_form_group input:required:valid {
     background: #fff url(/static/valid.png) no-repeat 98% center;
     box-shadow: 0 0 5px #5cd053;
@@ -636,6 +657,7 @@ select:required {
 }
 
 .cp_form select:required:valid, 
+.cp_form_user select:required:valid, 
 .cp_form_group select:required:valid {
     background: #fff url(/static/valid.png) no-repeat 90% center;
     box-shadow: 0 0 5px #5cd053;

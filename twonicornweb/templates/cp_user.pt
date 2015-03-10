@@ -1,9 +1,6 @@
 <div metal:use-macro="layout">
     <div metal:fill-slot="content">
 
-      <script src="/static/jquery-2.1.3.min.js"></script>
-      <script src="/static/row_expansion_user.js"></script>
-
       <div tal:condition="not commit and mode == 'add'">
         <p>
 
@@ -16,30 +13,54 @@
               </li>
             <ul>
               <li>
-                <h3>Group List</h3>
+                <h3>User</h3>
               </li>
               <li>
-
-                <table id="tab_user">
-                  <tbody>
-                    <tr id='addr0'>
-                      <td>
-                        <span for="user_name">User Name:</span><br>
-                        <input type="text" id="user_name" name="user_name" required/>
-                        <span class="form_hint">The user name you wish to add</span>
-                      </td>
-                    </tr>
-                    <tr id='addr1'></tr>
-                  </tbody>
-                </table>
-
+                <span for="user_name">User Name:</span><br>
+                <input type="text" id="user_name" name="user_name" required/>
+                <span class="form_hint">The login name of the user</span>
+              </li>
+              <li>
+                <span for="first_name">First Name:</span><br>
+                <input type="text" id="first_name" name="first_name" required/>
+                <span class="form_hint">The login name of the user</span>
+              </li>
+              <li>
+                <span for="last_name">Last Name:</span><br>
+                <input type="text" id="last_name" name="last_name" required/>
+                <span class="form_hint">The last name of the user</span>
+              </li>
+              <li>
+                <span for="email_address">Email Address:</span><br>
+                <input type="text" id="email_address" name="email_address" required/>
+                <span class="form_hint">The email address of the user</span>
+              </li>
+              <li>
+                <span for="password">Password:</span><br>
+                <input type="password" id="password" name="password" required />
+                <span class="form_hint">The password for the user</span>
               </li>
             </ul>
             <ul>
-              <li class="exp">
-                <input id="add_row" class="button exp" type="button" value="Add Another User"/>
-                <input id="delete_row" class="button exp disable" type="button" value="Remove Last Row"/>
+              <li>
+                <h2>Groups</h2>
+                <span class="required_notification">Select the local groups for this user</span>
               </li>
+
+                <table class="cp_form_group">
+                  <tbody>
+                    <tr tal:repeat="item groups">
+                      <td>
+                        <input tal:attributes="value item.group_name" name="group_assingments" type="checkbox"/>
+                      </td>
+                      <td>
+                        <span tal:content="item.group_name"/>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+            </ul>
+            <ul>
               <li>
                 <input class="button" type="submit" name="submit" value="submit"/>
               </li>
@@ -55,7 +76,7 @@
 
           <form class="cp_form_user" action="/cp/user?mode=edit&commit=true" method="POST">
             <input type="hidden" name="form.submitted"/>
-            <input tal:attributes="value user.user_id" type="hidden" name="user_id"/>
+            <input tal:attributes="value this_user.user_id" type="hidden" name="user_id"/>
             <ul>
               <li>
                 <h2>${subtitle}</h2>
@@ -63,31 +84,51 @@
               </li>
             <ul>
               <li>
-                <h3>Group</h3>
+                <h3>User</h3>
               </li>
               <li>
-
-                <table>
+                <span for="user_name">User Name:</span><br>
+                <input tal:attributes="value this_user.user_name" type="text" id="user_name" name="user_name" required/>
+                <span class="form_hint">The login name of the user</span>
+              </li>
+              <li>
+                <span for="first_name">First Name:</span><br>
+                <input tal:attributes="value this_user.first_name" type="text" id="first_name" name="first_name" required/>
+                <span class="form_hint">The login name of the user</span>
+              </li>
+              <li>
+                <span for="last_name">Last Name:</span><br>
+                <input tal:attributes="value this_user.last_name" type="text" id="last_name" name="last_name" required/>
+                <span class="form_hint">The last name of the user</span>
+              </li>
+              <li>
+                <span for="email_address">Email Address:</span><br>
+                <input tal:attributes="value this_user.email_address" type="text" id="email_address" name="email_address" required/>
+                <span class="form_hint">The email address of the user</span>
+              </li>
+              <li>
+                <span for="password">Password:</span><br>
+                <input type="password" id="password" name="password" />
+                <span class="form_hint">The password for the user</span>
+              </li>
+            </ul>
+            <ul>
+              <li>
+                <h2>Groups</h2>
+                <span class="required_notification">You are a member of the following local groups</span>
+              </li>
+                <table class="cp_form_group">
                   <tbody>
-                    <tr>
+                    <tr tal:repeat="item groups">
                       <td>
-                        <span for="group_name">Group Name:</span><br>
-                        <input tal:attributes="value group.group_name" type="text" id="group_name" name="group_name" required/>
-                        <span class="form_hint">The full AD name of the group</span>
+                        <input tal:attributes="value item.group_name; checked True if (item.group_name in this_groups) else False" name="group_assingments" type="checkbox"/>
                       </td>
                       <td>
-                        <span for="group_perms">Promote:</span><br>
-                        <input tal:attributes="checked True if ('promote_prd' in group.get_all_assignments()) else False" type="checkbox" name="perms" value="promote_prd">
-                      </td>
-                      <td>
-                        <span for="group_perms">Control Panel:</span><br>
-                        <input tal:attributes="checked True if ('cp' in group.get_all_assignments()) else False" type="checkbox" name="perms" value="cp">
+                        <span tal:content="item.group_name"/>
                       </td>
                     </tr>
                   </tbody>
                 </table>
-
-              </li>
             </ul>
             <ul>
               <li>
@@ -106,20 +147,19 @@
         <p>
         <table>
           <tr>
-            <th>Group ID</th>
-            <th>Group Name</th>
-            <th tal:repeat="perm all_perms" tal:content="perm.perm_name">Promote</th>
-            <th>Created</th>
-            <th>Updated</th>
-            <th>User</th>
+            <th>User ID</th>
+            <th>User Name</th>
+            <th>First Name</th>
+            <th>Last name</th>
+            <th>Email Address</th>
             <th tal:condition="user.cp_auth"></th>
           </tr>
           <tbody tal:repeat="item users">
           <tr class="user">
             <td tal:content="item.user_id">
             <td tal:content="item.user_name">
-            <td tal:content="item.first">
-            <td tal:content="item.last">
+            <td tal:content="item.first_name">
+            <td tal:content="item.last_name">
             <td tal:content="item.email_address">
             <td tal:condition="user.cp_auth"><a href="/cp/user?mode=edit&group_id=0"
                    tal:attributes="href '/cp/user?mode=edit&user_id=%s' % item.user_id">Edit</a></td>
