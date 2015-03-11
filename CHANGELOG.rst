@@ -1,12 +1,18 @@
 Changelog
 =========
 
-Next Release (TBD)
+Wishlist
 ------------------
 
-* feature: Support for listing all staged promotions by application.
+* feature: Defined user role(s) that can promote to prod within a defined day/time window.
+* feature: Support for listing/promoting all staged promotions by application.
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
+
+2.8.4
+~~~~~~~
+* feature: Local users functionality for those who don't want to use
+           Active Directory/LDAP for authentication.
 
 2.8.3
 ~~~~~~~
