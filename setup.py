@@ -29,7 +29,7 @@ requires = [
 
 setup(name='TwonicornWeb',
       version='2.8.4',
-      description='TwonicornWeb',
+      description='Twonicorn web api/ui',
       long_description=README + '\n\n' + CHANGELOG,
       classifiers=[
         "Programming Language :: Python",
@@ -40,7 +40,8 @@ setup(name='TwonicornWeb',
       author='Aaron Bandt',
       author_email='aaron.bandt@citygridmedia.com',
       url='',
-      keywords='Twonicorn web api/ui',
+      license='Apache',
+      keywords='Twonicorn devops automation software deployment',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
