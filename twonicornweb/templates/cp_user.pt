@@ -51,7 +51,7 @@
                   <tbody>
                     <tr tal:repeat="item groups">
                       <td>
-                        <input tal:attributes="value item.group_name" name="group_assingments" type="checkbox"/>
+                        <input tal:attributes="value item.group_name" name="group_assignments" type="checkbox"/>
                       </td>
                       <td>
                         <span tal:content="item.group_name"/>
@@ -121,7 +121,7 @@
                   <tbody>
                     <tr tal:repeat="item groups">
                       <td>
-                        <input tal:attributes="value item.group_name; checked True if (item.group_name in this_groups) else False" name="group_assingments" type="checkbox"/>
+                        <input tal:attributes="value item.group_id; checked True if (item.group_name in this_groups) else False" name="group_assignments" type="checkbox"/>
                       </td>
                       <td>
                         <span tal:content="item.group_name"/>

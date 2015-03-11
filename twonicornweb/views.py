@@ -3,7 +3,6 @@ from pyramid.renderers import get_renderer
 from pyramid.httpexceptions import HTTPFound
 from pyramid.httpexceptions import HTTPServiceUnavailable
 from pyramid.httpexceptions import HTTPForbidden
-from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.httpexceptions import HTTPConflict
 from pyramid.security import remember, forget
 from pyramid.session import signed_serialize, signed_deserialize
@@ -95,10 +94,11 @@ def get_user(request):
     if request.registry.settings['tcw.auth_mode'] == 'ldap':
         try:
             id = request.authenticated_userid
-            (first,last) = format_user(id)
-            groups = groupfinder(id, request)
-            first_last = "%s %s" % (first, last)
-            auth = True
+            if id: 
+                (first,last) = format_user(id)
+                groups = groupfinder(id, request)
+                first_last = "%s %s" % (first, last)
+                auth = True
         except Exception, e:
             log.error("%s (%s)" % (Exception, e))
             (first_last, id, login, groups, first, last, auth, prd_auth, admin_auth, cp_auth) = ('', '', '', '', '', '', False, False, False, False)
@@ -741,8 +741,8 @@ def write_api(request):
     
         except Exception as ex:
             if type(ex).__name__ == 'IntegrityError':
-                logging.info('Artifact location/revision combination '
-                              'is not unique. Nothing to do.')
+                log.info('Artifact location/revision combination '
+                         'is not unique. Nothing to do.')
                 # Rollback
                 DBSession.rollback()
                 return HTTPConflict('Artifact location/revision combination '
@@ -751,7 +751,7 @@ def write_api(request):
                 # Rollback in case there is any error
                 DBSession.rollback()
                 raise
-                logging.error('There was an error updating the db!')
+                log.error('There was an error updating the db!')
 
     if request.matchdict['resource'] == 'artifact_assignment':
 
@@ -773,8 +773,8 @@ def write_api(request):
 
         except Exception as ex:
             if type(ex).__name__ == 'IntegrityError':
-                logging.info('Artifact location/revision combination '
-                              'is not unique. Nothing to do.')
+                log.info('Artifact location/revision combination '
+                         'is not unique. Nothing to do.')
                 # Rollback
                 DBSession.rollback()
                 return HTTPConflict('Artifact location/revision combination '
@@ -783,7 +783,7 @@ def write_api(request):
                 # Rollback in case there is any error
                 DBSession.rollback()
                 raise
-                logging.error('There was an error updating the db!')
+                log.error('There was an error updating the db!')
 
 
 @view_config(route_name='help', permission='view', renderer='twonicornweb:templates/help.pt')
@@ -821,12 +821,12 @@ def view_user(request):
             else:
 
                 # Update
-                logging.info('UPDATE: user_name=%s,first_name=%s,last_name=%s,email_address=%s,password=%s'
-                             % (user_name,
-                                first_name,
-                                last_name,
-                                email_address,
-                                'pass'))
+                log.info('UPDATE: user_name=%s,first_name=%s,last_name=%s,email_address=%s,password=%s'
+                         % (user_name,
+                           first_name,
+                           last_name,
+                           email_address,
+                           'pass'))
                 try:
                     user = DBSession.query(User).filter(User.user_name==user_name).one()
                     user.first_name = first_name
@@ -978,11 +978,11 @@ def view_cp_application(request):
                 else:
 
                     # Update the app
-                    logging.info('UPDATE: application_id=%s,application_name=%s,nodegroup=%s,updated_by=%s'
-                                 % (application_id,
-                                    application_name,
-                                    nodegroup,
-                                    user['login']))
+                    log.info('UPDATE: application_id=%s,application_name=%s,nodegroup=%s,updated_by=%s'
+                             % (application_id,
+                                application_name,
+                                nodegroup,
+                                user['login']))
                     app = DBSession.query(Application).filter(Application.application_id==application_id).one()
                     app.application_name = application_name
                     app.nodegroup = nodegroup
@@ -998,12 +998,12 @@ def view_cp_application(request):
                             pass
 
                         if deploy_id:
-                            logging.info('UPDATE: deploy=%s,deploy_id=%s,artifact_type=%s,deploy_path=%s,package_name=%s'
-                                         % (i,
-                                            deploy_id,
-                                            artifact_types[i],
-                                            deploy_paths[i],
-                                            package_names[i]))
+                            log.info('UPDATE: deploy=%s,deploy_id=%s,artifact_type=%s,deploy_path=%s,package_name=%s'
+                                     % (i,
+                                        deploy_id,
+                                        artifact_types[i],
+                                        deploy_paths[i],
+                                        package_names[i]))
                             dep = DBSession.query(Deploy).filter(Deploy.deploy_id==deploy_id).one()
                             artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
                             dep.artifact_type_id = artifact_type_id.artifact_type_id
@@ -1013,12 +1013,12 @@ def view_cp_application(request):
                             DBSession.flush()
                             
                         else:
-                            logging.info('CREATE: deploy=%s,deploy_id=%s,artifact_type=%s,deploy_path=%s,package_name=%s'
-                                         % (i,
-                                            deploy_id,
-                                            artifact_types[i],
-                                            deploy_paths[i],
-                                            package_names[i]))
+                            log.info('CREATE: deploy=%s,deploy_id=%s,artifact_type=%s,deploy_path=%s,package_name=%s'
+                                     % (i,
+                                        deploy_id,
+                                        artifact_types[i],
+                                        deploy_paths[i],
+                                        package_names[i]))
                             utcnow = datetime.utcnow()
                             artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
                             create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], updated_by=user['login'], created=utcnow, updated=utcnow)
@@ -1092,9 +1092,9 @@ def view_cp_user(request):
                     DBSession.flush()
                     user_id = create.user_id
 
-                    group_assingments = request.POST.getall('group_assingments')
+                    group_assignments = request.POST.getall('group_assignments')
 
-                    for a in group_assingments:
+                    for a in group_assignments:
                         g = DBSession.query(Group).filter(Group.group_name==a).one()
                         create = UserGroupAssignment(group_id=g.group_id, user_id=user_id, updated_by=user['login'], created=utcnow, updated=utcnow)
                         DBSession.add(create)
@@ -1106,7 +1106,7 @@ def view_cp_user(request):
 
             except Exception as ex:
                 if type(ex).__name__ == 'IntegrityError':
-                    logging.info('User already exists in the db, please edit instead.')
+                    log.info('User already exists in the db, please edit instead.')
                     # Rollback
                     DBSession.rollback()
                     # FIXME: Return a nice page
@@ -1148,49 +1148,46 @@ def view_cp_user(request):
                 last_name = request.POST.get('last_name')
                 email_address = request.POST.get('email_address')
                 password = request.POST.get('password')
+                group_assignments = request.POST.getall('group_assignments')
              
-                # Update the group
+                # Update the user
                 utcnow = datetime.utcnow()
-                user = DBSession.query(User).filter(User.user_id==user_id).one()
-                user.user_name = user_name
-                user.first_name = first_name
-                user.last_name = last_name
-                user.email_address = email_address
+                this_user = DBSession.query(User).filter(User.user_id==user_id).one()
+                this_user.user_name = user_name
+                this_user.first_name = first_name
+                this_user.last_name = last_name
+                this_user.email_address = email_address
                 if password:
                     salt = sha512_crypt.genconfig()[17:33]
                     encrypted_password = sha512_crypt.encrypt(password, salt=salt)
-                    user.salt = salt
-                    user.password = encrypted_password
-                user.updated_by=user['login']
+                    this_user.salt = salt
+                    this_user.password = encrypted_password
+                this_user.updated_by=user['login']
                 DBSession.flush()
 
-#                # Update the perms
-#                all_perms = DBSession.query(GroupPerm)
-#                for p in all_perms:
-#                    # insert
-#                    if p.perm_name in perms:
-#                        perm = GroupPerm.get_group_perm_id(p.perm_name)
-#                        q = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id)
-#                        check = DBSession.query(q.exists()).scalar()
-#                        if not check:
-#                            log.info("Adding permission %s for group %s" % (p.perm_name, group_name))
-#                            utcnow = datetime.utcnow()
-#                            create = GroupAssignment(group_id=group_id, perm_id=perm.perm_id, updated_by=user['login'], created=utcnow, updated=utcnow)
-#                            DBSession.add(create)
-#                            DBSession.flush()
-#    
-#                    # delete
-#                    else:
-#                        perm = GroupPerm.get_group_perm_id(p.perm_name)
-#                        q = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id)
-#                        check = DBSession.query(q.exists()).scalar()
-#                        if check:
-#                            log.info("Deleting permission %s for group %s" % (p.perm_name, group_name))
-#                            assignment = DBSession.query(GroupAssignment).filter(GroupAssignment.group_id==group_id, GroupAssignment.perm_id==perm.perm_id).one()
-#                            DBSession.delete(assignment)
-#                            DBSession.flush()
-
-                return_url = '/cp/group'
+                for g in groups:
+                    if str(g.group_id) in group_assignments:
+                        # assign
+                        log.debug("Group: %s is in group assignments" % g.group_name)
+                        q = DBSession.query(UserGroupAssignment).filter(UserGroupAssignment.group_id==g.group_id, UserGroupAssignment.user_id==this_user.user_id)
+                        check = DBSession.query(q.exists()).scalar()
+                        if not check:
+                            log.info("Assigning local user %s to group %s" % (this_user.user_name, g.group_name))
+                            update = UserGroupAssignment(group_id=g.group_id, user_id=user_id, updated_by=user['login'], created=utcnow, updated=utcnow)
+                            DBSession.add(update)
+                            DBSession.flush()
+                    else:
+                        # delete
+                        log.debug("Checking to see if we need to remove assignment for user: %s in group %s" % (this_user.user_name,g.group_name))
+                        q = DBSession.query(UserGroupAssignment).filter(UserGroupAssignment.group_id==g.group_id, UserGroupAssignment.user_id==this_user.user_id)
+                        check = DBSession.query(q.exists()).scalar()
+                        if check:
+                            log.info("Removing local user %s from group %s" % (this_user.user_name, g.group_name))
+                            assignment = DBSession.query(UserGroupAssignment).filter(UserGroupAssignment.group_id==g.group_id, UserGroupAssignment.user_id==this_user.user_id).one()
+                            DBSession.delete(assignment)
+                            DBSession.flush()
+                        
+                return_url = '/cp/user'
                 return HTTPFound(return_url)
 
     return {'layout': site_layout(),
@@ -1267,7 +1264,7 @@ def view_cp_group(request):
 
             except Exception as ex:
                 if type(ex).__name__ == 'IntegrityError':
-                    logging.info('Group already exists in the db, please edit instead.')
+                    log.info('Group already exists in the db, please edit instead.')
                     # Rollback
                     DBSession.rollback()
                     # FIXME: Return a nice page
