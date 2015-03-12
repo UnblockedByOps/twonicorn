@@ -12,10 +12,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+# These inserts are required to prime the db. Would be nice to set up
+# a web interface for this that runs on first startup.
+#
 use twonicorn;
 
-# These inserts are required to prime the db. Perhaps at some point
-# this would be managed in a web interface?
 INSERT INTO lifecycles VALUES (1,'init');
 INSERT INTO lifecycles VALUES (2,'current');
 INSERT INTO lifecycles VALUES (3,'stage');
@@ -45,7 +46,7 @@ INSERT INTO group_perms VALUES (1,'promote_prd',NOW(),NOW());
 INSERT INTO group_perms VALUES (2,'cp',NOW(),NOW());
 
 # Initial Admin password is 'password'
-INSERT INTO users VALUES (1, 'Admin', 'Morgan', 'Freeman', 'admin@yourcompany.com', '$6$Vf7ZmjQarLus/TqT', '$6$Vf7ZmjQarLus/TqT$l5qsqY4ntpX8nEzbm33n5StF5D.93yV3uoh8ucthwFf8mEJBitnGLr5SWhzD2vpkpnAJnUiLl40d0hH24qPOq1', 'Admin', NOW(),NOW());
+INSERT INTO users VALUES (1, 'Admin', 'Local', 'Superuser', 'admin@yourcompany.com', '$6$Vf7ZmjQarLus/TqT', '$6$Vf7ZmjQarLus/TqT$l5qsqY4ntpX8nEzbm33n5StF5D.93yV3uoh8ucthwFf8mEJBitnGLr5SWhzD2vpkpnAJnUiLl40d0hH24qPOq1', 'Admin', NOW(),NOW());
 INSERT INTO groups VALUES (1,'local_admin','Admin',NOW(),NOW());
 INSERT INTO user_group_assignments VALUES (1, 1, 1, 'Admin', NOW(),NOW());
 INSERT INTO group_assignments (group_id,perm_id,user) VALUES (1,1,'Admin');
@@ -53,15 +54,15 @@ INSERT INTO group_assignments (group_id,perm_id,user) VALUES (1,2,'Admin');
 
 # These are the only thing in this file that need to be customized for 
 # an install at another company.
-INSERT INTO repo_urls VALUES (1,1, 'lax1','http://nexus.prod.cs:8081');
-INSERT INTO repo_urls VALUES (2,1, 'vir1','http://nexus.prod.cs:8081');
-INSERT INTO repo_urls VALUES (3,1, 'aws1','https://nexus-prd-aws1.ctgrd.com:4001');
-INSERT INTO repo_urls VALUES (4,2, 'lax1','https://svn.prod.cs');
-INSERT INTO repo_urls VALUES (5,2, 'vir1','https://svn.prod.cs');
-INSERT INTO repo_urls VALUES (6,2, 'aws1','https://svn-prd-aws1.ctgrd.com:4002');
-INSERT INTO repo_urls VALUES (7,3, 'lax1','https://gerrit.ctgrd.com');
-INSERT INTO repo_urls VALUES (8,3, 'vir1','https://gerrit.ctgrd.com');
-INSERT INTO repo_urls VALUES (9,3, 'aws1','https://gerrit-prd-aws1.ctgrd.com:4003');
-INSERT INTO repo_urls VALUES (10,4, 'lax1','http://pip.ctgrd.com/simple/');
-INSERT INTO repo_urls VALUES (11,4, 'vir1','http://pip.ctgrd.com/simple/');
-INSERT INTO repo_urls VALUES (12,4, 'aws1','http://pip.ctgrd.com/simple/');
+INSERT INTO repo_urls VALUES (1,1, 'dfw','http://nexus.dfw.mycompany.com');
+INSERT INTO repo_urls VALUES (2,1, 'sfo','http://nexus.sfo.mycompany.com');
+INSERT INTO repo_urls VALUES (3,1, 'ec2','https://nexus.ec2.mycompany.com');
+INSERT INTO repo_urls VALUES (4,2, 'dfw','https://subversion.dfw.mycompany.com');
+INSERT INTO repo_urls VALUES (5,2, 'sfo','https://subversion.sfo.mycompany.com');
+INSERT INTO repo_urls VALUES (6,2, 'ec2','https://subversion.ec2.mycompany.com');
+INSERT INTO repo_urls VALUES (7,3, 'dfw','https://git.dfw.mycompany.com');
+INSERT INTO repo_urls VALUES (8,3, 'sfo','https://git.sfo.mycompany.com');
+INSERT INTO repo_urls VALUES (9,3, 'ec2','https://git.ec2.mycompany.com');
+INSERT INTO repo_urls VALUES (10,4, 'dfw','http://pip.dfw.mycompany.com/simple/');
+INSERT INTO repo_urls VALUES (11,4, 'sfo','http://pip.sfo.mycompany.com/simple/');
+INSERT INTO repo_urls VALUES (12,4, 'ec2','http://pip.ec2.mycompany.com/simple/');
