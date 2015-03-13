@@ -40,8 +40,6 @@ requires = [
     'passlib==1.6.2',
     ]
 
-dependency_links = ['http://cdn.mysql.com/Downloads/Connector-Python/mysql-connector-python-2.0.3.zip#md5=9fda73a7f69e769e6a545c98b6739514']
-
 setup(name='TwonicornWeb',
       version='2.8.5',
       description='Twonicorn web api/ui',
@@ -61,6 +59,7 @@ setup(name='TwonicornWeb',
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
+      dependency_links = ['http://cdn.mysql.com/Downloads/Connector-Python/mysql-connector-python-2.0.3.zip#md5=9fda73a7f69e769e6a545c98b6739514'],
       tests_require=requires,
       test_suite="TwonicornWeb",
       entry_points="""\
