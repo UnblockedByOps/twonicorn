@@ -30,7 +30,7 @@ requires = [
     'Pygments==1.6',
     'waitress==0.8.9',
     'SQLAlchemy==0.9.7',
-    '--allow-external mysql-connector-python mysql-connector-python==2.0.3',
+    'python mysql-connector-python==2.0.3',
     'transaction==1.4.3',
     'zope.sqlalchemy==0.7.5',
     'python-ldap==2.4.16',
@@ -39,6 +39,8 @@ requires = [
     'arrow==0.4.4',
     'passlib==1.6.2',
     ]
+
+dependency_links = ['http://cdn.mysql.com/Downloads/Connector-Python/mysql-connector-python-2.0.3.zip#md5=9fda73a7f69e769e6a545c98b6739514']
 
 setup(name='TwonicornWeb',
       version='2.8.5',
