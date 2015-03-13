@@ -299,6 +299,8 @@ class GroupAssignment(Base):
         q = q.join(Group, GroupAssignment.group_id == Group.group_id)
         q = q.join(GroupPerm, GroupAssignment.perm_id == GroupPerm.perm_id)
         q = q.filter(GroupPerm.perm_name==perm_name)
+        for f in q:
+            print f.__dict__
         return q.all()
 
 
