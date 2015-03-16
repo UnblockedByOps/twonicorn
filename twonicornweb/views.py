@@ -133,6 +133,7 @@ def get_user(request):
 
     try:
         login = validate_username_cookie(request.cookies['un'], request.registry.settings['tcw.cookie_token'])
+        login = str(login)
     except:
         return HTTPFound('/logout?message=Your cookie has been tampered with. You have been logged out')
 
@@ -141,12 +142,14 @@ def get_user(request):
 
     # Check if the user is authorized to do stuff to prd
     for a in group_perms['promote_prd_groups']:
+        a = str(a)
         if a in groups:
             promote_prd_auth = True
             break
 
     # Check if the user is authorized for cp
     for a in group_perms['cp_groups']:
+        a = str(a)
         if a in groups:
             cp_auth = True
             break
@@ -176,13 +179,12 @@ def get_group_permissions():
     group_perms = {}
 
     ga = GroupAssignment.get_assignments_by_perm('promote_prd')
-
-    for a in range(len(ga)):
-        promote_prd_groups.append(ga[a].group.group_name)
+    for a in ga:
+        promote_prd_groups.append(a.group.group_name)
 
     ga = GroupAssignment.get_assignments_by_perm('cp')
-    for a in range(len(ga)):
-        cp_groups.append(ga[a].group.group_name)
+    for a in ga:
+        cp_groups.append(a.group.group_name)
 
     group_perms['promote_prd_groups'] = promote_prd_groups
     group_perms['cp_groups'] = cp_groups
@@ -829,9 +831,9 @@ def view_user(request):
             email_address = request.POST['email_address']
             password = request.POST['password']
 
-            # Need some security checking here
+            # FIXME: Need some security checking here
             if user_name != user['login']:
-                print "Naughty monkey"
+                log.error('Bad person attemting to do bad things to:' % user_name)
             else:
 
                 # Update
@@ -840,14 +842,14 @@ def view_user(request):
                            first_name,
                            last_name,
                            email_address,
-                           'pass'))
+                           '<redacted>'))
                 try:
                     user = DBSession.query(User).filter(User.user_name==user_name).one()
                     user.first_name = first_name
                     user.last_name = last_name
                     user.email_address = email_address
                     if password:
-                        print "changing password"
+                        log.info('Changing password for: user_name=%s password=<redacted>' % user_name)
                         salt = sha512_crypt.genconfig()[17:33]
                         encrypted_password = sha512_crypt.encrypt(password, salt=salt)
                         user.salt = salt
@@ -914,7 +916,6 @@ def view_cp_application(request):
         artifact_types = q.all()
     except Exception, e:
         log.error("Failed to retrive data on api call (%s)" % (e))
-        # FIXME
         return log.error
 
     if mode == 'add':
