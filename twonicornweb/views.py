@@ -81,7 +81,6 @@ def local_authenticate(login, password):
         q = DBSession.query(User)
         q = q.filter(User.user_name == login)
         db_user = q.one()
-        print "DB USER: ", db_user.__dict__
     except Exception, e:
         log.info("%s (%s)" % (Exception, e))
         pass
@@ -120,7 +119,6 @@ def get_user(request):
     else:
         try:
             id = request.authenticated_userid
-            print "ID is :", id
             user = DBSession.query(User).filter(User.user_name==id).one()
             first = user.first_name
             last = user.last_name
@@ -833,9 +831,9 @@ def view_user(request):
             email_address = request.POST['email_address']
             password = request.POST['password']
 
-            # Need some security checking here
+            # FIXME: Need some security checking here
             if user_name != user['login']:
-                print "Naughty monkey"
+                log.error('Bad person attemting to do bad things to:' % user_name)
             else:
 
                 # Update
@@ -844,14 +842,14 @@ def view_user(request):
                            first_name,
                            last_name,
                            email_address,
-                           'pass'))
+                           '<redacted>'))
                 try:
                     user = DBSession.query(User).filter(User.user_name==user_name).one()
                     user.first_name = first_name
                     user.last_name = last_name
                     user.email_address = email_address
                     if password:
-                        print "changing password"
+                        log.info('Changing password for: user_name=%s password=<redacted>' % user_name)
                         salt = sha512_crypt.genconfig()[17:33]
                         encrypted_password = sha512_crypt.encrypt(password, salt=salt)
                         user.salt = salt
@@ -918,7 +916,6 @@ def view_cp_application(request):
         artifact_types = q.all()
     except Exception, e:
         log.error("Failed to retrive data on api call (%s)" % (e))
-        # FIXME
         return log.error
 
     if mode == 'add':
