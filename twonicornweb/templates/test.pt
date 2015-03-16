@@ -21,59 +21,6 @@
   </head>
   <body>
 
-    <div id="tree">
-      <img src='/static/bg.png'>
-    </div>
-
-    <div id="flys"></div>
-
-    <div id="ja">
-      <img class="center" src='/static/j_a.png'>
-    </div>
-
-    <div id="bannerl">
-      <img class="center" src='/static/banner_l.png'>
-    </div>
-
-    <div id="our_story_nav"><a href='/'><img src='/static/our_story_nav.png' onmouseover="this.src='/static/our_story_nav_o.png'" onmouseout="this.src='/static/our_story_nav.png'"/></a></div>
-    <div id="directions_nav"><a href='/directions/'><img src='/static/directions_nav.png' onmouseover="this.src='/static/directions_nav_o.png'" onmouseout="this.src='/static/directions_nav.png'"/></a></div>
-    <div id="accommodations_nav"><a href='/hotel/'><img src='/static/accommodations_nav.png' onmouseover="this.src='/static/accommodations_nav_o.png'" onmouseout="this.src='/static/accommodations_nav.png'"/></a></div>
-    <div id="schedule_nav"><a href='/schedule/'><img src='/static/schedule_nav.png' onmouseover="this.src='/static/schedule_nav_o.png'" onmouseout="this.src='/static/schedule_nav.png'"/></a></div>
-    <div id="registry_nav"><a href='/registry/'><img src='/static/registry_nav.png' onmouseover="this.src='/static/registry_nav_o.png'" onmouseout="this.src='/static/registry_nav.png'"/></a></div>
-
-    <div id="banners">
-      <img class="center" src='/static/banner_s.png'>
-    </div>
-
-    <div id="our_story_h">
-      <img src='/static/our_story_h.png'>
-    </div>
-
-    <div id="main_top">
-      <img src='/static/scroll_top.png'>
-    </div>
-    <div id="main">
-      <h3>April 18, 2013</h3>
-      <p>
-        The story of Julie and Aaron began when she winked at him.
-
-      <h3>April 25, 2013</h3>
-      <p>
-        They agreed to meet at Edendale in Silverlake for a drink. Lucky for Julie, Aaron decided to kiss her at the end of the night.
-      
-      <h3>May 5, 2013</h3>
-      <p>
-        A few days later they went on the best date of their lives which started at Houston's by Aaron's old place in Pasadena.  Next came a walk down the street to The Blind Donkey whiskey bar.  There Aaron officially won Julie's heart by reciting the entire script of "The Princess Bride".  Finally, Julie stole Aaron's heart by interpretive dancing in his living room.
-      
-      <h3>March 30, 2014</h3>
-      <p>
-        By the next spring Julie and Aaron had shared a lot of love, dreams, laughter, amazing food and the good life in general.  Aaron made Julie's dreams come true when he constructed a life-size scene from one of their favorite songs (....marriage in an orange grove...) and asked her to spend the rest of their lives together.
-      
-      <p>
-        She said yes! And together, they look forward to making that promise as husband and wife at the greatest party, with all their favorite people, on June 6th.
-
-    </div>
-
   </body>
 </html>
 
