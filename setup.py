@@ -41,7 +41,7 @@ requires = [
     ]
 
 dependency_links = [
-    'http://cdn.mysql.com/Downloads/Connector-Python/mysql-connector-python-1.2.3.zip#md5=6d42998cfec6e85b902d4ffa5a35ce86'
+    'http://cdn.mysql.com/Downloads/Connector-Python/mysql-connector-python-1.2.3.zip#md5=6d42998cfec6e85b902d4ffa5a35ce86',
     'https://github.com/CityGrid/pyramid_ldap'
     ]
 
