@@ -40,7 +40,7 @@ class tFacter:
 
     def __init__(self):
         # need this for ct_*
-        os.environ["FACTERLIB"] = "/var/lib/puppet/lib/facter"
+        os.environ["FACTERLIB"] = "/var/lib/puppet/lib/facter:/opt/twonicorn/conf/facter"
         p = subprocess.Popen(['facter'], stdout=subprocess.PIPE)
         p.wait()
         self.facts = p.stdout.readlines()
@@ -59,10 +59,14 @@ class tSvn:
         self.url = url
 
         # Set up our client object
-        self.client = pysvn.Client()
-        self.client.callback_ssl_server_trust_prompt = (
-            self.ssl_server_trust_prompt)
-        self.client.callback_get_login = self.get_login
+        try:
+            self.client = pysvn.Client()
+            self.client.callback_ssl_server_trust_prompt = (
+                self.ssl_server_trust_prompt)
+            self.client.callback_get_login = self.get_login
+        except NameError:
+            logging.error('pysn module is absent, no svn support')
+
 
     def ssl_server_trust_prompt(self, trust_dict):
         # we know what we're connecting to, no need to validate
