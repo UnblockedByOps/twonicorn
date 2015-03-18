@@ -22,19 +22,14 @@ import ConfigParser
 import re
 import subprocess
 import git
-import shutil
-import zipfile
-import datetime
-import ast
-import urllib2
-import json
 import requests
 from requests.auth import HTTPBasicAuth
 
-# FIXME: pysvn is gross, so allow it to fail if we don't care about svn.
 try:
     import pysvn
-except:
+except ImportError:
+    # pysvn is not friendly, no pip or easy_install option.
+    # If import fails, we don't have svn support.
     pass
 
 # requests is chatty

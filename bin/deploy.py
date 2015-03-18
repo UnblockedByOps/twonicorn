@@ -23,13 +23,19 @@ import ConfigParser
 import json
 import urllib2
 import git
-import pysvn
 import shutil
 import zipfile
 import tarfile
 import datetime
 import ast
 import re
+
+try:
+    import pysvn
+except ImportError:
+    # pysvn is not friendly, no pip or easy_install option.
+    # If import fails, we don't have svn support.
+    pass
 
 
 class tSvn:
