@@ -88,7 +88,7 @@ class tFacter:
 
     def __init__(self):
         # need this for ct_*
-        os.environ["FACTERLIB"] = "/var/lib/puppet/lib/facter:/opt/twonicorn/conf/facter"
+        os.environ["FACTERLIB"] = "/var/lib/puppet/lib/facter:/app/twonicorn/conf/facter"
         p = subprocess.Popen(['facter'], stdout=subprocess.PIPE)
         p.wait()
         self.facts = p.stdout.readlines()
