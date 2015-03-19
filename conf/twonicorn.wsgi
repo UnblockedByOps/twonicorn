@@ -13,12 +13,12 @@
 #  limitations under the License.
 #
 import os
-# CHANGEME - if you don't install in /opt
-activate_this = "/opt/twonicorn_web/venv/bin/activate_this.py"
+# CHANGEME - if you don't install in /app
+activate_this = "/app/twonicorn_web/venv/bin/activate_this.py"
 execfile(activate_this, dict(__file__=activate_this))
 
 from pyramid.paster import get_app, setup_logging
-# CHANGEME - if you don't install in /opt
-ini_path = '/opt/twonicorn_web/conf/twonicorn-web.ini'
+# CHANGEME - if you don't install in /app
+ini_path = '/app/twonicorn_web/conf/twonicorn-web.ini'
 setup_logging(ini_path)
 application = get_app(ini_path, 'main')
