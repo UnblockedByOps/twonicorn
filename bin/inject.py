@@ -191,10 +191,10 @@ def api_submit(request, user=None, password=None):
 
     if user:
         logging.info('Submitting data to API: %s' % api_url)
-        r = requests.put(api_url, verify=True, auth=HTTPBasicAuth(user, password))
+        r = requests.put(api_url, verify=verify_ssl_cert, auth=HTTPBasicAuth(user, password))
     else:
         logging.info('Requesting data from API: %s' % api_url)
-        r = requests.get(api_url, verify=True)
+        r = requests.get(api_url, verify=verify_ssl_cert)
 
     if r.status_code == requests.codes.ok:
 
@@ -530,9 +530,11 @@ def main(argv):
     global api_user
     global api_pass
     global api_protocol
+    global verify_ssl_cert
     api_host = config.get('main', 'tcw.host')
     api_user = config.get('main', 'tcw.api_user')
     api_protocol = config.get('main', 'tcw.api_protocol')
+    verify_ssl_cert = config.get('main', 'tcw.verify_ssl_cert')
     api_pass = secrets_config.get('main', 'tcw.api_pass')
 
     if options.verbose:
