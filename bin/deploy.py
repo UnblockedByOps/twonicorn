@@ -283,11 +283,19 @@ def dl_artifact_http(tmp_dir=None, download_url=None, revision=None):
     logging.info('Downloading revision: %s artifact: %s'
                  % (revision,
                     download_url))
+    artifact = download_url.rsplit('/', 1)
+    artifact = artifact[1]
+
+    if not os.path.exists(tmp_dir):
+        logging.debug('Creating dir: %s' % tmp_dir)
+        os.makedirs(tmp_dir)
+
     logging.debug('Downloading to dir: %s' % tmp_dir)
-    subprocess.check_call(["wget",
-                           "-q",
-                           "--no-check-certificate",
-                           "--directory-prefix=" + tmp_dir + '/',
+    subprocess.check_call(["curl",
+                           "-s",
+                           "-k",
+                           "-o",
+                           tmp_dir + '/' + artifact,
                            download_url])
 
 
