@@ -469,6 +469,7 @@ def view_promote(request):
 
     page_title = 'Promote'
     user = get_user(request)
+    office_loc = request.registry.settings['tcw.office_loc']
 
     error = ''
     message = ''
@@ -497,7 +498,7 @@ def view_promote(request):
         to_state = '2'
 
     try:
-        promote = Artifact.get_promotion(to_env, deploy_id, artifact_id)
+        promote = Artifact.get_promotion(office_loc,to_env, deploy_id, artifact_id)
     except Exception, e:
         conn_err_msg = e
         return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
@@ -642,6 +643,20 @@ def view_api(request):
             each = {}
             each['env_id'] = e.env_id
             each['name'] = e.name
+            results.append(each)
+
+    if request.matchdict['resource'] == 'repo_types':
+        try:
+            q = DBSession.query(RepoType)
+            repo_types = q.all()
+        except Exception, e:
+            log.error("Failed to retrive data on api call (%s)" % (e))
+            return results
+
+        for r in repo_types:
+            each = {}
+            each['repo_type_id'] = r.repo_type_id
+            each['name'] = r.name
             results.append(each)
 
     if request.matchdict['resource'] == 'artifact_types':

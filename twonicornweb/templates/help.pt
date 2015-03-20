@@ -48,6 +48,9 @@
     <p>
       Configured repo urls:<br>
     <a tal:attributes="href host_url + '/api/repo_urls'" tal:content="host_url + '/api/repo_urls'">/api</a>
+    <p>
+      Configured repo types:<br>
+    <a tal:attributes="href host_url + '/api/repo_types'" tal:content="host_url + '/api/repo_types'">/api</a>
 
     <h3>HTTP PUT Examples</h3>
 
