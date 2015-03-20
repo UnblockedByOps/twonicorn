@@ -107,6 +107,7 @@ class ArtifactAssignment(Base):
 
     @hybrid_property
     def pretty_url(self):
+        # FIXME: This needs to be configurable somehow
         url_location = self.artifact.repo.get_url('lax1').url + self.artifact.location
         if self.artifact.repo.name == 'gerrit':
             r = url_location.rpartition('/')
