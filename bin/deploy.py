@@ -291,12 +291,22 @@ def dl_artifact_http(tmp_dir=None, download_url=None, revision=None):
         os.makedirs(tmp_dir)
 
     logging.debug('Downloading to dir: %s' % tmp_dir)
-    subprocess.check_call(["curl",
-                           "-s",
-                           "-k",
-                           "-o",
-                           tmp_dir + '/' + artifact,
-                           download_url])
+    if verify_ssl:
+        subprocess.check_call(["curl",
+                               "-s",
+                               "--cacert",
+                               ca_bundle_file,
+                               "-o",
+                               tmp_dir + '/' + artifact,
+                               download_url])
+    else:
+        logging.warn('ssl cert check disabled for download URL: %s' % download_url)
+        subprocess.check_call(["curl",
+                               "-s",
+                               "-k",
+                               "-o",
+                               tmp_dir + '/' + artifact,
+                               download_url])
 
 
 def get_py_version(location, package_name):
@@ -584,6 +594,13 @@ def main(argv):
     # Get the config
     config = ConfigParser.ConfigParser()
     config.read(options.config_file)
+    # Globalizing these. Otherwise will be passing them all over the
+    # place for no reason.
+    global verify_ssl
+    global ca_bundle_file
+    verify_ssl = bool(config.get('deploy', 'verify_ssl'))
+    ca_bundle_file = config.get('deploy', 'ca_bundle_file')
+
     tcw_host = config.get('main', 'tcw.host')
     manifest_dir = config.get('main', 'manifest.dir')
     tmp_dir = config.get('main', 'tmp.dir')
