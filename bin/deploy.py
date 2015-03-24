@@ -125,7 +125,8 @@ def get_application_deploys(tcw_host, application_id, ct_env, ct_loc):
 
     # Fetch the list of deploys for the application
     # This becomes the api call
-    api_url = ('https://'
+    api_url = (api_protocol
+               + '://'
                + tcw_host
                + '/api/application?'
                + 'id='
@@ -598,6 +599,8 @@ def main(argv):
     # place for no reason.
     global verify_ssl
     global ca_bundle_file
+    global api_protocol
+    api_protocol = config.get('main', 'tcw.api_protocol')
     verify_ssl = bool(config.get('deploy', 'verify_ssl'))
     ca_bundle_file = config.get('deploy', 'ca_bundle_file')
 
