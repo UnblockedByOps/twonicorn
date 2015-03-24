@@ -9,10 +9,15 @@ Wishlist
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+2.8.5
+~~~~~~~
+* feature: fixing default urls and making deploy.py look at it's own secrets conf
+* feature: making svn user/pass a config item
+* bugfix: catching invalid location
+
 2.8.4
 ~~~~~~~
-* feature: Local users functionality for those who don't want to use
-           Active Directory/LDAP for authentication.
+* feature: Local users functionality for those who don't want to use Active Directory/LDAP for authentication.
 
 2.8.3
 ~~~~~~~
@@ -28,18 +33,15 @@ Wishlist
 2.8.1
 ~~~~~~~
 * bugfix: Chaging the artifact type for a deploy not updating db.
-* bugfix: Unable to get artifact type from db if there is not
-          an existing artifact assignment.
+* bugfix: Unable to get artifact type from db if there is not an existing artifact assignment.
 
 2.8
 ~~~~~~~
-* feature: Moving group management to the db. Additions to the control
-           panel to manage them.
+* feature: Moving group management to the db. Additions to the control panel to manage them.
 
 2.7
 ~~~~~~~
-* feature: Control panel for admins, allows to create and edit applications
-           and deploys within the UI.
+* feature: Control panel for admins, allows to create and edit applications and deploys within the UI.
 
 2.6
 ~~~~~~~
@@ -95,8 +97,7 @@ Wishlist
 
 1.1
 ~~~~~~~
-* Support for performing promotions via the UI. Replaces the functionality of
-  the promote jenkins job.
+* Support for performing promotions via the UI. Replaces the functionality of the promote jenkins job.
 
 1.0
 ~~~~~~~
