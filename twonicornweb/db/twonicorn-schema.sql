@@ -227,7 +227,7 @@ DROP TABLE IF EXISTS `repo_urls`;
 CREATE TABLE `repo_urls` (
   `repo_url_id`           mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `repo_id`               mediumint(9) UNSIGNED NOT NULL,
-  `ct_loc`                char(4) COLLATE utf8_bin NOT NULL,
+  `ct_loc`                char(25) COLLATE utf8_bin NOT NULL,
   `url`                   varchar(75) COLLATE utf8_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 CREATE UNIQUE INDEX idx_repo_url_unique on repo_urls (repo_id, ct_loc);
