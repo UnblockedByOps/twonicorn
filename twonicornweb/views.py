@@ -469,6 +469,7 @@ def view_promote(request):
 
     page_title = 'Promote'
     user = get_user(request)
+    office_loc = request.registry.settings['tcw.office_loc']
 
     error = ''
     message = ''
@@ -497,7 +498,7 @@ def view_promote(request):
         to_state = '2'
 
     try:
-        promote = Artifact.get_promotion(to_env, deploy_id, artifact_id)
+        promote = Artifact.get_promotion(office_loc,to_env, deploy_id, artifact_id)
     except Exception, e:
         conn_err_msg = e
         return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
@@ -574,11 +575,17 @@ def view_api(request):
             each = {}
             a = d.get_assignment(env, lifecycle)
             if a:
+                try:
+                    each['download_url'] = a.artifact.repo.get_url(loc).url + a.artifact.location
+                # FIXME: Better to return empty json?
+                except AttributeError:
+                    each['download_url'] = 'Invalid location'
+                    results.append(each)
+                    continue
                 each['deploy_id'] = d.deploy_id
                 each['package_name'] = d.package_name
                 each['artifact_assignment_id'] = a.artifact_assignment_id
                 each['deploy_path'] = d.deploy_path
-                each['download_url'] = a.artifact.repo.get_url(loc).url + a.artifact.location
                 each['revision'] = a.artifact.revision[:8]
                 each['artifact_type'] = d.type.name
                 each['repo_type'] = a.artifact.repo.type.name
@@ -598,16 +605,21 @@ def view_api(request):
         each = {}
         a = deploy.get_assignment(env, lifecycle)
         if a:
-            each['deploy_id'] = deploy.deploy_id
-            each['package_name'] = deploy.package_name
-            each['artifact_assignment_id'] = a.artifact_assignment_id
-            each['deploy_path'] = deploy.deploy_path
-            each['download_url'] = a.artifact.repo.get_url(loc).url + a.artifact.location
-            each['revision'] = a.artifact.revision[:8]
-            each['artifact_type'] = deploy.type.name
-            each['repo_type'] = a.artifact.repo.type.name
-            each['repo_name'] = a.artifact.repo.name
-            each['lifecycle'] = a.lifecycle.name
+            try:
+                each['download_url'] = a.artifact.repo.get_url(loc).url + a.artifact.location
+                each['deploy_id'] = deploy.deploy_id
+                each['package_name'] = deploy.package_name
+                each['artifact_assignment_id'] = a.artifact_assignment_id
+                each['deploy_path'] = deploy.deploy_path
+                each['revision'] = a.artifact.revision[:8]
+                each['artifact_type'] = deploy.type.name
+                each['repo_type'] = a.artifact.repo.type.name
+                each['repo_name'] = a.artifact.repo.name
+                each['lifecycle'] = a.lifecycle.name
+            # FIXME: Better to return empty json?
+            except AttributeError:
+                each['download_url'] = 'Invalid location'
+                results.append(each)
         results.append(each)
 
     if request.matchdict['resource'] == 'artifact':
@@ -620,14 +632,18 @@ def view_api(request):
             return results
 
         each = {}
-        each['artifact_id'] = artifact.artifact_id
-        each['branch'] = artifact.branch
-        each['created'] = artifact.localize_date
-        each['download_url'] = artifact.repo.get_url(loc).url + artifact.location
-        each['repo_id'] = artifact.repo_id
-        each['repo_type'] = artifact.repo.type.name
-        each['revision'] = artifact.revision
-        each['valid'] = artifact.valid
+        try:
+            each['download_url'] = artifact.repo.get_url(loc).url + artifact.location
+            each['artifact_id'] = artifact.artifact_id
+            each['branch'] = artifact.branch
+            each['created'] = artifact.localize_date_created
+            each['repo_id'] = artifact.repo_id
+            each['repo_type'] = artifact.repo.type.name
+            each['revision'] = artifact.revision
+            each['valid'] = artifact.valid
+        # FIXME: Better to return empty json?
+        except AttributeError:
+            each['download_url'] = 'Invalid location'
         results.append(each)
 
     if request.matchdict['resource'] == 'envs':
@@ -642,6 +658,20 @@ def view_api(request):
             each = {}
             each['env_id'] = e.env_id
             each['name'] = e.name
+            results.append(each)
+
+    if request.matchdict['resource'] == 'repo_types':
+        try:
+            q = DBSession.query(RepoType)
+            repo_types = q.all()
+        except Exception, e:
+            log.error("Failed to retrive data on api call (%s)" % (e))
+            return results
+
+        for r in repo_types:
+            each = {}
+            each['repo_type_id'] = r.repo_type_id
+            each['name'] = r.name
             results.append(each)
 
     if request.matchdict['resource'] == 'artifact_types':

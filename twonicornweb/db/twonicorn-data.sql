@@ -54,15 +54,20 @@ INSERT INTO group_assignments (group_id,perm_id,user) VALUES (1,2,'Admin');
 
 # These are the only thing in this file that need to be customized for 
 # an install at another company.
-INSERT INTO repo_urls VALUES (1,1, 'dfw','http://nexus.dfw.mycompany.com');
-INSERT INTO repo_urls VALUES (2,1, 'sfo','http://nexus.sfo.mycompany.com');
-INSERT INTO repo_urls VALUES (3,1, 'ec2','https://nexus.ec2.mycompany.com');
-INSERT INTO repo_urls VALUES (4,2, 'dfw','https://subversion.dfw.mycompany.com');
-INSERT INTO repo_urls VALUES (5,2, 'sfo','https://subversion.sfo.mycompany.com');
-INSERT INTO repo_urls VALUES (6,2, 'ec2','https://subversion.ec2.mycompany.com');
-INSERT INTO repo_urls VALUES (7,3, 'dfw','https://git.dfw.mycompany.com');
-INSERT INTO repo_urls VALUES (8,3, 'sfo','https://git.sfo.mycompany.com');
-INSERT INTO repo_urls VALUES (9,3, 'ec2','https://git.ec2.mycompany.com');
-INSERT INTO repo_urls VALUES (10,4, 'dfw','http://pip.dfw.mycompany.com/simple/');
-INSERT INTO repo_urls VALUES (11,4, 'sfo','http://pip.sfo.mycompany.com/simple/');
-INSERT INTO repo_urls VALUES (12,4, 'ec2','http://pip.ec2.mycompany.com/simple/');
+INSERT INTO repo_urls VALUES (1,1, 'default','http://nexus.dfw.mycompany.com');
+INSERT INTO repo_urls VALUES (2,2, 'default','https://subversion.dfw.mycompany.com');
+INSERT INTO repo_urls VALUES (3,3, 'default','https://git.dfw.mycompany.com');
+INSERT INTO repo_urls VALUES (4,4, 'default','http://pip.dfw.mycompany.com/simple/');
+
+INSERT INTO repo_urls VALUES (5,1, 'dfw','http://nexus.dfw.mycompany.com');
+INSERT INTO repo_urls VALUES (6,1, 'sfo','http://nexus.sfo.mycompany.com');
+INSERT INTO repo_urls VALUES (7,1, 'ec2','https://nexus.ec2.mycompany.com');
+INSERT INTO repo_urls VALUES (8,2, 'dfw','https://subversion.dfw.mycompany.com');
+INSERT INTO repo_urls VALUES (9,2, 'sfo','https://subversion.sfo.mycompany.com');
+INSERT INTO repo_urls VALUES (10,2, 'ec2','https://subversion.ec2.mycompany.com');
+INSERT INTO repo_urls VALUES (11,3, 'dfw','https://git.dfw.mycompany.com');
+INSERT INTO repo_urls VALUES (12,3, 'sfo','https://git.sfo.mycompany.com');
+INSERT INTO repo_urls VALUES (13,3, 'ec2','https://git.ec2.mycompany.com');
+INSERT INTO repo_urls VALUES (14,4, 'dfw','http://pip.dfw.mycompany.com/simple/');
+INSERT INTO repo_urls VALUES (15,4, 'sfo','http://pip.sfo.mycompany.com/simple/');
+INSERT INTO repo_urls VALUES (16,4, 'ec2','http://pip.ec2.mycompany.com/simple/');

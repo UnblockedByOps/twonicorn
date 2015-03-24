@@ -79,13 +79,13 @@ class Artifact(Base):
     created     = Column(TIMESTAMP, nullable=False)
 
     @hybrid_method
-    def get_promotion(self, env, deploy_id, artifact_id):
+    def get_promotion(self, office_loc, env, deploy_id, artifact_id):
         q = DBSession.query(Artifact)
         q = q.filter(Lifecycle.name == 'current')
         q = q.filter(Deploy.deploy_id == '%s' % deploy_id)
         q = q.filter(Env.name == '%s' % env)
         q = q.filter(Artifact.artifact_id == '%s' % artifact_id)
-        q = q.filter(RepoUrl.ct_loc == 'lax1')
+        q = q.filter(RepoUrl.ct_loc == '%s' % office_loc)
         return q.first()
 
     @hybrid_property
@@ -107,7 +107,8 @@ class ArtifactAssignment(Base):
 
     @hybrid_property
     def pretty_url(self):
-        url_location = self.artifact.repo.get_url('lax1').url + self.artifact.location
+        # FIXME: This needs to be configurable somehow
+        url_location = self.artifact.repo.get_url('default').url + self.artifact.location
         if self.artifact.repo.name == 'gerrit':
             r = url_location.rpartition('/')
             return r[0] + r[1] + 'git/gitweb.cgi?p=' + r[2] + '.git;a=summary'
@@ -299,8 +300,6 @@ class GroupAssignment(Base):
         q = q.join(Group, GroupAssignment.group_id == Group.group_id)
         q = q.join(GroupPerm, GroupAssignment.perm_id == GroupPerm.perm_id)
         q = q.filter(GroupPerm.perm_name==perm_name)
-        for f in q:
-            print f.__dict__
         return q.all()
 
 
