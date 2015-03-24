@@ -48,17 +48,14 @@ class tSvn:
             self.client = pysvn.Client()
             self.client.callback_ssl_server_trust_prompt = (
                 self.ssl_server_trust_prompt)
-            self.client.callback_get_login = self.get_login
+            self.client.set_default_username(svn_user)
+            self.client.set_default_password(svn_pass)
         except NameError:
             logging.error('pysn module is absent, no svn support')
 
     def ssl_server_trust_prompt(self, trust_dict):
         # we know what we're connecting to, no need to validate
         return (True, 0, True)
-
-    def get_login(self, realm, username, may_save):
-        # we know what we're connecting to, no need to validate
-        return (True, "hudson", "hudson", False)
 
     def dl_artifact_svn_conf(self, tmp_dir=None, location=None, revision=None):
 
@@ -600,9 +597,13 @@ def main(argv):
     global verify_ssl
     global ca_bundle_file
     global api_protocol
+    global svn_user
+    global svn_pass
     api_protocol = config.get('main', 'tcw.api_protocol')
     verify_ssl = bool(config.get('deploy', 'verify_ssl'))
     ca_bundle_file = config.get('deploy', 'ca_bundle_file')
+    svn_user = config.get('main', 'tcw.svn_user')
+    svn_pass = config.get('main', 'tcw.svn_pass')
 
     tcw_host = config.get('main', 'tcw.host')
     manifest_dir = config.get('main', 'manifest.dir')

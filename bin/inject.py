@@ -63,7 +63,8 @@ class tSvn:
             self.client = pysvn.Client()
             self.client.callback_ssl_server_trust_prompt = (
                 self.ssl_server_trust_prompt)
-            self.client.callback_get_login = self.get_login
+            self.client.set_default_username(svn_user)
+            self.client.set_default_password(svn_pass)
         except NameError:
             logging.error('pysn module is absent, no svn support')
 
@@ -71,11 +72,6 @@ class tSvn:
     def ssl_server_trust_prompt(self, trust_dict):
         # we know what we're connecting to, no need to validate
         return (True, 0, True)
-
-    def get_login(self, realm, username, may_save):
-        # we know what we're connecting to, no need to validate
-        # FIXME: read from conf
-        return (True, "hudson", "hudson", False)
 
     def cmp_revision_svn(self, revision=None, db_rev=None, env=None):
 
@@ -531,11 +527,16 @@ def main(argv):
     global api_pass
     global api_protocol
     global verify_ssl
+    global svn_user
+    global svn_pass
     api_host = config.get('main', 'tcw.host')
     api_user = config.get('main', 'tcw.api_user')
     api_protocol = config.get('main', 'tcw.api_protocol')
     verify_ssl = bool(config.get('inject', 'verify_ssl'))
     api_pass = secrets_config.get('main', 'tcw.api_pass')
+    svn_user = config.get('main', 'tcw.svn_user')
+    svn_pass = config.get('main', 'tcw.svn_pass')
+
 
     if options.verbose:
         log_level = logging.DEBUG
