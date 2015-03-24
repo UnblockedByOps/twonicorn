@@ -566,6 +566,13 @@ def main(argv):
                       dest='config_file',
                       help='Config file to use.',
                       default='/app/twonicorn/conf/twonicorn.conf')
+    parser.add_option('--secrets',
+                      '-s',
+                      action='store',
+                      type='string',
+                      dest='secrets_config_file',
+                      help='Secret config file to use.',
+                      default='/app/secrets/twonicorn.conf')
     parser.add_option('--verbose',
                       '-v',
                       action='store_true',
@@ -592,6 +599,8 @@ def main(argv):
     # Get the config
     config = ConfigParser.ConfigParser()
     config.read(options.config_file)
+    secrets_config = ConfigParser.ConfigParser()
+    secrets_config.read(options.secrets_config_file)
     # Globalizing these. Otherwise will be passing them all over the
     # place for no reason.
     global verify_ssl
@@ -603,7 +612,7 @@ def main(argv):
     verify_ssl = bool(config.get('deploy', 'verify_ssl'))
     ca_bundle_file = config.get('deploy', 'ca_bundle_file')
     svn_user = config.get('main', 'tcw.svn_user')
-    svn_pass = config.get('main', 'tcw.svn_pass')
+    svn_pass = secrets_config.get('main', 'tcw.svn_pass')
 
     tcw_host = config.get('main', 'tcw.host')
     manifest_dir = config.get('main', 'manifest.dir')

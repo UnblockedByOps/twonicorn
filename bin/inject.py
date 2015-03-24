@@ -535,7 +535,7 @@ def main(argv):
     verify_ssl = bool(config.get('inject', 'verify_ssl'))
     api_pass = secrets_config.get('main', 'tcw.api_pass')
     svn_user = config.get('main', 'tcw.svn_user')
-    svn_pass = config.get('main', 'tcw.svn_pass')
+    svn_pass = secrets_config.get('main', 'tcw.svn_pass')
 
 
     if options.verbose:
