@@ -572,7 +572,7 @@ def main(argv):
                       type='string',
                       dest='secrets_config_file',
                       help='Secret config file to use.',
-                      default='/app/secrets/twonicorn.conf')
+                      default='/app/secrets/twonicorn-deploy.conf')
     parser.add_option('--verbose',
                       '-v',
                       action='store_true',
