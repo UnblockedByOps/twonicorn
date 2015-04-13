@@ -289,22 +289,25 @@ def dl_artifact_http(tmp_dir=None, download_url=None, revision=None):
         os.makedirs(tmp_dir)
 
     logging.debug('Downloading to dir: %s' % tmp_dir)
-    if verify_ssl:
-        subprocess.check_call(["curl",
-                               "-s",
-                               "--cacert",
-                               ca_bundle_file,
-                               "-o",
-                               tmp_dir + '/' + artifact,
-                               download_url])
-    else:
-        logging.warn('ssl cert check disabled for download URL: %s' % download_url)
-        subprocess.check_call(["curl",
-                               "-s",
-                               "-k",
-                               "-o",
-                               tmp_dir + '/' + artifact,
-                               download_url])
+    try:
+        if verify_ssl:
+            subprocess.check_call(["curl",
+                                   "-s",
+                                   "--cacert",
+                                   ca_bundle_file,
+                                   "-o",
+                                   tmp_dir + '/' + artifact,
+                                   download_url])
+        else:
+            logging.warn('ssl cert check disabled for download URL: %s' % download_url)
+            subprocess.check_call(["curl",
+                                   "-s",
+                                   "-k",
+                                   "-o",
+                                   tmp_dir + '/' + artifact,
+                                   download_url])
+    except Exception, e:
+        logging.error('Artifact download failed: %s' % e)
 
 
 def get_py_version(location, package_name):
