@@ -61,9 +61,12 @@
             <td tal:attributes="class '%s_prom' % to_env" tal:content="promote.branch">trunk</td>
             <td tal:attributes="class '%s_prom' % to_env" tal:content="promote.repo.name">12345</td>
             <td tal:attributes="class '%s_prom' % to_env" tal:content="promote.artifact_assignments[0].deploy.type.name">12345</td>
+            <?python
+              aa = len(promote.artifact_assignments) - 1
+            ?>
             <td tal:attributes="class '%s_prom' % to_env"><a href="http://code.ctgrd.com/my/awesome/artifact.war"
                    title="some description"
-                   tal:attributes="href promote.artifact_assignments[0].pretty_url; title promote.artifact_assignments[0].pretty_url"
+                   tal:attributes="href promote.artifact_assignments[aa].pretty_url; title promote.artifact_assignments[aa].pretty_url"
                    tal:content="promote.location.split('/')[-1]">Artifact</a></td>
             <td tal:attributes="class '%s_prom' % to_env" tal:content="promote.localize_date_created">12345</td>
           </tr>

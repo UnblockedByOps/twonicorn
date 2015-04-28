@@ -74,6 +74,10 @@ th {
     color: #ffffff;
 }
 
+tbody tr:nth-child(odd) td {
+    background-color: #f6f6f6;
+}
+
 tr.app:hover td {
     background-color: #CEFFFD;
 }

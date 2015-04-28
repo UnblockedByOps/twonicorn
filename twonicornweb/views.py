@@ -366,7 +366,7 @@ def view_applications(request):
     page_title = 'Applications'
     user = get_user(request)
 
-    perpage = 10
+    perpage = 50
     offset = 0
 
     try:
@@ -397,7 +397,7 @@ def view_deploys(request):
     page_title = 'Deploys'
     user = get_user(request)
 
-    perpage = 10
+    perpage = 50
     offset = 0
     end = 10
     total = 0
