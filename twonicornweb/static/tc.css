@@ -74,10 +74,6 @@ th {
     color: #ffffff;
 }
 
-tbody tr:nth-child(odd) td {
-    background-color: #f6f6f6;
-}
-
 tr.app:hover td {
     background-color: #CEFFFD;
 }
@@ -324,6 +320,11 @@ input.button_submit:hover {
     position: relative;
     top: 5px;
 }
+
+div#app_results tbody:nth-child(odd) tr td {
+    background-color: #f6f6f6;
+}
+
 
 #results_nav {
     float: right;    
@@ -753,3 +754,4 @@ li.exp {
 .disable a {
     background: #CCCCCC;
 }
+
