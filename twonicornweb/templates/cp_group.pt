@@ -48,6 +48,10 @@
                         <input type="checkbox" name="group_perms0" value="promote_prd">
                       </td>
                       <td>
+                        <span for="group_perms0">Promote to prd (time based):</span><br>
+                        <input type="checkbox" name="group_perms0" value="promote_prd_time">
+                      </td>
+                      <td>
                         <span for="group_perms0">Control Panel:</span><br>
                         <input type="checkbox" name="group_perms0" value="cp">
                       </td>
@@ -101,6 +105,10 @@
                       <td>
                         <span for="group_perms">Promote:</span><br>
                         <input tal:attributes="checked True if ('promote_prd' in group.get_all_assignments()) else False" type="checkbox" name="perms" value="promote_prd">
+                      </td>
+                      <td>
+                        <span for="group_perms">Promote (time based):</span><br>
+                        <input tal:attributes="checked True if ('promote_prd_time' in group.get_all_assignments()) else False" type="checkbox" name="perms" value="promote_prd_time">
                       </td>
                       <td>
                         <span for="group_perms">Control Panel:</span><br>

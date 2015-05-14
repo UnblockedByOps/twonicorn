@@ -44,6 +44,7 @@ INSERT INTO artifact_types VALUES (5,'tar');
 
 INSERT INTO group_perms VALUES (1,'promote_prd',NOW(),NOW());
 INSERT INTO group_perms VALUES (2,'cp',NOW(),NOW());
+INSERT INTO group_perms VALUES (3,'promote_prd_time',NOW(),NOW());
 
 # Initial Admin password is 'password'
 INSERT INTO users VALUES (1, 'Admin', 'Local', 'Superuser', 'admin@yourcompany.com', '$6$Vf7ZmjQarLus/TqT', '$6$Vf7ZmjQarLus/TqT$l5qsqY4ntpX8nEzbm33n5StF5D.93yV3uoh8ucthwFf8mEJBitnGLr5SWhzD2vpkpnAJnUiLl40d0hH24qPOq1', 'Admin', NOW(),NOW());
@@ -71,3 +72,7 @@ INSERT INTO repo_urls VALUES (13,3, 'ec2','https://git.ec2.mycompany.com');
 INSERT INTO repo_urls VALUES (14,4, 'dfw','http://pip.dfw.mycompany.com/simple/');
 INSERT INTO repo_urls VALUES (15,4, 'sfo','http://pip.sfo.mycompany.com/simple/');
 INSERT INTO repo_urls VALUES (16,4, 'ec2','http://pip.ec2.mycompany.com/simple/');
+
+
+INSERT INTO deployment_time_windows VALUES(1,1,1,4,8,00,16,00,'bandta',NOW(),NOW());
+INSERT INTO deployment_time_windows VALUES(2,2,1,4,9,00,15,00,'bandta',NOW(),NOW());

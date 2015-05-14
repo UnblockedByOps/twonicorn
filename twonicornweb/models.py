@@ -29,6 +29,7 @@ from sqlalchemy.orm import (
     sessionmaker,
     )
 from zope.sqlalchemy import ZopeTransactionExtension
+from datetime import datetime
 
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
@@ -56,7 +57,27 @@ class Application(Base):
         q = q.join(Deploy, Application.application_id == Deploy.application_id)
         q = q.filter(Deploy.deploy_id == '%s' % deploy_id)
         return q.one()
-        
+
+    @hybrid_property
+    def time_valid(self):
+        try:
+            q = DBSession.query(DeploymentTimeWindow)
+            q = q.join(Application, DeploymentTimeWindow.application_id == Application.application_id)
+            q = q.filter(DeploymentTimeWindow.application_id == '%s' % self.application_id)
+            w = q.one()
+
+            d = datetime.now()
+
+            if (d.isoweekday() in range(w.day_start, w.day_end + 1) 
+                and d.hour*60+d.minute in range(w.hour_start*60+w.minute_start, w.hour_end*60+w.minute_end)):
+                setattr(w, 'valid', 'True')
+            else:
+                setattr(w, 'valid', None)
+        except:
+            return None
+
+        return w
+
     @hybrid_property
     def localize_date_created(self):
         local = _localize_date(self.created)
@@ -373,3 +394,17 @@ class UserGroupAssignment(Base):
     user                    = relationship("User", backref=backref('user_group_assignments'))
     group                   = relationship("Group", backref=backref('user_group_assignments'))
 
+class DeploymentTimeWindow(Base):
+    __tablename__ = 'deployment_time_windows'
+    deployment_time_window_id        = Column(Integer, primary_key=True, nullable=False)
+    application_id                   = Column(Integer, ForeignKey('applications.application_id'), nullable=False)
+    day_start                        = Column(Integer, nullable=False)
+    day_end                          = Column(Integer, nullable=False)
+    hour_start                       = Column(Integer, nullable=False)
+    minute_start                     = Column(Integer, nullable=False)
+    hour_end                         = Column(Integer, nullable=False)
+    minute_end                       = Column(Integer, nullable=False)
+    updated_by                       = Column(Text, nullable=False)
+    created                          = Column(TIMESTAMP, nullable=False)
+    updated                          = Column(TIMESTAMP, nullable=False)
+    application                      = relationship("Application", backref=backref('deployment_time_windows'))

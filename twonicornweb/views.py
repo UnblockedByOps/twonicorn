@@ -46,6 +46,7 @@ from twonicornweb.models import (
     Group,
     GroupPerm,
     GroupAssignment,
+    DeploymentTimeWindow,
     )
 
 log = logging.getLogger(__name__)
@@ -100,6 +101,7 @@ def get_user(request):
         and permissions, and returns a dict of everything. """
 
     promote_prd_auth = False
+    promote_prd_time_auth = False
     admin_auth = False
     cp_auth = False
     email_address = None
@@ -147,6 +149,13 @@ def get_user(request):
             promote_prd_auth = True
             break
 
+    # Check if the user is authorized to do stuff to prd in a time window
+    for a in group_perms['promote_prd_time_groups']:
+        a = str(a)
+        if a in groups:
+            promote_prd_time_auth = True
+            break
+
     # Check if the user is authorized for cp
     for a in group_perms['cp_groups']:
         a = str(a)
@@ -162,6 +171,7 @@ def get_user(request):
     user['last'] = last
     user['loggedin'] = auth
     user['promote_prd_auth'] = promote_prd_auth
+    user['promote_prd_time_auth'] = promote_prd_time_auth
     user['admin_auth'] = admin_auth
     user['cp_auth'] = cp_auth
     user['first_last'] = first_last
@@ -170,11 +180,13 @@ def get_user(request):
 
     return (user)
 
+# FIXME: Ugly and repetative
 def get_group_permissions():
     """ Gets all the groups and permissions from the db, 
         and returns a dict of everything. """
 
     promote_prd_groups = []
+    promote_prd_time_groups = []
     cp_groups = []
     group_perms = {}
 
@@ -182,11 +194,16 @@ def get_group_permissions():
     for a in ga:
         promote_prd_groups.append(a.group.group_name)
 
+    ga = GroupAssignment.get_assignments_by_perm('promote_prd_time')
+    for a in ga:
+        promote_prd_time_groups.append(a.group.group_name)
+
     ga = GroupAssignment.get_assignments_by_perm('cp')
     for a in ga:
         cp_groups.append(a.group.group_name)
 
     group_perms['promote_prd_groups'] = promote_prd_groups
+    group_perms['promote_prd_time_groups'] = promote_prd_time_groups
     group_perms['cp_groups'] = cp_groups
 
     return(group_perms)
@@ -220,6 +237,22 @@ def format_groups(groups):
     for g in range(len(groups)):
         formatted.append(find_between(groups[g], 'CN=', ',OU='))
     return formatted
+
+def format_window(w):
+    days = {'1': 'Monday',
+            '2': 'Tuesday',
+            '3': 'Wednesday',
+            '4': 'Thursday',
+            '5': 'Friday',
+            '6': 'Saturday',
+            '7': 'Sunday'
+    }
+    
+    fs = "{0} - {1} {2:02d}:{3:02d} - {4:02d}:{5:02d}".format(days[str(w.day_start)], days[str(w.day_end)], w.hour_start, w.minute_start, w.hour_end, w.minute_end)
+    log.info("Formatted time window: {0}".format(fs))
+
+    return fs
+
 
 def find_between(s, first, last):
     try:
@@ -260,6 +293,34 @@ def basicauth(request, l_login, l_password):
             return True
 
     return None
+
+
+def validate_time_deploy(app_id):
+
+    valid = None
+
+    q = DBSession.query(Application)
+    q = q.filter(Application.application_id == app_id)
+    app = q.one()
+    w = app.deployment_time_windows[0]
+
+    print "WINDOW day_start: %s day_end: %s start_time: %s:%s end_time: %s:%s " % (w.day_start, w.day_end, w.hour_start, w.minute_start, w.hour_end, w.minute_end)
+
+    d = datetime.now()
+    
+    # check if weekday is Monday - Thursday
+    if d.isoweekday() in range(w.day_start, w.day_end + 1) and d.hour*60+d.minute in range(w.hour_start*60+w.minute_start, w.hour_end*60+w.minute_end):
+        print "we are in range"
+        valid = True
+
+    return {'day_start': 'Monday',
+            'day_end': 'Thursday',
+            'hour_start': '8',
+            'minute_start': '00',
+            'hour_end': '16',
+            'minute_end': '00',
+            'valid': valid
+    }
 
 
 @view_config(route_name='healthcheck', renderer='twonicornweb:templates/healthcheck.pt')
@@ -474,6 +535,7 @@ def view_promote(request):
     error = ''
     message = ''
     promote = ''
+    valid_time = None
 
     params = {'deploy_id': None,
               'artifact_id': None,
@@ -492,7 +554,7 @@ def view_promote(request):
     commit = params['commit']
     referer = request.referer
 
-    if not user['promote_prd_auth'] and to_env == 'prd':
+    if not any((user['promote_prd_auth'], user['promote_prd_time_auth'])) and to_env == 'prd':
         to_state = '3'
     else:
         to_state = '2'
@@ -502,26 +564,47 @@ def view_promote(request):
     except Exception, e:
         conn_err_msg = e
         return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
+    print "PROD AUTH: ", user['promote_prd_auth']
+    print "TIME AUTH: ", user['promote_prd_time_auth']
 
     if artifact_id and commit == 'true':
-        if not user['promote_prd_auth'] and to_env == 'prd' and to_state == '2':
+        if not any((user['promote_prd_auth'], user['promote_prd_time_auth'])) and to_env == 'prd' and to_state == '2':
             error = True
             message = 'You do not have permission to perform the promote action on production!'
         else:
             # Actually promoting
             try:
-                # Convert the env name to the id
-                env_id = Env.get_env_id(to_env)
-
-                # Assign
-                utcnow = datetime.utcnow()
-                promote = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=to_state, updated_by=user['login'], created=utcnow)
-                DBSession.add(promote)
-                DBSession.flush()
-                
                 app = Application.get_app_by_deploy_id(deploy_id)
-                return_url = '/deploys?application_id=%s&nodegroup=%s&artifact_id=%s&to_env=%s&to_state=%s&commit=%s' % (app.application_id, app.nodegroup, artifact_id, to_env, to_state, commit)
-                return HTTPFound(return_url)
+
+                # Check on time based-users
+                if user['promote_prd_time_auth'] and not user['promote_prd_auth']:
+                    log.info("%s has access via time based promote permission" % (user['login']))
+                    w = app.time_valid
+                    fw = format_window(w)
+                    if w.valid:
+                        log.info("Promotion attempt by %s is inside the valid window: %s" % (user['login'], fw))
+                        valid_time = True
+                    else:
+                        log.info("Promotion attempt by %s is outside the valid window for %s: %s" % (user['login'], app.application_name, fw))
+                else:
+                    valid_time = True
+                    log.info("%s has access via global promote permission" % (user['login']))
+
+                if valid_time:
+                    # Convert the env name to the id
+                    env_id = Env.get_env_id(to_env)
+
+                    # Assign
+                    utcnow = datetime.utcnow()
+                    promote = ArtifactAssignment(deploy_id=deploy_id, artifact_id=artifact_id, env_id=env_id.env_id, lifecycle_id=to_state, updated_by=user['login'], created=utcnow)
+                    DBSession.add(promote)
+                    DBSession.flush()
+                    
+                    return_url = '/deploys?application_id=%s&nodegroup=%s&artifact_id=%s&to_env=%s&to_state=%s&commit=%s' % (app.application_id, app.nodegroup, artifact_id, to_env, to_state, commit)
+                    return HTTPFound(return_url)
+                else:
+                    error = True
+                    message = "ACCESS DENIED: You are attempting to promote outside the allowed time window for %s: %s" % (app.application_name, fw)
             except Exception, e:
                 log.error("Failed to promote artifact (%s)" % (e))
 

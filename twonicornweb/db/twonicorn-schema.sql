@@ -232,6 +232,28 @@ CREATE TABLE `repo_urls` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 CREATE UNIQUE INDEX idx_repo_url_unique on repo_urls (repo_id, ct_loc);
 
+###
+### TABLE: deployment_time_windows
+###   This table defines a time window, one per application, inside which
+###   users with the promote_prd_time permission can promote artifacts.
+###
+DROP TABLE IF EXISTS `deployment_time_windows`;
+CREATE TABLE `deployment_time_windows` (
+  `deployment_time_window_id` mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `application_id`            mediumint(9) UNSIGNED NOT NULL,
+  `day_start`                 tinyint(2) UNSIGNED NOT NULL,
+  `day_end`                   tinyint(2) UNSIGNED NOT NULL,
+  `hour_start`                tinyint(2) UNSIGNED NOT NULL,
+  `minute_start`              tinyint(2) UNSIGNED NOT NULL,
+  `hour_end`                  tinyint(2) UNSIGNED NOT NULL,
+  `minute_end`                tinyint(2) UNSIGNED NOT NULL,
+  `updated_by`                varchar(75) NOT NULL, # this could be/become a FK
+  `created`                   timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated`                   timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+CREATE UNIQUE INDEX idx_deployment_time_window on deployment_time_windows (application_id);
+
 ### 
 ### TABLE: groups
 ###   This is the primary groups table. 

@@ -199,7 +199,7 @@
                       </li>
                       <li tal:condition="(not (env == 'prd' and repeat.item.start and offset == 0)) 
                                           and (not (histdeploy.type.name == 'conf' and (env == 'dev' or env == 'qat'))) 
-                                          and (user.promote_prd_auth)"
+                                          and (user.promote_prd_auth or user.promote_prd_time_auth)"
                           tal:attributes="class 'promote %s' % env">
                         <a tal:attributes="href '/promote?deploy_id=%s&artifact_id=%s&to_env=prd&commit=false' %
                                                 (item.deploy_id,
