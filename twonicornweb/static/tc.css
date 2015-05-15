@@ -262,8 +262,9 @@ input.button {
     height: 20px;
     border-radius: 15px;
     border: 1p solid #999;
-    margin-left: auto ;
-    margin-right: auto ;
+    margin-left: auto;
+    margin-right: auto;
+    cursor: pointer;
 }
 
 input.button:hover {
@@ -447,6 +448,16 @@ ul.user li.user:hover ul.user {
 }
 
 /* Glossary */
+select.day_select {
+  width: 100px !important;
+  background: #fff !important;
+}
+
+select.time_select {
+  width: 75px !important;
+  background: #fff !important;
+}
+
 td.glossary {
     white-space: normal;
 }

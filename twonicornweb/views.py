@@ -1042,6 +1042,12 @@ def view_cp_application(request):
             artifact_types = request.POST.getall('artifact_type')
             deploy_paths = request.POST.getall('deploy_path')
             package_names = request.POST.getall('package_name')
+            day_start = request.POST['day_start']
+            day_end = request.POST['day_end']
+            hour_start = request.POST['hour_start']
+            minute_start = request.POST['minute_start']
+            hour_end = request.POST['hour_end']
+            minute_end = request.POST['minute_end']
 
             subtitle = 'Add an application'
             # FIXME not trapping because length is the same. - Safari only bug
@@ -1055,6 +1061,20 @@ def view_cp_application(request):
                     DBSession.add(create)
                     DBSession.flush()
                     application_id = create.application_id
+
+                    # Create a time window assignment
+                    create = DeploymentTimeWindow(application_id=application_id,
+                                                  day_start=day_start, 
+                                                  day_end=day_end, 
+                                                  hour_start=hour_start, 
+                                                  minute_start=minute_start, 
+                                                  hour_end=hour_end, 
+                                                  minute_end=minute_end, 
+                                                  updated_by=user['login'],
+                                                  created=utcnow,
+                                                  updated=utcnow)
+                    DBSession.add(create)
+                    DBSession.flush()
 
                     for i in range(len(deploy_paths)):
                         artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
@@ -1100,20 +1120,43 @@ def view_cp_application(request):
                 deploy_ids = request.POST.getall('deploy_id')
                 deploy_paths = request.POST.getall('deploy_path')
                 package_names = request.POST.getall('package_name')
+                day_start = request.POST['day_start']
+                day_end = request.POST['day_end']
+                hour_start = request.POST['hour_start']
+                minute_start = request.POST['minute_start']
+                hour_end = request.POST['hour_end']
+                minute_end = request.POST['minute_end']
+
 
                 if len(deploy_paths) != len(artifact_types):
                     error_msg = "You must select an artifact type and specify a deploy path."
                 else:
 
                     # Update the app
-                    log.info('UPDATE: application_id=%s,application_name=%s,nodegroup=%s,updated_by=%s'
+                    log.info('UPDATE APP: application_id=%s,application_name=%s,nodegroup=%s,updated_by=%s'
                              % (application_id,
                                 application_name,
                                 nodegroup,
                                 user['login']))
+                    log.info('UPDATE TIME WINDOW: application_id=%s,day_start=%s,day_end=%s,hour_start=%s,minute_start=%s,hour_end=%s,minute_end=%s,updated_by=%s'
+                             % (application_id,
+                                day_start,
+                                day_end,
+                                hour_start,
+                                minute_start,
+                                hour_end,
+                                minute_end,
+                                user['login']))
+
                     app = DBSession.query(Application).filter(Application.application_id==application_id).one()
                     app.application_name = application_name
                     app.nodegroup = nodegroup
+                    app.time_valid.day_start = day_start
+                    app.time_valid.day_end = day_end
+                    app.time_valid.hour_start = hour_start
+                    app.time_valid.minute_start = minute_start
+                    app.time_valid.hour_end = hour_end
+                    app.time_valid.minute_end = minute_end
                     app.updated_by=user['login']
                     DBSession.flush()
 

@@ -42,13 +42,86 @@
                 <span class="form_hint">Name of the nodegroup this application lives on</span>
               </li>
             </ul>
+            <ul>
+              <li>
+                <h3>Time Window</h3>
+                <span class="required_notification">Time window for time-based deployments</span>
+              </li>
+              <li>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <span for="day_start">Day Start:</span><br>
+                          <select class="day_select" id="day_start" name="day_start" required>
+                            <option value="1" selected>Monday</option>
+                            <option value="2">Tuesday</option>
+                            <option value="3">Wednesday</option>
+                            <option value="4">Thursday</option>
+                            <option value="5">Friday</option>
+                            <option value="6">Saturday</option>
+                            <option value="7">Sunday</option>
+                          </select>
+                        <span class="form_hint">First day of the week to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="day_end">Day End:</span><br>
+                          <select class="day_select" id="day_end" name="day_end" required>
+                            <option value="1">Monday</option>
+                            <option value="2">Tuesday</option>
+                            <option value="3">Wednesday</option>
+                            <option value="4" selected>Thursday</option>
+                            <option value="5">Friday</option>
+                            <option value="6">Saturday</option>
+                            <option value="7">Sunday</option>
+                          </select>
+                        <span class="form_hint">Last day of the week to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="hour_start">Hour Start:</span><br>
+                          <select class="time_select" id="hour_start" name="hour_start" required>
+                            <option tal:repeat="item range(24)" tal:attributes="value item; selected python:item == 8" tal:content="'{0:02d}'.format(item)">00</option>
+                          </select>
+                        <span class="form_hint">Start hour of each day to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="minute_start">Minute Start:</span><br>
+                          <select class="time_select" id="minute_start" name="minute_start" required>
+                            <option value="0" selected>00</option>
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                            <option value="45">45</option>
+                          </select>
+                        <span class="form_hint">Start minute of the day to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="hour_end">Hour End:</span><br>
+                          <select class="time_select" id="hour_end" name="hour_end" required>
+                            <option tal:repeat="item range(24)" tal:attributes="value item; selected python:item == 16" tal:content="'{0:02d}'.format(item)">00</option>
+                          </select>
+                        <span class="form_hint">End hour of each day to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="minute_end">Minute End:</span><br>
+                          <select class="time_select" id="minute_end" name="minute_end" required>
+                            <option value="0" selected>00</option>
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                            <option value="45">45</option>
+                          </select>
+                        <span class="form_hint">End minute of the day to allow deploys</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </li>
+            </ul>
             <ul id="ul_deploy">
               <li>
                 <h3>Deploy</h3>
                 <span class="required_notification">An application requires at least one deploy</span>
               </li>
               <li>
-
                 <table id="tab_deploy">
                   <tbody>
                     <tr id='addr0'>
@@ -74,7 +147,6 @@
                     <tr id='addr1'></tr>
                   </tbody>
                 </table>
-
               </li>
             </ul>
             <ul>
@@ -114,13 +186,87 @@
                 <input tal:attributes="value app.nodegroup" type="text" id="nodegroup" name="nodegroup" required/>
                 <span class="form_hint">Name of the nodegroup this application lives on</span>
               </li>
+            </ul>
+            <ul>
+              <li>
+                <h3>Time Window</h3>
+                <span class="required_notification">Time window for time-based deployments</span>
+              </li>
+              <li>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <span for="day_start">Day Start:</span><br>
+                          <select class="day_select" id="day_start" name="day_start" required>
+                            <option value="1" tal:attributes="selected app.time_valid.day_start == '1'">Monday</option>
+                            <option value="2" tal:attributes="selected app.time_valid.day_start == '2'">Tuesday</option>
+                            <option value="3" tal:attributes="selected app.time_valid.day_start == '3'">Wednesday</option>
+                            <option value="4" tal:attributes="selected app.time_valid.day_start == '4'">Thursday</option>
+                            <option value="5" tal:attributes="selected app.time_valid.day_start == '5'">Friday</option>
+                            <option value="6" tal:attributes="selected app.time_valid.day_start == '6'">Saturday</option>
+                            <option value="7" tal:attributes="selected app.time_valid.day_start == '7'">Sunday</option>
+                          </select>
+                        <span class="form_hint">First day of the week to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="day_end">Day End:</span><br>
+                          <select class="day_select" id="day_end" name="day_end" required>
+                            <option value="1" tal:attributes="selected app.time_valid.day_end == '1'">Monday</option>
+                            <option value="2" tal:attributes="selected app.time_valid.day_end == '2'">Tuesday</option>
+                            <option value="3" tal:attributes="selected app.time_valid.day_end == '3'">Wednesday</option>
+                            <option value="4" tal:attributes="selected app.time_valid.day_end == '4'">Thursday</option>
+                            <option value="5" tal:attributes="selected app.time_valid.day_end == '5'">Friday</option>
+                            <option value="6" tal:attributes="selected app.time_valid.day_end == '6'">Saturday</option>
+                            <option value="7" tal:attributes="selected app.time_valid.day_end == '7'">Sunday</option>
+                          </select>
+                        <span class="form_hint">Last day of the week to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="hour_start">Hour Start:</span><br>
+                          <select class="time_select" id="hour_start" name="hour_start" required>
+                            <option tal:repeat="item range(24)" tal:attributes="value item;selected item == app.time_valid.hour_start" tal:content="'{0:02d}'.format(item)">00</option>
+                          </select>
+                        <span class="form_hint">Start hour of each day to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="minute_start">Minute Start:</span><br>
+                          <select class="time_select" id="minute_start" name="minute_start" required>
+                            <option value="0" tal:attributes="selected app.time_valid.minute_start == 0">00</option>
+                            <option value="15" tal:attributes="selected app.time_valid.minute_start == 15">15</option>
+                            <option value="30" tal:attributes="selected app.time_valid.minute_start == 30">30</option>
+                            <option value="45" tal:attributes="selected app.time_valid.minute_start == 45">45</option>
+                          </select>
+                        <span class="form_hint">Start minute of the day to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="hour_end">Hour End:</span><br>
+                          <select class="time_select" id="hour_end" name="hour_end" required>
+                            <option tal:repeat="item range(24)" tal:attributes="value item;selected item == app.time_valid.hour_end" tal:content="'{0:02d}'.format(item)">00</option>
+                          </select>
+                        <span class="form_hint">End hour of each day to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="minute_end">Minute End:</span><br>
+                          <select class="time_select" id="minute_end" name="minute_end" required>
+                            <option value="0" tal:attributes="selected app.time_valid.minute_end == 0">00</option>
+                            <option value="15" tal:attributes="selected app.time_valid.minute_end == 15">15</option>
+                            <option value="30" tal:attributes="selected app.time_valid.minute_end == 30">30</option>
+                            <option value="45" tal:attributes="selected app.time_valid.minute_end == 45">45</option>
+                          </select>
+                        <span class="form_hint">End minute of the day to allow deploys</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </li>
+            </ul>
             <ul id="ul_deploy">
               <li>
                 <h3>Deploy</h3>
                 <span class="required_notification">An application requires at least one deploy</span>
               </li>
               <li>
-
                 <table id="tab_deploy">
                   <tbody>
                     <tr tal:condition="app" tal:repeat="item app.deploys" id='addr0'>
@@ -144,8 +290,6 @@
                         <span class="form_hint">Required for deploys that are deployed using a native package management tool (python (pip), rpm (yum), etc.)</span>
                       </td>
                     </tr>
-
-
                     <tr id='addr1'></tr>
                   </tbody>
                 </table>
@@ -162,7 +306,6 @@
               </li>
             </ul>
           </form>
-
         </p>
       </div>
 
