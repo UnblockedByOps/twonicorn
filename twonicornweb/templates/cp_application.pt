@@ -199,26 +199,26 @@
                       <td>
                         <span for="day_start">Day Start:</span><br>
                           <select class="day_select" id="day_start" name="day_start" required>
-                            <option value="1" tal:attributes="selected app.time_valid.day_start == '1'">Monday</option>
-                            <option value="2" tal:attributes="selected app.time_valid.day_start == '2'">Tuesday</option>
-                            <option value="3" tal:attributes="selected app.time_valid.day_start == '3'">Wednesday</option>
-                            <option value="4" tal:attributes="selected app.time_valid.day_start == '4'">Thursday</option>
-                            <option value="5" tal:attributes="selected app.time_valid.day_start == '5'">Friday</option>
-                            <option value="6" tal:attributes="selected app.time_valid.day_start == '6'">Saturday</option>
-                            <option value="7" tal:attributes="selected app.time_valid.day_start == '7'">Sunday</option>
+                            <option value="1" tal:attributes="selected app.time_valid.day_start == 1">Monday</option>
+                            <option value="2" tal:attributes="selected app.time_valid.day_start == 2">Tuesday</option>
+                            <option value="3" tal:attributes="selected app.time_valid.day_start == 3">Wednesday</option>
+                            <option value="4" tal:attributes="selected app.time_valid.day_start == 4">Thursday</option>
+                            <option value="5" tal:attributes="selected app.time_valid.day_start == 5">Friday</option>
+                            <option value="6" tal:attributes="selected app.time_valid.day_start == 6">Saturday</option>
+                            <option value="7" tal:attributes="selected app.time_valid.day_start == 7">Sunday</option>
                           </select>
                         <span class="form_hint">First day of the week to allow deploys</span>
                       </td>
                       <td>
                         <span for="day_end">Day End:</span><br>
                           <select class="day_select" id="day_end" name="day_end" required>
-                            <option value="1" tal:attributes="selected app.time_valid.day_end == '1'">Monday</option>
-                            <option value="2" tal:attributes="selected app.time_valid.day_end == '2'">Tuesday</option>
-                            <option value="3" tal:attributes="selected app.time_valid.day_end == '3'">Wednesday</option>
-                            <option value="4" tal:attributes="selected app.time_valid.day_end == '4'">Thursday</option>
-                            <option value="5" tal:attributes="selected app.time_valid.day_end == '5'">Friday</option>
-                            <option value="6" tal:attributes="selected app.time_valid.day_end == '6'">Saturday</option>
-                            <option value="7" tal:attributes="selected app.time_valid.day_end == '7'">Sunday</option>
+                            <option value="1" tal:attributes="selected app.time_valid.day_end == 1">Monday</option>
+                            <option value="2" tal:attributes="selected app.time_valid.day_end == 2">Tuesday</option>
+                            <option value="3" tal:attributes="selected app.time_valid.day_end == 3">Wednesday</option>
+                            <option value="4" tal:attributes="selected app.time_valid.day_end == 4">Thursday</option>
+                            <option value="5" tal:attributes="selected app.time_valid.day_end == 5">Friday</option>
+                            <option value="6" tal:attributes="selected app.time_valid.day_end == 6">Saturday</option>
+                            <option value="7" tal:attributes="selected app.time_valid.day_end == 7">Sunday</option>
                           </select>
                         <span class="form_hint">Last day of the week to allow deploys</span>
                       </td>
