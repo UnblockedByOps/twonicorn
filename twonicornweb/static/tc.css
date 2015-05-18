@@ -262,8 +262,9 @@ input.button {
     height: 20px;
     border-radius: 15px;
     border: 1p solid #999;
-    margin-left: auto ;
-    margin-right: auto ;
+    margin-left: auto;
+    margin-right: auto;
+    cursor: pointer;
 }
 
 input.button:hover {
@@ -277,6 +278,7 @@ input.button_submit {
     height: 20px;
     border-radius: 15px;
     border: 1p solid #999;
+    cursor: pointer;
 }
 
 input.button_submit:hover {
@@ -611,6 +613,7 @@ td.glossary {
     margin-left: 0 ;
     margin-right: 0 ;
     box-shadow: none;
+    cursor: pointer;
 }
 
 .cp_form input.button:hover,
@@ -627,6 +630,7 @@ td.glossary {
     height: 20px;
     border-radius: 15px;
     border: 1p solid #999;
+    cursor: pointer;
 }
 
 .cp_form input.button_submit:hover, 
@@ -701,6 +705,7 @@ input.button.exp {
     padding: 0px;
     position: right;
     display:inline-block;
+    cursor: pointer;
 }
 
 li.exp {

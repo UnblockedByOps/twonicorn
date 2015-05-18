@@ -69,7 +69,7 @@ def local_groupfinder(userid, request):
         groups = user.get_all_assignments()
     except Exception, e:
         pass
-        log.info("%s (%s)" % (Exception, e))
+        log.error("%s (%s)" % (Exception, e))
 
     return groups
 
@@ -83,14 +83,14 @@ def local_authenticate(login, password):
         q = q.filter(User.user_name == login)
         db_user = q.one()
     except Exception, e:
-        log.info("%s (%s)" % (Exception, e))
+        log.error("%s (%s)" % (Exception, e))
         pass
 
     try: 
         if sha512_crypt.verify(password, db_user.password):
             return [login]
     except Exception, e:
-        log.info("%s (%s)" % (Exception, e))
+        log.error("%s (%s)" % (Exception, e))
         pass
 
     return None
@@ -249,7 +249,7 @@ def format_window(w):
     }
     
     fs = "{0} - {1} {2:02d}:{3:02d} - {4:02d}:{5:02d}".format(days[str(w.day_start)], days[str(w.day_end)], w.hour_start, w.minute_start, w.hour_end, w.minute_end)
-    log.info("Formatted time window: {0}".format(fs))
+    log.debug("Formatted time window: {0}".format(fs))
 
     return fs
 
@@ -564,8 +564,6 @@ def view_promote(request):
     except Exception, e:
         conn_err_msg = e
         return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
-    print "PROD AUTH: ", user['promote_prd_auth']
-    print "TIME AUTH: ", user['promote_prd_time_auth']
 
     if artifact_id and commit == 'true':
         if not any((user['promote_prd_auth'], user['promote_prd_time_auth'])) and to_env == 'prd' and to_state == '2':
@@ -578,17 +576,17 @@ def view_promote(request):
 
                 # Check on time based-users
                 if user['promote_prd_time_auth'] and not user['promote_prd_auth']:
-                    log.info("%s has access via time based promote permission" % (user['login']))
+                    log.debug("%s has access via time based promote permission" % (user['login']))
                     w = app.time_valid
                     fw = format_window(w)
                     if w.valid:
-                        log.info("Promotion attempt by %s is inside the valid window: %s" % (user['login'], fw))
+                        log.debug("Promotion attempt by %s is inside the valid window: %s" % (user['login'], fw))
                         valid_time = True
                     else:
-                        log.info("Promotion attempt by %s is outside the valid window for %s: %s" % (user['login'], app.application_name, fw))
+                        log.error("Promotion attempt by %s is outside the valid window for %s: %s" % (user['login'], app.application_name, fw))
                 else:
                     valid_time = True
-                    log.info("%s has access via global promote permission" % (user['login']))
+                    log.debug("%s has access via global promote permission" % (user['login']))
 
                 if valid_time:
                     # Convert the env name to the id
@@ -975,7 +973,7 @@ def view_user(request):
 
                 except Exception, e:
                     pass
-                    log.info("%s (%s)" % (Exception, e))
+                    log.error("%s (%s)" % (Exception, e))
 
         user = get_user(request)
 
@@ -1277,7 +1275,7 @@ def view_cp_user(request):
 
             except Exception as ex:
                 if type(ex).__name__ == 'IntegrityError':
-                    log.info('User already exists in the db, please edit instead.')
+                    log.error('User already exists in the db, please edit instead.')
                     # Rollback
                     DBSession.rollback()
                     # FIXME: Return a nice page
@@ -1435,7 +1433,7 @@ def view_cp_group(request):
 
             except Exception as ex:
                 if type(ex).__name__ == 'IntegrityError':
-                    log.info('Group already exists in the db, please edit instead.')
+                    log.error('Group already exists in the db, please edit instead.')
                     # Rollback
                     DBSession.rollback()
                     # FIXME: Return a nice page
