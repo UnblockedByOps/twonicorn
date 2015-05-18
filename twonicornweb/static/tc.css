@@ -61,7 +61,7 @@ table {
 }
 table, tr, th, td {
     font-size: 1em;
-    padding: 3px 7px 2px 7px;
+    padding: 5px;
     border-collapse: collapse;
     white-space: nowrap;
 }
@@ -262,9 +262,8 @@ input.button {
     height: 20px;
     border-radius: 15px;
     border: 1p solid #999;
-    margin-left: auto;
-    margin-right: auto;
-    cursor: pointer;
+    margin-left: auto ;
+    margin-right: auto ;
 }
 
 input.button:hover {
@@ -322,10 +321,12 @@ input.button_submit:hover {
     top: 5px;
 }
 
-div#app_results tbody:nth-child(odd) tr td {
+#app_results tbody:nth-child(odd) tr td {
     background-color: #f6f6f6;
 }
-
+#app_results tbody:nth-child(odd) tr:hover td {
+    background-color: #CEFFFD;
+}
 
 #results_nav {
     float: right;    
@@ -344,8 +345,8 @@ ul.promote li.promote {
     display: inline-block;
     margin-right: -4px;
     position: relative;
-    padding: 0px 2px;
-    cursor: pointer;
+    padding: 5px 10px;
+    cursor: default;
     -webkit-transition: all 0.2s;
     -moz-transition: all 0.2s;
     -ms-transition: all 0.2s;
@@ -360,7 +361,7 @@ ul.promote li.promote:hover {
 ul.promote li.promote ul.promote {
     padding: 0px 0px;
     position: absolute;
-    top: 17px;
+    top: 25px;
     left: 0;
     width: 80;
     -webkit-box-shadow: none;
