@@ -4,10 +4,18 @@ Changelog
 Wishlist
 ------------------
 
-* feature: Defined user role(s) that can promote to prod within a defined day/time window.
 * feature: Support for listing/promoting all staged promotions by application.
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
+
+2.8.7
+~~~~~~~
+feature: Time-window based deployment implementation. Provides a role where groups can be assigned permission to promote to prod within a given time window.
+
+2.8.6
+~~~~~~~
+bugfix: Fixing the svn conf promote url display
+feature: Upping pages to 50 results
 
 2.8.5
 ~~~~~~~
