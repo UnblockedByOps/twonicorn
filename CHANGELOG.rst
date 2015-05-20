@@ -8,6 +8,10 @@ Wishlist
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+2.8.8
+~~~~~~~
+feature: Updated/cleaned up some styles and a more unified look & feel.
+
 2.8.7
 ~~~~~~~
 feature: Time-window based deployment implementation. Provides a role where groups can be assigned permission to promote to prod within a given time window.
