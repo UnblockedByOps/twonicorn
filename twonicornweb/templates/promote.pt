@@ -84,11 +84,11 @@
            <table>
              <tr>
                <td>
-                 <input tal:condition="to_state == '3'" class="button_submit" type="submit" name="submit" value="Stage"/>
-                 <input tal:condition="to_state != '3'" class="button_submit" type="submit" name="submit" value="Promote"/>
+                 <input tal:condition="to_state == '3'" class="button" type="submit" name="submit" value="Stage"/>
+                 <input tal:condition="to_state != '3'" class="button" type="submit" name="submit" value="Promote"/>
                </td>
                <td>
-                 <a tal:attributes="href referer"><input class="button_submit" type="button" value="Cancel" /></a>
+                 <a class="button" tal:attributes="href referer"><input class="button" type="button" value="Cancel" /></a>
                </td>
              </tr>
            </table>

@@ -15,6 +15,11 @@
 */
 @import url(//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700);
 
+html, body {
+  width:100%
+  height:100%
+}
+
 body {
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 75%;
@@ -53,6 +58,22 @@ a:hover {
 
 .right {
     float: right;
+}
+.hidden {
+    display: none;
+}
+
+.ellipses {
+  max-width:300px;
+  white-space:nowrap; 
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.ellipses:hover {
+  overflow:visible;
+  white-space: normal; 
+  width: auto; 
+  z-index:99999;
 }
 
 /* Default table settings */
@@ -170,7 +191,24 @@ td.subh_app {
     background: #CEFFFD;
 }
 
-td.prd, ul.prd, li.prd, td.prd_prom {
+.subh_app tr:first-child {
+   border-radius: 14px 14px 0 0;
+}
+.subh_app tr {
+   border-radius: 0;
+}
+.subh_app tr:first-child {
+   border-radius: 0 0 14px 14px;
+}
+
+div.prd {
+  background-color: #CAFEB8;
+}
+
+td.prd,
+ul.prd,
+li.prd,
+td.prd_prom {
     color: #000000;
     background-color: #CAFEB8;
     width: 100%;
@@ -181,7 +219,14 @@ tr.prd_hover:hover td {
     background-color: #CAFEB8;
 }
 
-td.qat, ul.qat, li.qat, td.qat_prom {
+div.qat {
+  background-color: #FFF284;
+}
+
+td.qat,
+ul.qat,
+li.qat,
+td.qat_prom {
     color: #000000;
     background-color: #FFF284;
     width: 100%;
@@ -192,7 +237,14 @@ tr.qat_hover:hover td {
     background-color: #FFF284;
 }
 
-td.dev, ul.dev, li.dev, td.dev_prom {
+div.dev {
+  background-color: #FFC8f2;
+}
+
+td.dev,
+ul.dev,
+li.dev,
+td.dev_prom {
     color: #000000;
     background-color: #FFC8f2;
     width: 100%;
@@ -230,10 +282,6 @@ tr.dev_hover:hover td {
     margin-right: auto ;
 }
 
-form {
-    width: 250px ;
-}
-
 form.login {
     margin-left: auto ;
     margin-right: auto ;
@@ -256,33 +304,24 @@ input[type=checkbox] {
 }
 
 input.button {
+    position:center;
     width: 100px;
-    position :center;
-    background: #CCCCCC;
-    height: 20px;
-    border-radius: 15px;
-    border: 1p solid #999;
-    margin-left: auto;
-    margin-right: auto;
+    color: #fff;
+    background: #2FAACE;
+    border-radius: 5px;
+    border: none;
+    box-shadow: none;
     cursor: pointer;
 }
 
 input.button:hover {
     background: #FF0099;
 }
-
-input.button_submit {
-    width: 100px;
-    background: #CCCCCC;
-    color: #000000;
-    height: 20px;
-    border-radius: 15px;
-    border: 1p solid #999;
-    cursor: pointer;
+input.button:active {
+    background: #FFF284;
 }
-
-input.button_submit:hover {
-    background: #FF0099;
+a.button {
+    text-decoration: none;
 }
 
 .nb {
@@ -342,6 +381,14 @@ ul.promote {
     padding: 0px 0px 0px 0;
     list-style: none;
     z-index: 50;
+    color: #fff;
+    background: #2FAACE;
+    border-radius: 5px;
+    padding: 5px;
+}
+ul.promote:hover {
+    background: #F09;
+    border-radius: 5px;
 }
 ul.promote li.promote {
     display: inline-block;
@@ -349,22 +396,24 @@ ul.promote li.promote {
     position: relative;
     padding: 5px 10px;
     cursor: default;
-    -webkit-transition: all 0.2s;
-    -moz-transition: all 0.2s;
-    -ms-transition: all 0.2s;
-    -o-transition: all 0.2s;
-    transition: all 0.2s;
 }
 ul.promote li.promote:hover {
-    background: #2FAACE;
+    background: #F09;
     color: #fff;
+    border-radius: 0;
+}
+ul.promote li.promote:first-child {
+    border-radius: 0 5px 0 0;
+}
+ul.promote li.promote:last-child {
+    border-radius: 0 0 5px 5px;
 }
 /* Sub menu properties */
 ul.promote li.promote ul.promote {
     padding: 0px 0px;
     position: absolute;
-    top: 25px;
-    left: 0;
+    top: 27px;
+    left: 10px;
     width: 80;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
@@ -492,7 +541,6 @@ td.glossary {
 
 .cp_form_user ul,
 .cp_form_group ul {
-    width:1050px;
     list-style-type:none;
     list-style-position:outside;
     margin:0px;
@@ -601,53 +649,11 @@ td.glossary {
     display:inline-block;
 }
 
-.cp_form input.button,
-.cp_form_user input.button,
-.cp_form_group input.button {
-    width: 100px;
-    position :center;
-    background: #CCCCCC;
-    height: 20px;
-    border-radius: 15px;
-    border: 1p solid #999;
-    margin-left: 0 ;
-    margin-right: 0 ;
-    box-shadow: none;
-    cursor: pointer;
-}
-
-.cp_form input.button:hover,
-.cp_form_user input.button:hover,
-.cp_form_group input.button:hover {
-    background: #FF0099;
-}
-
-.cp_form input.button_submit,
-.cp_form_user input.button_submit,
-.cp_form_group input.button_submit {
-    width: 100px;
-    background: #CCCCCC;
-    height: 20px;
-    border-radius: 15px;
-    border: 1p solid #999;
-    cursor: pointer;
-}
-
-.cp_form input.button_submit:hover, 
-.cp_form_user input.button_submit:hover, 
-.cp_form_group input.button_submit:hover {
-    background: #FF0099;
-}
-
-.cp_form input,
 .cp_form select,
 .cp_form_user input,
 .cp_form_user select,
-.cp_form_group input,
 .cp_form_group select {
     border:1px solid #aaa;
-    box-shadow: 0px 0px 3px #ccc, 0 10px 15px #eee inset;
-    border-radius:2px;
     -moz-transition: padding .25s;
     -webkit-transition: padding .25s;
     -o-transition: padding .25s;
@@ -665,7 +671,6 @@ td.glossary {
 .cp_form_group select:focus {
     background: #fff;
     border:1px solid #555;
-    box-shadow: 0 0 3px #aaa;
 }
 
 input:required {
@@ -680,7 +685,6 @@ select:required {
 .cp_form_user input:focus:invalid, 
 .cp_form_group input:focus:invalid {
     background: #fff url(/static/invalid.png) no-repeat 98% center;
-    box-shadow: 0 0 5px #d45252;
     border-color: #b03535
 }
 
@@ -688,7 +692,6 @@ select:required {
 .cp_form_user input:required:valid, 
 .cp_form_group input:required:valid {
     background: #fff url(/static/valid.png) no-repeat 98% center;
-    box-shadow: 0 0 5px #5cd053;
     border-color: #28921f;
 }
 
@@ -696,7 +699,6 @@ select:required {
 .cp_form_user select:required:valid, 
 .cp_form_group select:required:valid {
     background: #fff url(/static/valid.png) no-repeat 90% center;
-    box-shadow: 0 0 5px #5cd053;
     border-color: #28921f;
 }
 
@@ -717,6 +719,12 @@ li.exp {
 #pag_container {
     text-align:right;
 }
+#pag_hist_container {
+  position: relative;
+  top: 135px;
+  text-align: right;
+  z-index: 9999;
+}
 
 .pag_content {
     display:inline-block;
@@ -729,22 +737,25 @@ li.exp {
     background: #2FAACE;
 }
 
-.pag_buttons:hover,
-.pag_buttons:hover a {
-    color: #2FAACE;
+.pag_buttons_c {
+    padding: 3px 5px;
+}
+
+.pag_buttons:hover {
     text-decoration: none;
     background: #FF0099;
-
+}
+.pag_buttons:active {
+    background: #FFF284;
 }
 
 .pag_buttons a {
-    color: #000000;
-    background: #2FAACE;
     height: 15px;
     width: 20px;       
     text-decoration: none;       
     font-size: 0.9em;
     border-radius:3px;
+    background: none;
 }
 
 .pag_buttons a:link, a:visited {
@@ -752,7 +763,6 @@ li.exp {
 }
 
 .pag_buttons a:hover {
-    color: #2FAACE;
     text-decoration: none;
     background: #FF0099;
 
@@ -762,13 +772,69 @@ li.exp {
 }
 
 .disable {
-    background: #CCCCCC;
-    color: #F0F0F0;
-    pointer-events: none;
-    cursor: default;
+  background: #CCCCCC !important;
+  color: #F0F0F0 !important;
+  pointer-events: none;
+  cursor: default;
 }
 
 .disable a {
-    background: #CCCCCC;
+  background: #CCCCCC;
 }
 
+
+/* START Deploy header */
+.deploy_header {
+  height: 50px;
+  display: table;
+  overflow: auto;
+  border-radius: 4px 4px 0 0;
+}
+.deploy_header_title {
+  float: left;
+  padding: 15px;
+  height: 74px;
+  background: #2FAACE;
+  font-size: 1.2em;
+  color: #FFFFFF;
+  border-radius: 4px 0 0 0;
+}
+.deploy_header_content {
+  float: right;
+  padding: 15px;
+  height: 74px;
+  background: #CEFFFD;
+  font-size: 1.2em;
+  border-radius: 0 4px 0 0;
+}
+.deploy_header_element {
+  padding: 3px;
+}
+/* END Deploy header */
+/* START Hist header */
+.history_header {
+  height: 50px;
+  display: table;
+  border-radius: 4px 4px 0 0;
+}
+.history_header_title {
+  float: left;
+  padding: 15px;
+  height: 48px;
+  background: #2FAACE;
+  font-size: 1.2em;
+  color: #FFFFFF;
+  border-radius: 4px 0 0 0;
+}
+.history_header_content {
+  float: right;
+  padding: 15px;
+  width: 100px;
+  height: 48px;
+  font-size: 1.2em;
+  border-radius: 0 4px 0 0;
+}
+.history_header_element {
+  padding: 3px;
+}
+/* END Hist header */

@@ -23,23 +23,24 @@
     <div id="app_main">
       <!!-- Results navigation -->
       <div id="pag_container">
-        <div tal:attributes="class 'pag_buttons disable' if offset == 0 else 'pag_buttons'">
-          <a tal:attributes="href '?start=0'"><img src='/static/nav-le.gif' border='0'></a>
-        </div>
-        <div tal:attributes="class 'pag_buttons disable' if offset == 0 else 'pag_buttons'">
-          <a tal:attributes="href '?start=%d' % (offset-perpage)"><img src='/static/nav-l.gif' border='0'></a>
-        </div>
+        <a tal:attributes="class 'pag_buttons disable' if offset == 0 else 'pag_buttons' ; href '?start=0'">
+          <div class="pag_buttons_c"><img src='/static/nav-le.gif' border='0'></div>
+        </a>
+
+        <a tal:attributes="class 'pag_buttons disable' if offset == 0 else 'pag_buttons' ;href '?start=%d' % (offset-perpage)">
+          <div class="pag_buttons_c"><img src='/static/nav-l.gif' border='0'></div>
+        </a>
         <div class="pag_content">
           <span tal:content="'%d-%d of %d' % (offset+1, min((offset+perpage),total), total)">
             11-20 of 123
           </span>
         </div>
-        <div tal:attributes="class 'pag_buttons disable' if (offset+perpage) &gt;= total else 'pag_buttons'">
-          <a tal:attributes="href '?start=%d' % (offset+perpage)"><img src='/static/nav-r.gif' border='0'></a>
-        </div>
-        <div tal:attributes="class 'pag_buttons disable' if (offset+perpage) &gt;= total else 'pag_buttons'">
-          <a tal:attributes="href '?start=%d' % ((total-1)/perpage*perpage)"><img src='/static/nav-re.gif' border='0'></a>
-        </div>
+        <a tal:attributes="class 'pag_buttons disable' if (offset+perpage) &gt;= total else 'pag_buttons' ; href '?start=%d' % (offset+perpage)">
+          <div class="pag_buttons_c"><img src='/static/nav-r.gif' border='0'></div>
+        </a>
+        <a tal:attributes="class 'pag_buttons disable' if (offset+perpage) &gt;= total else 'pag_buttons'; href '?start=%d' % ((total-1)/perpage*perpage)">
+          <div class="pag_buttons_c"><img src='/static/nav-re.gif' border='0'></div>
+        </a>
       </div>
   
       <!!-- Results -->
@@ -68,8 +69,8 @@
             <td tal:content="item.localize_date_created">1975-01-01 00:00:00</td>
             <td tal:content="item.localize_date_updated">1975-01-01 00:00:00</td>
             <td tal:content="item.updated_by">bandta</td>
-            <td tal:condition="user.cp_auth"><a href="/cp/application?mode=edit&application_id=0"
-                   tal:attributes="href '/cp/application?mode=edit&application_id=%s' % item.application_id">Edit</a></td>
+            <td tal:condition="user.cp_auth"><a class="button" href="/cp/application?mode=edit&application_id=0"
+                   tal:attributes="href '/cp/application?mode=edit&application_id=%s' % item.application_id"><input class="button" type="button" value="Edit" /></a></td>
           </tr>
           </tbody>
         </table>

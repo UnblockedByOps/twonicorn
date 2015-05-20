@@ -36,21 +36,22 @@
 
       <div tal:condition="nodegroup">
 
-        <h2 tal:attributes="title 'Application ID: ' + str(application_id)">Deployment summary by environment</h2>
+        <h2>Deployment summary by environment</h2>
 
-        <table width="100%" tal:condition="(application_id or nodegroup)">
-          <tr class="subh">
-            <td class="subh">Application Name</td>
-            <td class="subh_app" colspan="12" tal:content="app.application_name">tct</td>
-          </tr>
-          <tr class="subh">
-            <td class="subh">Application ID</td>
-            <td class="subh_app" colspan="12" tal:content="str(application_id)">tct</td>
-          </tr>
-          <tr class="subh">
-            <td class="subh">Node Group</td>
-            <td class="subh_app" colspan="12" tal:content="nodegroup.upper()">tct</td>
-          </tr>
+        <div class="deploy_header">
+          <div class="deploy_header_title">
+            <div class="deploy_header_element">Application Name </div>
+            <div class="deploy_header_element">Application ID </div>
+            <div class="deploy_header_element">Nodegroup </div>
+          </div>
+          <div class="deploy_header_content">
+            <div  class="deploy_header_element" tal:content="app.application_name">Some Application</div>
+            <div  class="deploy_header_element" tal:content="str(app.application_id)">1</div>
+            <div  class="deploy_header_element" tal:content="nodegroup">tct</div>
+          </div>
+        </div>
+
+        <table tal:condition="(application_id or nodegroup)">
           <tr>
             <th>Deploy Path</th>
             <th>Deploy ID</th>
@@ -96,50 +97,56 @@
             <td tal:content="aa.localize_date_created if aa else 'No Data'">12345</td>
             <td tal:content="aa.updated_by if aa else 'No Data'">12345</td>
             <td tal:condition="not aa">No Data</td>
-            <td tal:condition="aa"><a href="http://twonicorn.ctgrd.com/deploys?history=true"
-                   title="Show History"
+            <td tal:condition="aa"><a class="button" href="http://twonicorn.ctgrd.com/deploys?history=true"
                    tal:attributes="href '/deploys?history=true&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s' %
                                         (item.deploy_id,
                                          aa.env.name,
                                          application_id,
                                          nodegroup
-                                        );
-                                   title 'Show history for deploy id: ' + str(item.deploy_id)"
-                   tal:content="'Show History'">show history</a></td>
+                                        )"><input class="button" type="button" value="Show History" /></a></td>
           </tr>
           </tbody>
         </table>
       </div>
 
-      <p>
-      <div tal:condition="histassignments" id="history_main">
-
-        <div id="pag_container">
-          <div tal:attributes="class 'pag_buttons disable' if offset == 0 else 'pag_buttons'">
-            <a tal:attributes="href '?history=%s&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s&start=0' % (history,deploy_id,env,application_id,nodegroup)"><img src='/static/nav-le.gif' border='0'></a>
-          </div>
-          <div tal:attributes="class 'pag_buttons disable' if offset == 0 else 'pag_buttons'">
-            <a tal:attributes="href '?history=%s&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s&start=%d' % (history,deploy_id,env,application_id,nodegroup,offset-perpage)"><img src='/static/nav-l.gif' border='0'></a>
-          </div>
+      <div tal:condition="histassignments">
+        <div id="pag_hist_container">
+          <a tal:attributes="class 'pag_buttons disable' if offset == 0 else 'pag_buttons' ; href '?history=%s&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s&start=0' % (history,deploy_id,env,application_id,nodegroup)">
+            <div class="pag_buttons_c"><img src='/static/nav-le.gif' border='0'></div>
+          </a>
+  
+          <a tal:attributes="class 'pag_buttons disable' if offset == 0 else 'pag_buttons' ;href '?history=%s&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s&start=%d' % (history,deploy_id,env,application_id,nodegroup,offset-perpage)">
+            <div class="pag_buttons_c"><img src='/static/nav-l.gif' border='0'></div>
+          </a>
           <div class="pag_content">
             <span tal:content="'%d-%d of %d' % (offset+1, min((offset+perpage),total), total)">
-              1-10 of 123
+              11-20 of 123
             </span>
           </div>
-          <div tal:attributes="class 'pag_buttons disable' if (offset+perpage) &gt;= total else 'pag_buttons'">
-            <a tal:attributes="href '?history=%s&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s&start=%d' % (history,deploy_id,env,application_id,nodegroup,offset+perpage)"><img src='/static/nav-r.gif' border='0'></a>
+          <a tal:attributes="class 'pag_buttons disable' if (offset+perpage) &gt;= total else 'pag_buttons' ; href '?history=%s&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s&start=%d' % (history,deploy_id,env,application_id,nodegroup,offset+perpage)">
+            <div class="pag_buttons_c"><img src='/static/nav-r.gif' border='0'></div>
+          </a>
+          <a tal:attributes="class 'pag_buttons disable' if (offset+perpage) &gt;= total else 'pag_buttons'; href '?history=%s&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s&start=%d' % (history,deploy_id,env,application_id,nodegroup,(total-1)/perpage*perpage)">
+            <div class="pag_buttons_c"><img src='/static/nav-re.gif' border='0'></div>
+          </a>
+        </div>
+
+
+        <div id="history_results">
+        <h2>History</h2>
+
+        <div class="history_header">
+          <div class="history_header_title">
+            <div class="history_header_element">Deploy ID </div>
+            <div class="history_header_element">Environment </div>
           </div>
-          <div tal:attributes="class 'pag_buttons disable' if (offset+perpage) &gt;= total else 'pag_buttons'">
-            <a tal:attributes="href '?history=%s&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s&start=%d' % (history,deploy_id,env,application_id,nodegroup,(total-1)/perpage*perpage)"><img src='/static/nav-re.gif' border='0'></a>
+          <div tal:attributes="class 'history_header_content %s' % env">
+            <div tal:attributes="class 'history_header_element %s' % env" tal:content="deploy_id">1</div>
+            <div tal:attributes="class 'history_header_element %s' % env" tal:content="env">dev</div>
           </div>
         </div>
 
-        <div id="history_results">
           <table width="100%">
-            <tr>
-              <td class="subh">Deployment History</td>
-              <td class="env" colspan="11" tal:attributes="class '%s' % env ; title 'Env: ' + env.upper() + ' Deploy ID:' + deploy_id" tal:content="env.upper() + ' (' + deploy_id + ')'">env</td>
-            </tr>
             <tr>
               <th>Deploy Path</th>
               <th>Package Name</th>

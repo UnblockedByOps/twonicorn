@@ -148,13 +148,13 @@
           <tbody tal:repeat="item groups">
           <tr class="group">
             <td tal:content="item.group_id">
-            <td tal:content="item.group_name">
+            <td><div class="ellipses" tal:content="item.group_name"></td>
             <td tal:repeat="perm all_perms"><input tal:attributes="checked True if (perm.perm_name in item.get_all_assignments()) else False; name perm.perm_name" type="checkbox" disabled/></td>
             <td tal:content="item.localize_date_created">1975-01-01 00:00:00</td>
             <td tal:content="item.localize_date_updated">1975-01-01 00:00:00</td>
             <td tal:content="item.updated_by">bandta</td>
-            <td tal:condition="user.cp_auth"><a href="/cp/group?mode=edit&group_id=0"
-                   tal:attributes="href '/cp/group?mode=edit&group_id=%s' % item.group_id">Edit</a></td>
+            <td tal:condition="user.cp_auth"><a class="button" href="/cp/group?mode=edit&group_id=0"
+                   tal:attributes="href '/cp/group?mode=edit&group_id=%s' % item.group_id"><input class="button" type="button" value="Edit" /></a></td>
           </tr>
           </tbody>
         </table>
