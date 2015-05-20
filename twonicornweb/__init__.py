@@ -92,6 +92,7 @@ def main(global_config, **settings):
     config.add_route('promote', '/promote')
     config.add_route('help', '/help')
     config.add_route('user', '/user')
+    config.add_route('ss', '/ss')
     config.add_route('cp', '/cp')
     config.add_route('cp_application', '/cp/application')
     config.add_route('cp_user', '/cp/user')

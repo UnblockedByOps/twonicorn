@@ -1,0 +1,338 @@
+<!--!
+   Copyright 2015 CityGrid Media, LLC
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<div metal:use-macro="layout">
+    <div metal:fill-slot="content">
+
+      <script src="/static/jquery-2.1.3.min.js"></script>
+      <script src="/static/row_expansion_app.js"></script>
+      <script>
+        // Only show package name for types that require it.
+        $(function() {
+          $(document.body).on('change', '[id^=artifact_type-]' ,function(){
+            var pkg_td_idx = $(this).attr('id').split("-", 2);
+            if ($.inArray($(this).val(), ["python", "tar"]) > -1) {
+                $( "#pkg_td"+pkg_td_idx[1] ).show();
+                $( "#package_name"+pkg_td_idx[1] ).prop('required',true);
+            } else {
+                $( "#pkg_td"+pkg_td_idx[1] ).hide();
+                $( "#package_name"+pkg_td_idx[1] ).prop('required',false);
+            }
+          });
+        });
+      </script>
+
+      <div tal:condition="not commit and mode == 'add'">
+        <p>
+          <form class="cp_form" action="/cp/application?mode=add&commit=true" method="POST">
+            <input type="hidden" name="form.submitted"/>
+            <ul>
+              <li>
+                <h2>${subtitle}</h2>
+                <span class="required_notification">* Denotes Required Field</span>
+              </li>
+              <li>
+                <h3>Application</h3>
+              </li>
+              <li>
+                <label for="application_name">Name:</label>
+                <input type="text" id="application_name" name="application_name" placeholder="Profile API" required />
+                <span class="form_hint">Friendly name</span>
+              </li>
+              <li>
+                <label for="nodegroup">Node Group:</label>
+                <input type="text" id="nodegroup" name="nodegroup" placeholder="paw" required/>
+                <span class="form_hint">Name of the nodegroup this application lives on</span>
+              </li>
+            </ul>
+            <ul>
+              <li>
+                <h3>Time Window</h3>
+                <span class="required_notification">Time window for time-based deployments</span>
+              </li>
+              <li>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <span for="day_start">Day Start:</span><br>
+                          <select class="day_select" id="day_start" name="day_start" required>
+                            <option value="1" selected>Monday</option>
+                            <option value="2">Tuesday</option>
+                            <option value="3">Wednesday</option>
+                            <option value="4">Thursday</option>
+                            <option value="5">Friday</option>
+                            <option value="6">Saturday</option>
+                            <option value="7">Sunday</option>
+                          </select>
+                        <span class="form_hint">First day of the week to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="day_end">Day End:</span><br>
+                          <select class="day_select" id="day_end" name="day_end" required>
+                            <option value="1">Monday</option>
+                            <option value="2">Tuesday</option>
+                            <option value="3">Wednesday</option>
+                            <option value="4" selected>Thursday</option>
+                            <option value="5">Friday</option>
+                            <option value="6">Saturday</option>
+                            <option value="7">Sunday</option>
+                          </select>
+                        <span class="form_hint">Last day of the week to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="hour_start">Hour Start:</span><br>
+                          <select class="time_select" id="hour_start" name="hour_start" required>
+                            <option tal:repeat="item range(24)" tal:attributes="value item; selected python:item == 8" tal:content="'{0:02d}'.format(item)">00</option>
+                          </select>
+                        <span class="form_hint">Start hour of each day to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="minute_start">Minute Start:</span><br>
+                          <select class="time_select" id="minute_start" name="minute_start" required>
+                            <option value="0" selected>00</option>
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                            <option value="45">45</option>
+                          </select>
+                        <span class="form_hint">Start minute of the day to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="hour_end">Hour End:</span><br>
+                          <select class="time_select" id="hour_end" name="hour_end" required>
+                            <option tal:repeat="item range(24)" tal:attributes="value item; selected python:item == 16" tal:content="'{0:02d}'.format(item)">00</option>
+                          </select>
+                        <span class="form_hint">End hour of each day to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="minute_end">Minute End:</span><br>
+                          <select class="time_select" id="minute_end" name="minute_end" required>
+                            <option value="0" selected>00</option>
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                            <option value="45">45</option>
+                          </select>
+                        <span class="form_hint">End minute of the day to allow deploys</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </li>
+            </ul>
+            <ul id="ul_deploy">
+              <li>
+                <h3>Deploy</h3>
+                <span class="required_notification">An application requires at least one deploy</span>
+              </li>
+              <li>
+                <table id="tab_deploy">
+                  <tbody>
+                    <tr id='addr0'>
+                      <td>
+                        <span for="artifact_type-0">Artifact Type:</span><br>
+                          <select id="artifact_type-0" name="artifact_type" placeholder="Select Something" required>
+                            <option value="" disabled="disabled" selected>Please select an artifact type</option>
+                            <option tal:repeat="item artifact_types" tal:content="item.name"></option>
+                          </select>
+                        <span class="form_hint">Artifact type</span>
+                      </td>
+                      <td>
+                        <span for="deploy_path0">Deploy Path:</span><br>
+                        <input type="text" id="deploy_path0" name="deploy_path" placeholder="/app/tomcat/conf" required/>
+                        <span class="form_hint">Where this deploy gets installed</span>
+                      </td>
+                      <td id="pkg_td0" class="hidden">
+                        <span for="package_name0">Package Name:</span><br>
+                        <input type="text" id="package_name0" name="package_name" placeholder="MyPythonPackage"/>
+                        <span class="form_hint">Required for deploys that are deployed using a native package management tool (python (pip), rpm (yum), etc.)</span>
+                      </td>
+                    </tr>
+                    <tr id='addr1'></tr>
+                  </tbody>
+                </table>
+              </li>
+            </ul>
+            <ul>
+              <li class="exp">
+                <input id="add_row" class="button exp" type="button" value="Add A Deploy"/>
+                <input id="delete_row" class="button exp disable" type="button" value="Remove Last Row"/>
+              </li>
+              <li>
+                <input class="button" type="submit" name="submit" value="submit"/>
+              </li>
+            </ul>
+          </form>
+
+        </p>
+      </div>
+
+      <div tal:condition="not commit and mode == 'edit'">
+        <p>
+          <form class="cp_form" action="/cp/application?mode=edit&commit=true" method="POST">
+            <input type="hidden" name="form.submitted"/>
+            <input tal:attributes="value app.application_id" type="hidden" name="application_id"/>
+            <ul>
+              <li>
+                <h2>${subtitle}</h2>
+                <span class="required_notification">* Denotes Required Field</span>
+              </li>
+              <li>
+                <h3>Application ID: ${app.application_id}</h3>
+              </li>
+              <li>
+                <label for="application_name">Name:</label>
+                <input tal:attributes="value app.application_name" type="text" id="application_name" name="application_name" required />
+                <span class="form_hint">Friendly name</span>
+              </li>
+              <li>
+                <label for="nodegroup">Node Group:</label>
+                <input tal:attributes="value app.nodegroup" type="text" id="nodegroup" name="nodegroup" required/>
+                <span class="form_hint">Name of the nodegroup this application lives on</span>
+              </li>
+            </ul>
+            <ul>
+              <li>
+                <h3>Time Window</h3>
+                <span class="required_notification">Time window for time-based deployments</span>
+              </li>
+              <li>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <span for="day_start">Day Start:</span><br>
+                          <select class="day_select" id="day_start" name="day_start" required>
+                            <option value="1" tal:attributes="selected app.time_valid.day_start == 1">Monday</option>
+                            <option value="2" tal:attributes="selected app.time_valid.day_start == 2">Tuesday</option>
+                            <option value="3" tal:attributes="selected app.time_valid.day_start == 3">Wednesday</option>
+                            <option value="4" tal:attributes="selected app.time_valid.day_start == 4">Thursday</option>
+                            <option value="5" tal:attributes="selected app.time_valid.day_start == 5">Friday</option>
+                            <option value="6" tal:attributes="selected app.time_valid.day_start == 6">Saturday</option>
+                            <option value="7" tal:attributes="selected app.time_valid.day_start == 7">Sunday</option>
+                          </select>
+                        <span class="form_hint">First day of the week to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="day_end">Day End:</span><br>
+                          <select class="day_select" id="day_end" name="day_end" required>
+                            <option value="1" tal:attributes="selected app.time_valid.day_end == 1">Monday</option>
+                            <option value="2" tal:attributes="selected app.time_valid.day_end == 2">Tuesday</option>
+                            <option value="3" tal:attributes="selected app.time_valid.day_end == 3">Wednesday</option>
+                            <option value="4" tal:attributes="selected app.time_valid.day_end == 4">Thursday</option>
+                            <option value="5" tal:attributes="selected app.time_valid.day_end == 5">Friday</option>
+                            <option value="6" tal:attributes="selected app.time_valid.day_end == 6">Saturday</option>
+                            <option value="7" tal:attributes="selected app.time_valid.day_end == 7">Sunday</option>
+                          </select>
+                        <span class="form_hint">Last day of the week to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="hour_start">Hour Start:</span><br>
+                          <select class="time_select" id="hour_start" name="hour_start" required>
+                            <option tal:repeat="item range(24)" tal:attributes="value item;selected item == app.time_valid.hour_start" tal:content="'{0:02d}'.format(item)">00</option>
+                          </select>
+                        <span class="form_hint">Start hour of each day to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="minute_start">Minute Start:</span><br>
+                          <select class="time_select" id="minute_start" name="minute_start" required>
+                            <option value="0" tal:attributes="selected app.time_valid.minute_start == 0">00</option>
+                            <option value="15" tal:attributes="selected app.time_valid.minute_start == 15">15</option>
+                            <option value="30" tal:attributes="selected app.time_valid.minute_start == 30">30</option>
+                            <option value="45" tal:attributes="selected app.time_valid.minute_start == 45">45</option>
+                          </select>
+                        <span class="form_hint">Start minute of the day to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="hour_end">Hour End:</span><br>
+                          <select class="time_select" id="hour_end" name="hour_end" required>
+                            <option tal:repeat="item range(24)" tal:attributes="value item;selected item == app.time_valid.hour_end" tal:content="'{0:02d}'.format(item)">00</option>
+                          </select>
+                        <span class="form_hint">End hour of each day to allow deploys</span>
+                      </td>
+                      <td>
+                        <span for="minute_end">Minute End:</span><br>
+                          <select class="time_select" id="minute_end" name="minute_end" required>
+                            <option value="0" tal:attributes="selected app.time_valid.minute_end == 0">00</option>
+                            <option value="15" tal:attributes="selected app.time_valid.minute_end == 15">15</option>
+                            <option value="30" tal:attributes="selected app.time_valid.minute_end == 30">30</option>
+                            <option value="45" tal:attributes="selected app.time_valid.minute_end == 45">45</option>
+                          </select>
+                        <span class="form_hint">End minute of the day to allow deploys</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </li>
+            </ul>
+            <ul id="ul_deploy">
+              <li>
+                <h3>Deploy</h3>
+                <span class="required_notification">An application requires at least one deploy</span>
+              </li>
+              <li>
+                <table id="tab_deploy">
+                  <tbody>
+                    <tr tal:condition="app" tal:repeat="item app.deploys" id='addr0'>
+                      <td>
+                        <input tal:attributes="value item.deploy_id" type="hidden" name="deploy_id"/>
+                        <span for="artifact_type-0">Artifact Type:</span><br>
+                          <select id="artifact_type-0" name="artifact_type" disabled="disabled" required>
+                            <option value="" disabled="disabled" selected>Please select an artifact type</option>
+                            <option tal:repeat="types artifact_types" tal:attributes="selected item.type.name == types.name" tal:content="types.name"></option>
+                          </select>
+                            <input type="hidden" name="artifact_type" tal:attributes="value item.type.name"></input>
+                        <span class="form_hint">Artifact type</span>
+                      </td>
+                      <td>
+                        <span for="deploy_path0">Deploy Path:</span><br>
+                        <input tal:attributes="value item.deploy_path" type="text" id="deploy_path0" name="deploy_path" required/>
+                        <span class="form_hint">Where this deploy gets installed</span>
+                      </td>
+                      <td id="pkg_td0" class="hidden">
+                        <span for="package_name0">Package Name:</span><br>
+                        <input tal:attributes="value item.package_name" type="text" id="package_name0" name="package_name" placeholder="MyPythonPackage"/>
+                        <span class="form_hint">Required for deploys that are deployed using a native package management tool (python (pip), rpm (yum), etc.)</span>
+                      </td>
+                    </tr>
+                    <tr id='addr1'></tr>
+                  </tbody>
+                </table>
+
+              </li>
+            </ul>
+            <ul>
+              <li class="exp">
+                <input id="add_row" class="button exp" type="button" value="Add A Deploy"/>
+                <input id="delete_row" class="button exp disable" type="button" value="Remove Last Row"/>
+              </li>
+              <li>
+                <input class="button" type="submit" name="submit" value="submit"/>
+              </li>
+            </ul>
+          </form>
+        </p>
+      </div>
+
+      <p tal:condition="commit and mode == 'add' and not error_msg">
+        Successfully created new Application: <a tal:attributes="href '/deploys?application_id=%s&nodegroup=%s' % (application_id,nodegroup)">${application_id}</a>
+      </p>
+
+      <p tal:condition="error_msg">
+        <h2>ERROR</h2>
+        Error creating new Application: ${error_msg}
+      </p>
+
+  </div>
+</div>
