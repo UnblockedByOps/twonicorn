@@ -13,23 +13,48 @@
 #  limitations under the License.
 #
 from pyramid.view import view_config
+from pyramid.response import Response
 import logging
 from twonicornweb.views import (
     site_layout,
     get_user,
     )
 
+from twonicornweb.models import (
+    DBSession,
+    Application,
+    )
+
 log = logging.getLogger(__name__)
 
 
-@view_config(route_name='help', permission='view', renderer='twonicornweb:templates/help.pt')
-def view_help(request):
-
-    page_title = 'Help'
+@view_config(route_name='applications', permission='view', renderer='twonicornweb:templates/applications.pt')
+def view_applications(request):
+    page_title = 'Applications'
     user = get_user(request)
+
+    perpage = 50
+    offset = 0
+
+    try:
+        offset = int(request.GET.getone("start"))
+    except:
+        pass
+
+    try:
+        q = DBSession.query(Application)
+        total = q.count()
+        applications = q.limit(perpage).offset(offset)
+    except Exception, e:
+        conn_err_msg = e
+        return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
 
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'host_url': request.host_url,
+            'perpage': perpage,
+            'offset': offset,
+            'total': total,
+            'applications': applications,
            }
+

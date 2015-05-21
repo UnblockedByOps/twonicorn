@@ -13,23 +13,17 @@
 #  limitations under the License.
 #
 from pyramid.view import view_config
+from pyramid.httpexceptions import HTTPServiceUnavailable
 import logging
-from twonicornweb.views import (
-    site_layout,
-    get_user,
-    )
+import os.path
 
 log = logging.getLogger(__name__)
 
 
-@view_config(route_name='help', permission='view', renderer='twonicornweb:templates/help.pt')
-def view_help(request):
+@view_config(route_name='healthcheck', renderer='twonicornweb:templates/healthcheck.pt')
+def healthcheck(request):
 
-    page_title = 'Help'
-    user = get_user(request)
-
-    return {'layout': site_layout(),
-            'page_title': page_title,
-            'user': user,
-            'host_url': request.host_url,
-           }
+    if os.path.isfile(request.registry.settings['tcw.healthcheck_file']):
+        return {'message': 'ok'}
+    else:
+        return HTTPServiceUnavailable()

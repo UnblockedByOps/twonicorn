@@ -1,56 +1,67 @@
-from pyramid.view import view_config
+#  Copyright 2015 CityGrid Media, LLC
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+from pyramid.view import view_config, forbidden_view_config
+from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPServiceUnavailable
+from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPConflict
+from pyramid.security import remember, forget
+from pyramid.session import signed_serialize
+from pyramid_ldap import get_ldap_connector
 from pyramid.response import Response
-from sqlalchemy.sql import func
-from sqlalchemy import or_
-from sqlalchemy import desc
-from sqlalchemy.sql import label
-from arsenalweb.views import (
-    get_authenticated_user,
+from datetime import datetime
+import logging
+import os.path
+from passlib.hash import sha512_crypt
+from twonicornweb.views import (
     site_layout,
-    log,
+    local_authenticate,
+    get_user,
+    format_window,
+    basicauth,
     )
-from arsenalweb.models import (
+
+from twonicornweb.models import (
     DBSession,
+    Application,
+    Deploy,
+    Artifact,
+    ArtifactAssignment,
+    Lifecycle,
+    Env,
+    RepoType,
+    ArtifactType,
+    RepoUrl,
+    User,
+    UserGroupAssignment,
+    Group,
+    GroupPerm,
+    GroupAssignment,
+    DeploymentTimeWindow,
     )
 
-@view_config(route_name='test', permission='view', renderer='arsenalweb:templates/test.pt')
+log = logging.getLogger(__name__)
+
+@view_config(route_name='test', permission='view', renderer='twonicornweb:templates/test.pt')
 def view_test(request):
+
     page_title = 'Test'
-    au = get_authenticated_user(request)
-    results = False
-    params = {'type': 'vir',
-             }
-    for p in params:
-        try:
-            params[p] = request.params[p]
-        except:
-            pass
+    user = get_user(request)
 
-    type = params['type']
-    if type == 'ec2':
-        host = 'aws1prdtcw1.opsprod.ctgrd.com'
-        uniq_id = 'i-303a6c4a'
-        ng = 'tcw'
-        vhost = 'aws1'
-    elif type == 'rds':
-        host = 'aws1devcpd1.csqa.ctgrd.com'
-        uniq_id = 'aws1devcpd1.cltftmkcg4dd.us-east-1.rds.amazonaws.com'
-        ng = 'none'
-        vhost = 'aws1'
-    else:
-        host = 'vir1prdpaw1.prod.cs'
-        uniq_id = '6A:37:2A:68:E1:B0'
-        ng = 'paw'
-        vhost = 'vir1prdxen41.prod.cs'
-
-    return {'layout': site_layout('max'),
+    return {'layout': site_layout(),
             'page_title': page_title,
-            'au': au,
-            'results': results,
-            'type': type,
-            'host': host,
-            'uniq_id': uniq_id,
-            'ng': ng,
-            'vhost': vhost,
+            'user': user,
            }
 

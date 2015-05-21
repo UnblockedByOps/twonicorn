@@ -22,14 +22,13 @@ from twonicornweb.views import (
 log = logging.getLogger(__name__)
 
 
-@view_config(route_name='help', permission='view', renderer='twonicornweb:templates/help.pt')
-def view_help(request):
+@view_config(route_name='cp', permission='cp', renderer='twonicornweb:templates/cp.pt')
+def view_cp(request):
 
-    page_title = 'Help'
+    page_title = 'Control Panel'
     user = get_user(request)
 
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
-            'host_url': request.host_url,
            }
