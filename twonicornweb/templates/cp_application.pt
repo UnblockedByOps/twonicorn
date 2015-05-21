@@ -41,7 +41,7 @@
             <ul>
               <li>
                 <h2>${subtitle}</h2>
-                <span class="required_notification">* Denotes Required Field</span>
+                <span class="required_notification">All Fields Required</span>
               </li>
               <li>
                 <h3>Application</h3>
@@ -186,7 +186,7 @@
             <ul>
               <li>
                 <h2>${subtitle}</h2>
-                <span class="required_notification">* Denotes Required Field</span>
+                <span class="required_notification">All Fields Required</span>
               </li>
               <li>
                 <h3>Application ID: ${app.application_id}</h3>

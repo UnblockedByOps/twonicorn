@@ -32,6 +32,21 @@ from twonicornweb.models import (
 
 log = logging.getLogger(__name__)
 
+class SearchResult(object):
+
+    def __init__(self, name, cs_id, lat, lon, addr_street, addr_city, addr_state, addr_zip, phone, website):
+        self.name = name
+        self.cs_id = cs_id
+        self.lat = lat
+        self.lon = lon
+        self.addr_street = addr_street
+        self.addr_city = addr_city
+        self.addr_state = addr_state
+        self.addr_zip = addr_zip
+        self.phone = phone
+        self.website = website
+
+
 
 @view_config(route_name='ss', permission='view', renderer='twonicornweb:templates/ss.pt')
 def view_ss(request):
@@ -41,7 +56,7 @@ def view_ss(request):
     user = get_user(request)
 
     params = {'mode': None,
-              'commit': None,
+              'confirm': None,
              }
     for p in params:
         try:
@@ -50,37 +65,60 @@ def view_ss(request):
             pass
 
     mode = params['mode']
-    commit = params['commit']
-    error_msg = None
+    confirm = params['confirm']
+    results = None
 
-    if mode == 'confirm':
+    if 'form.process' in request.POST:
+         print "process"
+         project_type = request.POST['project_type']
+         project_name = request.POST['project_name']
+         code_review = request.POST['code_review']
+         job_server = request.POST['job_server']
+         job_prefix = request.POST['job_prefix']
 
-       if not commit:
+         if project_type == 'tomcat':
+             print "tomcat"
+             dir_app ='/app/tomcat/webapp'
+             dir_conf ='/app/tomcat/conf'
+         if project_type == 'python':
+             print "python"
+             dir_app ='/app/{0}/venv'.format(project_name.replace(" ","_"))
+             dir_conf ='/app/{0}/conf'.format(project_name.replace(" ","_"))
 
-           if 'form.submitted' in request.POST:
-                nodegroup = request.POST['nodegroup']
-                artifact_types = request.POST.getall('artifact_type')
+         git_repo_name = project_name.replace(" ","-")
+         git_code_repo = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}'.format(git_repo_name)
+         git_conf_repo = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}-conf'.format(git_repo_name)
+         job_part_name = 'https://ci-{0}.prod.cs/{1}_{2}'.format(job_server,job_prefix,project_name.replace(" ","-").capitalize())
+         if code_review:
+             job_review_name = job_part_name + '_Build-review'
+         job_code_name = job_part_name + '_Build-artifact'
+         job_conf_name = job_part_name + '_Build-conf'
+
+         results = {'project_type': project_type,
+                    'git_code_repo': git_code_repo,
+                    'git_conf_repo': git_conf_repo,
+                    'job_review_name': job_review_name,
+                    'job_code_name': job_code_name,
+                    'job_conf_name': job_conf_name,
+                    'dir_app': dir_app,
+                    'dir_conf': dir_conf,
+                   }
 
 
-                log.info('UPDATE TIME WINDOW: application_id=%s,day_start=%s,day_end=%s,hour_start=%s,minute_start=%s,hour_end=%s,minute_end=%s,updated_by=%s'
-                         % (application_id,
-                            day_start,
-                            day_end,
-                            hour_start,
-                            minute_start,
-                            hour_end,
-                            minute_end,
-                            user['login']))
+         log.info('doing stuff: mode=%s,updated_by=%s'
+                  % (mode,
+                     user['login']))
 
-                return_url = '/deploys?application_id=%s&nodegroup=%s' % (application_id, nodegroup)
-                return HTTPFound(return_url)
+         confirm = 'true'
 
+    if 'form.confirm' in request.POST:
+         nodegroup = request.POST['nodegroup']
 
     return {'layout': site_layout(),
             'page_title': page_title,
             'user': user,
             'subtitle': subtitle,
             'mode': mode,
-            'commit': commit,
-            'error_msg': error_msg,
+            'confirm': confirm,
+            'results': results,
            }
