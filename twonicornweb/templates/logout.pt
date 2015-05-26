@@ -30,7 +30,9 @@
   
       <h2 class="error" tal:condition="message" tal:content="message"/>
 
+    <div class="center">
       <input class="button" type="submit" value="Log In Again"  onclick="window.location='/login';"/>
+    </div>
   </div>
 
   </body>

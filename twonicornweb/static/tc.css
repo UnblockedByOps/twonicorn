@@ -59,6 +59,12 @@ a:hover {
 .right {
     float: right;
 }
+
+.center {
+  display: table;
+  margin: 0 auto;
+}
+
 .hidden {
     display: none;
 }

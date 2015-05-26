@@ -33,6 +33,126 @@ from twonicornweb.models import (
 log = logging.getLogger(__name__)
 
 
+def create_application(**kwargs):
+
+    try:
+        utcnow = datetime.utcnow()
+        create = Application(application_name=kwargs['application_name'],
+                             nodegroup=kwargs['nodegroup'],
+                             updated_by=kwargs['updated_by'],
+                             created=utcnow,
+                             updated=utcnow)
+
+        DBSession.add(create)
+        DBSession.flush()
+        application_id = create.application_id
+    
+        # Create a time window assignment
+        create = DeploymentTimeWindow(application_id=application_id,
+                                      day_start=kwargs['day_start'],
+                                      day_end=kwargs['day_end'],
+                                      hour_start=kwargs['hour_start'],
+                                      minute_start=kwargs['minute_start'],
+                                      hour_end=kwargs['hour_end'],
+                                      minute_end=kwargs['minute_end'],
+                                      updated_by=kwargs['updated_by'],
+                                      created=utcnow,
+                                      updated=utcnow)
+        DBSession.add(create)
+        DBSession.flush()
+    
+        for i in range(len(kwargs['deploy_paths'])):
+            artifact_type_id = ArtifactType.get_artifact_type_id(kwargs['artifact_types'][i])
+            create = Deploy(application_id=application_id,
+                            artifact_type_id=artifact_type_id.artifact_type_id,
+                            deploy_path=kwargs['deploy_paths'][i],
+                            package_name=kwargs['package_names'][i],
+                            updated_by=kwargs['updated_by'],
+                            created=utcnow,
+                            updated=utcnow)
+            DBSession.add(create)
+    
+        DBSession.flush()
+    
+        return_url = '/deploys?application_id=%s&nodegroup=%s' % (application_id, kwargs['nodegroup'])
+        return HTTPFound(return_url)
+    
+    except Exception, e:
+        raise
+        # FIXME not trapping correctly
+        DBSession.rollback()
+        error_msg = ("Failed to create application (%s)" % (e))
+        log.error(error_msg)
+
+def edit_application(**kwargs):
+    # Update the app
+    log.info('UPDATE APP: application_id=%s,application_name=%s,nodegroup=%s,updated_by=%s'
+             % (kwargs['application_id'],
+                kwargs['application_name'],
+                kwargs['nodegroup'],
+                kwargs['updated_by']))
+    log.info('UPDATE TIME WINDOW: application_id=%s,day_start=%s,day_end=%s,hour_start=%s,minute_start=%s,hour_end=%s,minute_end=%s,updated_by=%s'
+             % (kwargs['application_id'],
+                kwargs['day_start'],
+                kwargs['day_end'],
+                kwargs['hour_start'],
+                kwargs['minute_start'],
+                kwargs['hour_end'],
+                kwargs['minute_end'],
+                kwargs['updated_by']))
+    
+    app = DBSession.query(Application).filter(Application.application_id==kwargs['application_id']).one()
+    app.application_name = kwargs['application_name']
+    app.nodegroup = kwargs['nodegroup']
+    app.time_valid.day_start = kwargs['day_start']
+    app.time_valid.day_end = kwargs['day_end']
+    app.time_valid.hour_start = kwargs['hour_start']
+    app.time_valid.minute_start = kwargs['minute_start']
+    app.time_valid.hour_end = kwargs['hour_end']
+    app.time_valid.minute_end = kwargs['minute_end']
+    app.updated_by=kwargs['updated_by']
+    DBSession.flush()
+    
+    # Add/Update deploys
+    for i in range(len(deploy_paths)):
+        deploy_id = None
+        try:
+            deploy_id = deploy_ids[i]
+        except:
+            pass
+    
+        if deploy_id:
+            log.info('UPDATE: deploy=%s,deploy_id=%s,artifact_type=%s,deploy_path=%s,package_name=%s'
+                     % (i,
+                        deploy_id,
+                        artifact_types[i],
+                        deploy_paths[i],
+                        package_names[i]))
+            dep = DBSession.query(Deploy).filter(Deploy.deploy_id==deploy_id).one()
+            artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
+            dep.artifact_type_id = artifact_type_id.artifact_type_id
+            dep.deploy_path = deploy_paths[i]
+            dep.package_name = package_names[i]
+            dep.updated_by=user['login']
+            DBSession.flush()
+    
+        else:
+            log.info('CREATE: deploy=%s,deploy_id=%s,artifact_type=%s,deploy_path=%s,package_name=%s'
+                     % (i,
+                        deploy_id,
+                        artifact_types[i],
+                        deploy_paths[i],
+                        package_names[i]))
+            utcnow = datetime.utcnow()
+            artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
+            create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], updated_by=user['login'], created=utcnow, updated=utcnow)
+            DBSession.add(create)
+            DBSession.flush()
+    
+    return_url = '/deploys?application_id=%s&nodegroup=%s' % (application_id, nodegroup)
+    return HTTPFound(return_url)
+
+
 @view_config(route_name='cp_application', permission='cp', renderer='twonicornweb:templates/cp_application.pt')
 def view_cp_application(request):
 
@@ -71,62 +191,26 @@ def view_cp_application(request):
 
         if commit:
 
-            application_name = request.POST['application_name']
-            nodegroup = request.POST['nodegroup']
-            artifact_types = request.POST.getall('artifact_type')
-            deploy_paths = request.POST.getall('deploy_path')
-            package_names = request.POST.getall('package_name')
-            day_start = request.POST['day_start']
-            day_end = request.POST['day_end']
-            hour_start = request.POST['hour_start']
-            minute_start = request.POST['minute_start']
-            hour_end = request.POST['hour_end']
-            minute_end = request.POST['minute_end']
+            ca = {'application_name': request.POST['application_name'],
+                  'nodegroup': request.POST['nodegroup'],
+                  'artifact_types': request.POST.getall('artifact_type'),
+                  'deploy_paths': request.POST.getall('deploy_path'),
+                  'package_names': request.POST.getall('package_name'),
+                  'day_start': request.POST['day_start'],
+                  'day_end': request.POST['day_end'],
+                  'hour_start': request.POST['hour_start'],
+                  'minute_start': request.POST['minute_start'],
+                  'hour_end': request.POST['hour_end'],
+                  'minute_end': request.POST['minute_end'],
+                  'updated_by': user['login']
+            }
 
-            subtitle = 'Add an application'
             # FIXME not trapping because length is the same. - Safari only bug
-            if len(deploy_paths) != len(artifact_types):
+            if len(ca['deploy_paths']) != len(ca['artifact_types']):
                error_msg = "You must select an artifact type and specify a deploy path."
             else:
 
-                try:
-                    utcnow = datetime.utcnow()
-                    create = Application(application_name=application_name, nodegroup=nodegroup, updated_by=user['login'], created=utcnow, updated=utcnow)
-                    DBSession.add(create)
-                    DBSession.flush()
-                    application_id = create.application_id
-
-                    # Create a time window assignment
-                    create = DeploymentTimeWindow(application_id=application_id,
-                                                  day_start=day_start, 
-                                                  day_end=day_end, 
-                                                  hour_start=hour_start, 
-                                                  minute_start=minute_start, 
-                                                  hour_end=hour_end, 
-                                                  minute_end=minute_end, 
-                                                  updated_by=user['login'],
-                                                  created=utcnow,
-                                                  updated=utcnow)
-                    DBSession.add(create)
-                    DBSession.flush()
-
-                    for i in range(len(deploy_paths)):
-                        artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
-                        create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], updated_by=user['login'], created=utcnow, updated=utcnow)
-                        DBSession.add(create)
-                        deploy_id = create.deploy_id
-
-                    DBSession.flush()
-
-                    return_url = '/deploys?application_id=%s&nodegroup=%s' % (application_id, nodegroup)
-                    return HTTPFound(return_url)
-
-                except Exception, e:
-                    raise
-                    # FIXME not trapping correctly
-                    DBSession.rollback()
-                    error_msg = ("Failed to create application (%s)" % (e))
-                    log.error(error_msg)
+                return create_application(**ca)
 
     if mode == 'edit':
 
@@ -147,92 +231,28 @@ def view_cp_application(request):
            subtitle = 'Edit an application'
 
            if 'form.submitted' in request.POST:
-                application_id = request.POST['application_id']
-                application_name = request.POST['application_name']
-                nodegroup = request.POST['nodegroup']
-                artifact_types = request.POST.getall('artifact_type')
-                deploy_ids = request.POST.getall('deploy_id')
-                deploy_paths = request.POST.getall('deploy_path')
-                package_names = request.POST.getall('package_name')
-                day_start = request.POST['day_start']
-                day_end = request.POST['day_end']
-                hour_start = request.POST['hour_start']
-                minute_start = request.POST['minute_start']
-                hour_end = request.POST['hour_end']
-                minute_end = request.POST['minute_end']
+                ea = {'application_id': request.POST['application_id'],
+                      'application_name': request.POST['application_name'],
+                      'nodegroup': request.POST['nodegroup'],
+                      'artifact_types': request.POST.getall('artifact_type'),
+                      'deploy_ids': request.POST.getall('deploy_id'),
+                      'deploy_paths': request.POST.getall('deploy_path'),
+                      'package_names': request.POST.getall('package_name'),
+                      'day_start': request.POST['day_start'],
+                      'day_end': request.POST['day_end'],
+                      'hour_start': request.POST['hour_start'],
+                      'minute_start': request.POST['minute_start'],
+                      'hour_end': request.POST['hour_end'],
+                      'minute_end': request.POST['minute_end'],
+                      'updated_by': user['login']
+                }
 
-
-                if len(deploy_paths) != len(artifact_types):
+                if len(ea['deploy_paths']) != len(ea['artifact_types']):
                     error_msg = "You must select an artifact type and specify a deploy path."
                 else:
 
                     # Update the app
-                    log.info('UPDATE APP: application_id=%s,application_name=%s,nodegroup=%s,updated_by=%s'
-                             % (application_id,
-                                application_name,
-                                nodegroup,
-                                user['login']))
-                    log.info('UPDATE TIME WINDOW: application_id=%s,day_start=%s,day_end=%s,hour_start=%s,minute_start=%s,hour_end=%s,minute_end=%s,updated_by=%s'
-                             % (application_id,
-                                day_start,
-                                day_end,
-                                hour_start,
-                                minute_start,
-                                hour_end,
-                                minute_end,
-                                user['login']))
-
-                    app = DBSession.query(Application).filter(Application.application_id==application_id).one()
-                    app.application_name = application_name
-                    app.nodegroup = nodegroup
-                    app.time_valid.day_start = day_start
-                    app.time_valid.day_end = day_end
-                    app.time_valid.hour_start = hour_start
-                    app.time_valid.minute_start = minute_start
-                    app.time_valid.hour_end = hour_end
-                    app.time_valid.minute_end = minute_end
-                    app.updated_by=user['login']
-                    DBSession.flush()
-
-                    # Add/Update deploys
-                    for i in range(len(deploy_paths)):
-                        deploy_id = None
-                        try:
-                            deploy_id = deploy_ids[i]
-                        except:
-                            pass
-
-                        if deploy_id:
-                            log.info('UPDATE: deploy=%s,deploy_id=%s,artifact_type=%s,deploy_path=%s,package_name=%s'
-                                     % (i,
-                                        deploy_id,
-                                        artifact_types[i],
-                                        deploy_paths[i],
-                                        package_names[i]))
-                            dep = DBSession.query(Deploy).filter(Deploy.deploy_id==deploy_id).one()
-                            artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
-                            dep.artifact_type_id = artifact_type_id.artifact_type_id
-                            dep.deploy_path = deploy_paths[i]
-                            dep.package_name = package_names[i]
-                            dep.updated_by=user['login'] 
-                            DBSession.flush()
-                            
-                        else:
-                            log.info('CREATE: deploy=%s,deploy_id=%s,artifact_type=%s,deploy_path=%s,package_name=%s'
-                                     % (i,
-                                        deploy_id,
-                                        artifact_types[i],
-                                        deploy_paths[i],
-                                        package_names[i]))
-                            utcnow = datetime.utcnow()
-                            artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
-                            create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], updated_by=user['login'], created=utcnow, updated=utcnow)
-                            DBSession.add(create)
-                            DBSession.flush()
-
-                    return_url = '/deploys?application_id=%s&nodegroup=%s' % (application_id, nodegroup)
-                    return HTTPFound(return_url)
-
+                    return edit_application(**ea)
 
     return {'layout': site_layout(),
             'page_title': page_title,
