@@ -114,10 +114,10 @@ def edit_application(**kwargs):
     DBSession.flush()
     
     # Add/Update deploys
-    for i in range(len(deploy_paths)):
+    for i in range(len(kwargs['deploy_paths'])):
         deploy_id = None
         try:
-            deploy_id = deploy_ids[i]
+            deploy_id = kwargs['deploy_ids'][i]
         except:
             pass
     
@@ -125,31 +125,37 @@ def edit_application(**kwargs):
             log.info('UPDATE: deploy=%s,deploy_id=%s,artifact_type=%s,deploy_path=%s,package_name=%s'
                      % (i,
                         deploy_id,
-                        artifact_types[i],
-                        deploy_paths[i],
-                        package_names[i]))
+                        kwargs['artifact_types'][i],
+                        kwargs['deploy_paths'][i],
+                        kwargs['package_names'][i]))
             dep = DBSession.query(Deploy).filter(Deploy.deploy_id==deploy_id).one()
-            artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
+            artifact_type_id = ArtifactType.get_artifact_type_id(kwargs['artifact_types'][i])
             dep.artifact_type_id = artifact_type_id.artifact_type_id
-            dep.deploy_path = deploy_paths[i]
-            dep.package_name = package_names[i]
-            dep.updated_by=user['login']
+            dep.deploy_path = kwargs['deploy_paths'][i]
+            dep.package_name = kwargs['package_names'][i]
+            dep.updated_by=kwargs['updated_by']
             DBSession.flush()
     
         else:
             log.info('CREATE: deploy=%s,deploy_id=%s,artifact_type=%s,deploy_path=%s,package_name=%s'
                      % (i,
                         deploy_id,
-                        artifact_types[i],
-                        deploy_paths[i],
-                        package_names[i]))
+                        kwargs['artifact_types'][i],
+                        kwargs['deploy_paths'][i],
+                        kwargs['package_names'][i]))
             utcnow = datetime.utcnow()
-            artifact_type_id = ArtifactType.get_artifact_type_id(artifact_types[i])
-            create = Deploy(application_id=application_id, artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=deploy_paths[i], package_name=package_names[i], updated_by=user['login'], created=utcnow, updated=utcnow)
+            artifact_type_id = ArtifactType.get_artifact_type_id(kwargs['artifact_types'][i])
+            create = Deploy(application_id=kwargs['application_id'],
+                            artifact_type_id=artifact_type_id.artifact_type_id,
+                            deploy_path=kwargs['deploy_paths'][i],
+                            package_name=kwargs['package_names'][i],
+                            updated_by=kwargs['updated_by'],
+                            created=utcnow,
+                            updated=utcnow)
             DBSession.add(create)
             DBSession.flush()
     
-    return_url = '/deploys?application_id=%s&nodegroup=%s' % (application_id, nodegroup)
+    return_url = '/deploys?application_id=%s&nodegroup=%s' % (kwargs['application_id'], kwargs['nodegroup'])
     return HTTPFound(return_url)
 
 
