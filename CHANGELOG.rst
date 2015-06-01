@@ -8,6 +8,10 @@ Wishlist
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+2.8.10
+~~~~~~~
+bugfix: Missed the bug on editing an application.
+
 2.8.9
 ~~~~~~~
 bugfix: jar artifact type also requires package_name.
