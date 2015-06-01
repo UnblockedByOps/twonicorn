@@ -112,7 +112,7 @@
                       <td>
                         <span for="hour_end">Hour End:</span><br>
                           <select class="time_select" id="hour_end" name="hour_end" required>
-                            <option tal:repeat="item range(24)" tal:attributes="value item; selected python:item == 16" tal:content="'{0:02d}'.format(item)">00</option>
+                            <option tal:repeat="item range(24)" tal:attributes="value item; selected python:item == 17" tal:content="'{0:02d}'.format(item)">00</option>
                           </select>
                         <span class="form_hint">End hour of each day to allow deploys</span>
                       </td>
@@ -300,7 +300,7 @@
                         <input tal:attributes="value item.deploy_path" type="text" id="deploy_path0" name="deploy_path" required/>
                         <span class="form_hint">Where this deploy gets installed</span>
                       </td>
-                      <td id="pkg_td0" class="hidden">
+                      <td id="pkg_td0" tal:attributes="class 'hidden' if (item.type.name in ['conf', 'war']) else False">
                         <span for="package_name0">Package Name:</span><br>
                         <input tal:attributes="value item.package_name" type="text" id="package_name0" name="package_name" placeholder="MyPythonPackage"/>
                         <span class="form_hint">Required for deploys that are deployed using a native package management tool (python (pip), rpm (yum), etc.)</span>
