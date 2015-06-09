@@ -803,4 +803,8 @@ li.exp {
     color: red;
     padding-left: 10px;
 }
+
+#ss_submit {
+  padding-top: 10px;
+}
 /* END self service form */

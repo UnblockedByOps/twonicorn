@@ -79,32 +79,29 @@
             <div>
                 <select id="project_type" name="project_type" title="Please select something!">
                   <option value="">Select...</option>
-                  <option value="tomcat">tomcat</option>
-                  <option value="python">python</option>
-                  <option value="jar">jar</option>
-                  <option value="tar">tar</option>
+                  <option tal:repeat="item artifact_types" tal:attributes="value item.name; selected item.name == results.project_type" tal:content="item.name">some_type</option>
                 </select>
             </div>
             <div>
               <h2>Project Name</h2>
             </div>
             <div>
-                <input type="text" id="project_name" name="project_name" placeholder="Name of your project" />
+                <input type="text" id="project_name" name="project_name" placeholder="Name of your project" tal:attributes="value results.project_name if results.project_name else None"/>
             </div>
             <div>
               <h2>Code Review</h2>
             </div>
             <div>
                 <select id="code_review" name="code_review" required>
-                  <option value="no_review">No Code Review</option>
-                  <option value="review">Code Review</option>
+                  <option value="no_review" tal:attributes="selected results.code_review == 'no_review'">No Code Review</option>
+                  <option value="review" tal:attributes="selected results.code_review == 'review'">Code Review</option>
                 </select>
             </div>
             <div>
               <h2>Job Prefix</h2>
             </div>
             <div>
-              <input type="text" id="job_prefix" name="job_prefix" placeholder="PREFIX" />
+              <input type="text" id="job_prefix" name="job_prefix" placeholder="PREFIX" tal:attributes="value results.job_prefix if results.job_prefix else None"/>
             </div>
             <div>
               <h2>Job Server</h2>
@@ -125,35 +122,70 @@
       </div>
 
       <div tal:condition="confirm">
-        <div>
-          <h2>We are ready to create the following resources. Continue?</h2>
+        <div class="center">
           <div>
-            <h3>Git Repos</h3>
-            <p>${results.git_code_repo}
-            <p>${results.git_conf_repo}
+            <div class="center">
+              <h2>We are ready to create the following resources. Continue?</h2>
+            </div>
+            <div class="cp_form">
+              <ul>
+                <li>
+                  <h2>Git Repos</h2>
+                </li>
+                <li>
+                  ${results.git_code_repo}
+                </li>
+                <li>
+                  ${results.git_conf_repo}
+                </li>
+              </ul>
+            </div>
+            <div class="cp_form">
+              <ul>
+                <li>
+                  <h2>Jenkins Jobs</h2>
+                </li>
+                <li>
+                  ${results.job_review_name}
+                </li>
+                <li>
+                  ${results.job_code_name}
+                </li>
+                <li>
+                  ${results.job_conf_name}
+                </li>
+              </ul>
+            </div>
+            <div class="cp_form">
+              <ul>
+                <li>
+                  <h2>Installation dirs</h2>
+                </li>
+                <li>
+                  ${results.dir_app}
+                </li>
+                <li>
+                  ${results.dir_conf}
+                </li>
+              </ul>
+            </div>
           </div>
-          <div>
-            <h3>Jenkins Jobs</h3>
-            <p>${results.job_review_name}
-            <p>${results.job_code_name}
-            <p>${results.job_conf_name}
+          <div id="ss_submit" class="center">
+                <form class="cp_form" action="/ss" method="POST">
+                  <input type="hidden" name="form.confirm"/>
+                  <input class="button" type="submit" name="submit" value="Confirm"/>
+                </form>
+                <form class="cp_form" action="/ss" method="POST">
+                  <input type="hidden" name="form.edit"/>
+                  <input type="hidden" name="project_type" value="${results.project_type}"/>
+                  <input type="hidden" name="project_name" value="${results.project_name}"/>
+                  <input type="hidden" name="code_review" value="${results.code_review}"/>
+                  <input type="hidden" name="job_prefix" value="${results.job_prefix}"/>
+                  <input type="hidden" name="job_server" value="${results.job_server}"/>
+                  <input class="button" type="submit" name="submit" value="Edit"/>
+                </form>
           </div>
-          <div>
-            <h3>Installation dirs</h3>
-            <p>${results.dir_app}
-            <p>${results.dir_conf}
-          </div>
-        
         </div>
-        <form class="cp_form" action="/ss" method="POST">
-          <input type="hidden" name="form.confirm"/>
-          <ul>
-            <li>
-              <input class="button" type="submit" name="submit" value="Confirm"/>
-              <input class="button" type="submit" name="submit" value="Edit"/>
-            </li>
-          </ul>
-        </form>
       </div>
 
   </div>

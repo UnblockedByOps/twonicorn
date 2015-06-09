@@ -17,6 +17,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.response import Response
 from datetime import datetime
 import logging
+import re
 from twonicornweb.views import (
     site_layout,
     get_user,
@@ -68,42 +69,63 @@ def view_ss(request):
     confirm = params['confirm']
     results = None
 
+    results = dict.fromkeys(['project_type',
+                             'project_name',
+                             'code_review',
+                             'job_server',
+                             'job_prefix',
+                             'git_conf_repo',
+                             'job_review_name',
+                             'job_code_name',
+                             'job_conf_name',
+                             'dir_app',
+                             'dir_conf'])
+
+    q = DBSession.query(ArtifactType)
+    q = q.filter(ArtifactType.name != 'conf')
+    artifact_types = q.all()
+
+    if 'form.edit' in request.POST:
+         print "edit"
+         results['project_type'] = request.POST['project_type']
+         results['project_name'] = request.POST['project_name']
+         results['code_review'] = request.POST['code_review']
+         results['job_server'] = request.POST['job_server']
+         results['job_prefix'] = request.POST['job_prefix']
+
     if 'form.process' in request.POST:
          print "process"
-         project_type = request.POST['project_type']
-         project_name = request.POST['project_name']
-         code_review = request.POST['code_review']
-         job_server = request.POST['job_server']
-         job_prefix = request.POST['job_prefix']
+         results['project_type'] = request.POST['project_type']
+         results['project_name'] = request.POST['project_name']
+         results['code_review'] = request.POST['code_review']
+         results['job_server'] = request.POST['job_server']
+         results['job_prefix'] = request.POST['job_prefix']
 
-         if project_type == 'tomcat':
+         if results['project_type'] == 'tomcat':
              print "tomcat"
-             dir_app ='/app/tomcat/webapp'
-             dir_conf ='/app/tomcat/conf'
-         if project_type == 'python':
+             results['dir_app'] ='/app/tomcat/webapp'
+             results['dir_conf'] ='/app/tomcat/conf'
+         if results['project_type'] == 'python':
              print "python"
-             dir_app ='/app/{0}/venv'.format(project_name.replace(" ","_"))
-             dir_conf ='/app/{0}/conf'.format(project_name.replace(" ","_"))
+             # Camel case to underscore
+             a = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
+             convert = a.sub(r'_\1', results['project_name']).lower()
+             results['dir_app'] ='/app/{0}/venv'.format(convert.replace(" ","_"))
+             results['dir_conf'] ='/app/{0}/conf'.format(convert.replace(" ","_"))
 
-         git_repo_name = project_name.replace(" ","-")
-         git_code_repo = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}'.format(git_repo_name)
-         git_conf_repo = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}-conf'.format(git_repo_name)
-         job_part_name = 'https://ci-{0}.prod.cs/{1}_{2}'.format(job_server,job_prefix,project_name.replace(" ","-").capitalize())
-         if code_review:
-             job_review_name = job_part_name + '_Build-review'
-         job_code_name = job_part_name + '_Build-artifact'
-         job_conf_name = job_part_name + '_Build-conf'
+         # space to dash
+         results['git_repo_name'] = results['project_name'].replace(" ","-")
+         # Camel case to dash
+         b = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
+         results['git_repo_name'] = b.sub(r'-\1', results['git_repo_name']).lower()
 
-         results = {'project_type': project_type,
-                    'git_code_repo': git_code_repo,
-                    'git_conf_repo': git_conf_repo,
-                    'job_review_name': job_review_name,
-                    'job_code_name': job_code_name,
-                    'job_conf_name': job_conf_name,
-                    'dir_app': dir_app,
-                    'dir_conf': dir_conf,
-                   }
-
+         results['git_code_repo'] = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}'.format(results['git_repo_name'])
+         results['git_conf_repo'] = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}-conf'.format(results['git_repo_name'])
+         results['job_part_name'] = 'https://ci-{0}.prod.cs/{1}_{2}'.format(results['job_server'],results['job_prefix'],results['git_repo_name'].capitalize())
+         if results['code_review']:
+             results['job_review_name'] = results['job_part_name'] + '_Build-review'
+         results['job_code_name'] = results['job_part_name'] + '_Build-artifact'
+         results['job_conf_name'] = results['job_part_name'] + '_Build-conf'
 
          log.info('doing stuff: mode=%s,updated_by=%s'
                   % (mode,
@@ -121,4 +143,5 @@ def view_ss(request):
             'mode': mode,
             'confirm': confirm,
             'results': results,
+            'artifact_types': artifact_types,
            }
