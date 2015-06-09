@@ -59,6 +59,12 @@ a:hover {
 .right {
     float: right;
 }
+
+.center {
+  display: table;
+  margin: 0 auto;
+}
+
 .hidden {
     display: none;
 }
@@ -266,6 +272,13 @@ tr.dev_hover:hover td {
 .logout, .error {
     text-align: center;
     color: #F70000;
+}
+
+.red {
+    color: #F70000;
+}
+.green {
+    color: #28921F;
 }
 
 .login {
@@ -500,16 +513,6 @@ ul.user li.user:hover ul.user {
 }
 
 /* Glossary */
-select.day_select {
-  width: 100px !important;
-  background: #fff !important;
-}
-
-select.time_select {
-  width: 75px !important;
-  background: #fff !important;
-}
-
 td.glossary {
     white-space: normal;
 }
@@ -636,70 +639,28 @@ td.glossary {
 
 .cp_form input,
 .cp_form select {
-    height:25px;
     width:220px;
-    padding:2px;
+    padding-left:5px;
     display:inline-block;
 }
 
 .cp_form_group input[type=text] {
     height:25px;
     width:800px;
-    padding:2px;
+    padding-left:5px;
     display:inline-block;
 }
 
-.cp_form select,
-.cp_form_user input,
-.cp_form_user select,
-.cp_form_group select {
-    border:1px solid #aaa;
-    -moz-transition: padding .25s;
-    -webkit-transition: padding .25s;
-    -o-transition: padding .25s;
-    transition: padding .25s;
+.cp_form input.button {
+    width:100px;
 }
 
-.cp_form input:focus,
-.cp_form textarea:focus,
-.cp_form select:focus, 
-.cp_form_user input:focus,
-.cp_form_user textarea:focus,
-.cp_form_user select:focus, 
-.cp_form_group input:focus,
-.cp_form_group textarea:focus,
-.cp_form_group select:focus {
-    background: #fff;
-    border:1px solid #555;
+select.day_select {
+  width: 100px !important;
 }
 
-input:required {
-    background: #fff url(/static/red_asterisk.png) no-repeat 98% center;
-}
-
-select:required {
-    background: #fff url(/static/red_asterisk.png) no-repeat 92% center;
-}
-
-.cp_form input:focus:invalid, 
-.cp_form_user input:focus:invalid, 
-.cp_form_group input:focus:invalid {
-    background: #fff url(/static/invalid.png) no-repeat 98% center;
-    border-color: #b03535
-}
-
-.cp_form input:required:valid, 
-.cp_form_user input:required:valid, 
-.cp_form_group input:required:valid {
-    background: #fff url(/static/valid.png) no-repeat 98% center;
-    border-color: #28921f;
-}
-
-.cp_form select:required:valid, 
-.cp_form_user select:required:valid, 
-.cp_form_group select:required:valid {
-    background: #fff url(/static/valid.png) no-repeat 90% center;
-    border-color: #28921f;
+select.time_select {
+  width: 75px !important;
 }
 
 input.button.exp {
@@ -838,3 +799,59 @@ li.exp {
   padding: 3px;
 }
 /* END Hist header */
+/* START self service form */
+.ss_form input,
+.ss_form select {
+    width: 220px;
+    padding-left: 5px;
+    display: inline-block;
+}
+.ss_form input.button {
+    width: 100px;
+}
+
+.ss_form label.invalid {
+    color: red;
+    padding-left: 10px;
+}
+
+#ss_submit {
+  padding-top: 10px;
+}
+#ss_form_c {
+  width: 600px;
+}
+#ss_cb_autosnap,
+#ss_cb_skel {
+  width: 20px;
+}
+/* END self service form */
+
+/* START loading overlay */
+#overlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+}
+#loading_c {
+  position: relative;
+  top: 50%;
+  padding: 20px;
+  background: #2FAACE;
+}
+#loading_h {
+  display: table;
+  margin: 0 auto;
+  color: #fff;
+  border-bottom: none;
+}
+#loading_i {
+  width: 220px;
+  height: 19px;
+  display: table;
+  margin: 0 auto;
+}
+/* END loading overlay */

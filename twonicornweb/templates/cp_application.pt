@@ -23,7 +23,7 @@
         $(function() {
           $(document.body).on('change', '[id^=artifact_type-]' ,function(){
             var pkg_td_idx = $(this).attr('id').split("-", 2);
-            if ($.inArray($(this).val(), ["python", "tar", "jar"]) > -1) {
+            if ($.inArray($(this).val(), ["python", "jar"]) > -1) {
                 $( "#pkg_td"+pkg_td_idx[1] ).show();
                 $( "#package_name"+pkg_td_idx[1] ).prop('required',true);
             } else {
@@ -41,7 +41,7 @@
             <ul>
               <li>
                 <h2>${subtitle}</h2>
-                <span class="required_notification">* Denotes Required Field</span>
+                <span class="required_notification">All Fields Required</span>
               </li>
               <li>
                 <h3>Application</h3>
@@ -186,7 +186,7 @@
             <ul>
               <li>
                 <h2>${subtitle}</h2>
-                <span class="required_notification">* Denotes Required Field</span>
+                <span class="required_notification">All Fields Required</span>
               </li>
               <li>
                 <h3>Application ID: ${app.application_id}</h3>

@@ -17,9 +17,27 @@
       xmlns="http://www.w3.org/1999/xhtml">
   <head profile="http://www.w3.org/2005/10/profile">
     <title>test</title>
-    <link href="/static/test.css" rel="stylesheet" type="text/css" />
+    <link href="/static/tc.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
+
+    <form action="/ss" method="POST">
+ 
+      <div class="test_form">
+        <div>
+          <select id="project_type" name="project_type" required>
+            <option value="tomcat">tomcat</option>
+            <option value="python">python</option>
+            <option value="jar">jar</option>
+            <option value="tar">tar</option>
+          </select>
+          <label for="job_prefix" style="display: inline;" class="error" id="job_prefix-error">This field is required.</label>
+        </div>
+        <div>
+        </div>
+      </div>
+
+    </form>
 
   </body>
 </html>

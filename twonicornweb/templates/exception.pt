@@ -13,27 +13,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<html lang="en-US">
-  <head profile="http://www.w3.org/2005/10/profile">
-    <link rel="icon"
-        type="image/png"
-        href="/static/favico.png?v=2">
-    <title>TUI: Logout</title>
-    <link href="/static/tc.css" rel="stylesheet" type="text/css" />
-  </head>
-  <body>
+<div metal:use-macro="layout">
+    <div metal:fill-slot="content">
 
-  <div id="logout">
-      <p class="logout">
-      <img src="/static/logo_medium.gif">
-      </p>
-  
-      <h2 class="error" tal:condition="message" tal:content="message"/>
+      <h2 class="error" tal:content="error"/>
 
-    <div class="center">
-      <input class="button" type="submit" value="Log In Again"  onclick="window.location='/login';"/>
-    </div>
   </div>
-
-  </body>
-</html>
+</div>
