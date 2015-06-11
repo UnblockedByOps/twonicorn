@@ -48,6 +48,85 @@ class SearchResult(object):
         self.phone = phone
         self.website = website
 
+def init_results():
+
+    results = dict.fromkeys(['project_type',
+                             'project_name',
+                             'code_review',
+                             'job_server',
+                             'job_prefix',
+                             'git_conf_repo',
+                             'job_review_name',
+                             'job_code_name',
+                             'job_conf_name',
+                             'job_abs',
+                             'job_abs_name',
+                             'dir_app',
+                             'dir_conf'])
+
+    return results
+
+def get_results(request, results):
+
+    results['project_type'] = request.POST['project_type']
+    results['project_name'] = request.POST['project_name']
+    results['code_review'] = request.POST['code_review']
+    results['job_server'] = request.POST['job_server']
+    results['job_prefix'] = request.POST['job_prefix'].upper()
+    try:
+        results['job_abs'] = request.POST['job_abs']
+    except:
+        pass
+
+    # Convert camel case, spaces and dashes to underscore for job naming and dir creation.
+    a = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
+    convert = a.sub(r'_\1', results['project_name']).lower()
+    convert = convert.replace(" ","_")
+    convert = convert.replace("-","_")
+
+    if results['project_type'] == 'war':
+        log.info("self service project type is war")
+
+        results['dir_app'] ='/app/tomcat/webapp'
+        results['dir_conf'] ='/app/tomcat/conf'
+
+    if results['project_type'] == 'jar':
+        log.info("self service project type is jar")
+
+        results['dir_app'] ='/app/{0}/lib'.format(convert)
+        results['dir_conf'] ='/app/{0}/conf'.format(convert)
+
+    if results['project_type'] == 'python':
+        log.info("self service project type is python")
+
+        results['dir_app'] ='/app/{0}/venv'.format(convert)
+        results['dir_conf'] ='/app/{0}/conf'.format(convert)
+
+    if results['project_type'] == 'tar':
+        log.info("self service project type is tar")
+
+        results['dir_app'] ='/app/{0}'.format(convert)
+        results['dir_conf'] ='/app/{0}/conf'.format(convert)
+
+    # space to dash
+    results['git_repo_name'] = results['project_name'].replace(" ","-")
+    # Camel case to dash
+    b = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
+    results['git_repo_name'] = b.sub(r'-\1', results['git_repo_name']).lower()
+
+    results['git_code_repo'] = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}'.format(results['git_repo_name'])
+    results['git_conf_repo'] = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}-conf'.format(results['git_repo_name'])
+    results['job_ci_name'] = 'https://ci-{0}.prod.cs/{1}_{2}'.format(results['job_server'],results['job_prefix'],results['git_repo_name'].capitalize())
+
+    if results['code_review'] == 'review':
+        results['job_review_name'] = results['job_ci_name'] + '_Build-review'
+    results['job_code_name'] = results['job_ci_name'] + '_Build-artifact'
+    results['job_conf_name'] = results['job_ci_name'] + '_Build-conf'
+
+    if results['job_abs']:
+        results['job_abs_name'] = 'https://abs-{0}.prod.cs/{1}_{2}_Run'.format(results['job_server'],results['job_prefix'],results['git_repo_name'].capitalize())
+
+    return results
 
 
 @view_config(route_name='ss', permission='view', renderer='twonicornweb:templates/ss.pt')
@@ -70,17 +149,7 @@ def view_ss(request):
     mode = params['mode']
     confirm = params['confirm']
     processed = params['processed']
-    results = dict.fromkeys(['project_type',
-                             'project_name',
-                             'code_review',
-                             'job_server',
-                             'job_prefix',
-                             'git_conf_repo',
-                             'job_review_name',
-                             'job_code_name',
-                             'job_conf_name',
-                             'dir_app',
-                             'dir_conf'])
+    results = init_results()
 
     # Build some lists of choices
     q = DBSession.query(ArtifactType)
@@ -94,65 +163,12 @@ def view_ss(request):
     if 'form.edit' in request.POST:
          log.info("Editing self service")
 
-         results['project_type'] = request.POST['project_type']
-         results['project_name'] = request.POST['project_name']
-         results['code_review'] = request.POST['code_review']
-         results['job_server'] = request.POST['job_server']
-         results['job_prefix'] = request.POST['job_prefix']
+         results = get_results(request, results)
 
     if 'form.preprocess' in request.POST:
          log.info("Pre-processing self service")
 
-         results['project_type'] = request.POST['project_type']
-         results['project_name'] = request.POST['project_name']
-         results['code_review'] = request.POST['code_review']
-         results['job_server'] = request.POST['job_server']
-         results['job_prefix'] = request.POST['job_prefix']
-
-         # Convert camel case, spaces and dashes to underscore for job naming and dir creation.
-         a = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
-         convert = a.sub(r'_\1', results['project_name']).lower()
-         convert = convert.replace(" ","_")
-         convert = convert.replace("-","_")
-
-         if results['project_type'] == 'war':
-             log.info("self service project type is war")
-
-             results['dir_app'] ='/app/tomcat/webapp'
-             results['dir_conf'] ='/app/tomcat/conf'
-
-         if results['project_type'] == 'jar':
-             log.info("self service project type is jar")
-
-             results['dir_app'] ='/app/{0}/lib'.format(convert)
-             results['dir_conf'] ='/app/{0}/conf'.format(convert)
-
-         if results['project_type'] == 'python':
-             log.info("self service project type is python")
-
-             results['dir_app'] ='/app/{0}/venv'.format(convert)
-             results['dir_conf'] ='/app/{0}/conf'.format(convert)
-
-         if results['project_type'] == 'tar':
-             log.info("self service project type is tar")
-
-             results['dir_app'] ='/app/{0}'.format(convert)
-             results['dir_conf'] ='/app/{0}/conf'.format(convert)
-
-         # space to dash
-         results['git_repo_name'] = results['project_name'].replace(" ","-")
-         # Camel case to dash
-         b = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
-         results['git_repo_name'] = b.sub(r'-\1', results['git_repo_name']).lower()
-
-         results['git_code_repo'] = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}'.format(results['git_repo_name'])
-         results['git_conf_repo'] = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}-conf'.format(results['git_repo_name'])
-         results['job_part_name'] = 'https://ci-{0}.prod.cs/{1}_{2}'.format(results['job_server'],results['job_prefix'],results['git_repo_name'].capitalize())
-
-         if results['code_review'] == 'review':
-             results['job_review_name'] = results['job_part_name'] + '_Build-review'
-         results['job_code_name'] = results['job_part_name'] + '_Build-artifact'
-         results['job_conf_name'] = results['job_part_name'] + '_Build-conf'
+         results = get_results(request, results)
 
          log.info('doing stuff: mode=%s,updated_by=%s'
                   % (mode,

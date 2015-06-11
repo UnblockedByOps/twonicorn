@@ -50,16 +50,20 @@
                   },
                   job_prefix: {
                       required: true,
-                      rangelength: [2, 5]
+                      lettersonly: true,
+                      rangelength: [2, 20]
                   },
                   job_server: {
                       required: true,
-                  },
+                  }
               },
               messages: {
                   "project_name": {
                       required: "You must enter a project name",
                       loginRegex: "Project format not valid"
+                  },
+                  "job_prefix": {
+                      required: "You must enter a job prefix"
                   }
               },
               errorPlacement: function(error, element) {
@@ -80,7 +84,7 @@
               <h2>Project type</h2>
             </div>
             <div>
-                <p>The type of application you are developing. This will determine which jenkins jobs will be copied, and how the application will be created in twonicorn.
+                <p>The type of application you are developing. This will determine which Jenkins job templates to use, and how the application will be created in twonicorn.
                 <p>
                 <select id="project_type" name="project_type" title="Please select a project type.">
                   <option value="">Select...</option>
@@ -91,20 +95,20 @@
               <h2>Project Name</h2>
             </div>
             <div>
-                <p>The name of the project. This will be used to name the git repos, jenkins jobs and deployment dirs. Generally speaking, this should be the name of the artifact.
+                <p>The name of the project. This will be used to name the git repos, Jenkins jobs, deployment directory paths, and must match the name you set your package/artifact to for jar and python projects.
                 <p>
                 <input type="text" 
                        id="project_name"
                        name="project_name"
                        placeholder="Name of your project"
                        tal:attributes="value results.project_name if results.project_name else None"
-                       title="Please enter a project name."/>
+                       title="Project name must contain only letters, numbers, spaces, or dashes."/>
             </div>
             <div>
               <h2>Code Review?</h2>
             </div>
             <div>
-                <p>Whether or not you would like gerrit code review for your project.
+                <p>Whether or not you would like Gerrit code review enabled for your project.
                 <p>
                 <select id="code_review" name="code_review" required title="Please select if you would like code review or not.">
                   <option value="no_review" tal:attributes="selected results.code_review == 'no_review'">No</option>
@@ -115,24 +119,32 @@
               <h2>Job Prefix</h2>
             </div>
             <div>
-                <p>A two to five character prefix to be used for the jenkins jobs.
+                <p>A two to twenty character prefix to be used in the Jenkins job names.
                 <p>
               <input type="text" 
                      id="job_prefix" 
                      name="job_prefix" 
                      placeholder="PREFIX" tal:attributes="value results.job_prefix if results.job_prefix else None"
-                     title="Please enter a jenkins job prefix."/>
+                     title="Prefix must be between 2 and 20 letters only."/>
             </div>
             <div>
               <h2>Job Server</h2>
             </div>
             <div>
-                <p>What jenkins instance you want your build/run jobs created on.
+                <p>What Jenkins instances you want your build/run jobs created on.
                 <p>
                 <select id="job_server" name="job_server" title="Please select your jenkins instance.">
                   <option value="">Select...</option>
                   <option tal:repeat="item jenkins_instances" tal:attributes="value item.instance_name ; selected item.instance_name == results.job_server" tal:content="item.instance_name">jenkins</option>
                 </select>
+            </div>
+            <div>
+              <h2>ABS Skeleton Job</h2>
+            </div>
+            <div>
+                <p>Would you like an ABS skeleton job created with the twonicorn execute shell?
+                <p>
+                  <input id="ss_cb" type="checkbox" name="job_abs" value="job_abs" tal:attributes="checked 'True' if results.job_abs else None">Create abs skeleton job?</input>
             </div>
             <div id="ss_submit">
               <input id="submit_btn" class="button" type="submit" name="submit" value="Review"/>
@@ -152,7 +164,7 @@
                 <li>
                   <h2>Git Repos</h2>
                 </li>
-                <li tal:content="'Code Review' if results.code_review == 'review' else 'No Code Review'">
+                <li tal:content="'Code Review: Yes' if results.code_review == 'review' else 'Code Review: No'">
                 <li>
                   ${results.git_code_repo}
                 </li>
@@ -174,6 +186,8 @@
                 </li>
                 <li>
                   ${results.job_conf_name}
+                </li>
+                  <li tal:content="results['job_abs_name'] if results['job_abs'] else 'No abs job requested'">
                 </li>
               </ul>
             </div>
@@ -203,6 +217,7 @@
                   <input type="hidden" name="code_review" value="${results.code_review}"/>
                   <input type="hidden" name="job_prefix" value="${results.job_prefix}"/>
                   <input type="hidden" name="job_server" value="${results.job_server}"/>
+                  <input type="hidden" name="job_abs" value="${results.job_abs}"/>
                   <input class="button" type="submit" name="submit" value="Edit"/>
                 </form>
           </div>
