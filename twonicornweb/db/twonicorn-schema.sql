@@ -254,6 +254,22 @@ CREATE TABLE `deployment_time_windows` (
 
 CREATE UNIQUE INDEX idx_deployment_time_window on deployment_time_windows (application_id);
 
+###
+### TABLE: jenkins_instances
+###   This table holds all thepossible jenkins instances that jobs
+###   can be created on.
+###
+DROP TABLE IF EXISTS `jenkins_instances`;
+CREATE TABLE `jenkins_instances` (
+  `jenkins_instance_id` mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `instance_name`             varchar(200) NOT NULL, # this could be/become a FK
+  `updated_by`                varchar(75) NOT NULL, # this could be/become a FK
+  `created`                   timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated`                   timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+CREATE UNIQUE INDEX idx_jenkins_instance_unique on jenkins_instances (instance_name);
+
 ### 
 ### TABLE: groups
 ###   This is the primary groups table. 

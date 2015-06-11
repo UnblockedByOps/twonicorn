@@ -644,6 +644,10 @@ td.glossary {
     display:inline-block;
 }
 
+.cp_form input.button {
+    width:100px;
+}
+
 select.day_select {
   width: 100px !important;
 }
@@ -806,5 +810,8 @@ li.exp {
 
 #ss_submit {
   padding-top: 10px;
+}
+#ss_form_c {
+  width: 600px;
 }
 /* END self service form */

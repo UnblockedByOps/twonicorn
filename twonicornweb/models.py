@@ -408,3 +408,11 @@ class DeploymentTimeWindow(Base):
     created                          = Column(TIMESTAMP, nullable=False)
     updated                          = Column(TIMESTAMP, nullable=False)
     application                      = relationship("Application", backref=backref('deployment_time_windows'))
+
+class JenkinsInstance(Base):
+    __tablename__ = 'jenkins_instances'
+    jenkins_instance_id              = Column(Integer, primary_key=True, nullable=False)
+    instance_name                    = Column(Text, nullable=False)
+    updated_by                       = Column(Text, nullable=False)
+    created                          = Column(TIMESTAMP, nullable=False)
+    updated                          = Column(TIMESTAMP, nullable=False)

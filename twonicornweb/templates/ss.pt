@@ -29,55 +29,60 @@
             }
           });
 
-    $('#submit').validate({
-        wrapper: "span",
-        errorClass: "invalid",
-        rules: {
-            project_type: {
-                required: true,
-            },
-            project_name: {
-                required: true,
-                alphanumeric: true,
-                minlength: 5
-            },
-            code_review: {
-                required: true,
-            },
-            job_prefix: {
-                required: true,
-                rangelength: [2, 5]
-            },
-            job_server: {
-                required: true,
-            },
-        },
-        errorPlacement: function(error, element) {
-            error.insertAfter(element);
-//            error.appendTo(element.parent().next());
-        }
-    });
+          $.validator.addMethod("projectRegex", function(value, element) {
+              return this.optional(element) || /^[a-z0-9\-\s]+$/i.test(value);
+          }, "Project name must contain only letters, numbers, spaces, or dashes.");
+      
+          $('#submit').validate({
+              wrapper: "span",
+              errorClass: "invalid",
+              rules: {
+                  project_type: {
+                      required: true,
+                  },
+                  project_name: {
+                      required: true,
+                      projectRegex: true,
+                      minlength: 5
+                  },
+                  code_review: {
+                      required: true,
+                  },
+                  job_prefix: {
+                      required: true,
+                      rangelength: [2, 5]
+                  },
+                  job_server: {
+                      required: true,
+                  },
+              },
+              messages: {
+                  "project_name": {
+                      required: "You must enter a project name",
+                      loginRegex: "Project format not valid"
+                  }
+              },
+              errorPlacement: function(error, element) {
+                  error.insertAfter(element);
+      //            error.appendTo(element.parent().next());
+              }
+          });
 
-// $(function() {
-//    $("#submit_btn").click(function(){
-//       if (confirm("Click OK to continue?")){
-//          $('form#submit').submit();
-//       }
-//    });
-// });
         });
 
       </script>
 
-      <div tal:condition="not confirm">
+      <div tal:condition="not confirm and not processed" class="center" id="ss_form_c">
         <form id="submit" class="ss_form" action="/ss" method="POST" onsubmit="return(validate());">
-          <input type="hidden" name="form.process"/>
+          <input type="hidden" name="form.preprocess"/>
      
             <div>
               <h2>Project type</h2>
             </div>
             <div>
-                <select id="project_type" name="project_type" title="Please select something!">
+                <p>The type of application you are developing. This will determine which jenkins jobs will be copied, and how the application will be created in twonicorn.
+                <p>
+                <select id="project_type" name="project_type" title="Please select a project type.">
                   <option value="">Select...</option>
                   <option tal:repeat="item artifact_types" tal:attributes="value item.name; selected item.name == results.project_type" tal:content="item.name">some_type</option>
                 </select>
@@ -86,36 +91,51 @@
               <h2>Project Name</h2>
             </div>
             <div>
-                <input type="text" id="project_name" name="project_name" placeholder="Name of your project" tal:attributes="value results.project_name if results.project_name else None"/>
+                <p>The name of the project. This will be used to name the git repos, jenkins jobs and deployment dirs. Generally speaking, this should be the name of the artifact.
+                <p>
+                <input type="text" 
+                       id="project_name"
+                       name="project_name"
+                       placeholder="Name of your project"
+                       tal:attributes="value results.project_name if results.project_name else None"
+                       title="Please enter a project name."/>
             </div>
             <div>
-              <h2>Code Review</h2>
+              <h2>Code Review?</h2>
             </div>
             <div>
-                <select id="code_review" name="code_review" required>
-                  <option value="no_review" tal:attributes="selected results.code_review == 'no_review'">No Code Review</option>
-                  <option value="review" tal:attributes="selected results.code_review == 'review'">Code Review</option>
+                <p>Whether or not you would like gerrit code review for your project.
+                <p>
+                <select id="code_review" name="code_review" required title="Please select if you would like code review or not.">
+                  <option value="no_review" tal:attributes="selected results.code_review == 'no_review'">No</option>
+                  <option value="review" tal:attributes="selected results.code_review == 'review'">Yes</option>
                 </select>
             </div>
             <div>
               <h2>Job Prefix</h2>
             </div>
             <div>
-              <input type="text" id="job_prefix" name="job_prefix" placeholder="PREFIX" tal:attributes="value results.job_prefix if results.job_prefix else None"/>
+                <p>A two to five character prefix to be used for the jenkins jobs.
+                <p>
+              <input type="text" 
+                     id="job_prefix" 
+                     name="job_prefix" 
+                     placeholder="PREFIX" tal:attributes="value results.job_prefix if results.job_prefix else None"
+                     title="Please enter a jenkins job prefix."/>
             </div>
             <div>
               <h2>Job Server</h2>
             </div>
             <div>
-                <select id="job_server" name="job_server" title="Please select something!">
+                <p>What jenkins instance you want your build/run jobs created on.
+                <p>
+                <select id="job_server" name="job_server" title="Please select your jenkins instance.">
                   <option value="">Select...</option>
-                  <option value="ops">ops</option>
-                  <option value="stats">stats</option>
-                  <option value="coredata">coredata</option>
+                  <option tal:repeat="item jenkins_instances" tal:attributes="value item.instance_name ; selected item.instance_name == results.job_server" tal:content="item.instance_name">jenkins</option>
                 </select>
             </div>
-            <div>
-              <input id="submit_btn" class="button" type="submit" name="submit" value="Submit"/>
+            <div id="ss_submit">
+              <input id="submit_btn" class="button" type="submit" name="submit" value="Review"/>
             </div>
         </form>
 
@@ -132,6 +152,7 @@
                 <li>
                   <h2>Git Repos</h2>
                 </li>
+                <li tal:content="'Code Review' if results.code_review == 'review' else 'No Code Review'">
                 <li>
                   ${results.git_code_repo}
                 </li>
@@ -145,7 +166,7 @@
                 <li>
                   <h2>Jenkins Jobs</h2>
                 </li>
-                <li>
+                <li tal:condition="results['code_review'] == 'review'">
                   ${results.job_review_name}
                 </li>
                 <li>
@@ -186,7 +207,11 @@
                 </form>
           </div>
         </div>
-      </div>
+      </div> <!-- confirm -->
+
+      <div tal:condition="processed">
+        <p>SOON.
+      </div> <!-- processed -->
 
   </div>
 </div>
