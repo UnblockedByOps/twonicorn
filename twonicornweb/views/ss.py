@@ -13,11 +13,9 @@
 #  limitations under the License.
 #
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPFound
-from pyramid.response import Response
-from datetime import datetime
 import logging
 import re
+import requests
 from twonicornweb.views import (
     site_layout,
     get_user,
@@ -25,7 +23,6 @@ from twonicornweb.views import (
 from twonicornweb.views.cp_application import (
     create_application,
     )
-
 from twonicornweb.models import (
     DBSession,
     ArtifactType,
@@ -39,8 +36,6 @@ class UserInput(object):
     def __init__(self, 
                  project_type = None,
                  project_name = None,
-                 application_name = None,
-                 nodegroup = None,
                  code_review = None,
                  job_server = None,
                  job_prefix = None,
@@ -55,8 +50,6 @@ class UserInput(object):
                  dir_conf = None):
         self.project_type = project_type
         self.project_name = project_name
-        self.application_name = application_name
-        self.nodegroup = nodegroup
         self.code_review = code_review
         self.job_server = job_server
         self.job_prefix = job_prefix
@@ -75,8 +68,6 @@ def format_user_input(request, ui):
 
     ui.project_type = request.POST['project_type']
     ui.project_name = request.POST['project_name']
-    ui.application_name = request.POST['application_name']
-    ui.nodegroup = request.POST['nodegroup']
     ui.code_review = request.POST['code_review']
     ui.job_server = request.POST['job_server']
     ui.job_prefix = request.POST['job_prefix'].upper()
@@ -125,7 +116,7 @@ def format_user_input(request, ui):
     ui.git_conf_repo = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}-conf'.format(ui.git_repo_name)
     ui.job_ci_name = 'https://ci-{0}.prod.cs/{1}_{2}'.format(ui.job_server, ui.job_prefix, ui.git_repo_name.capitalize())
 
-    if ui.code_review == 'review':
+    if ui.code_review == 'true':
         ui.job_review_name = ui.job_ci_name + '_Build-review'
     ui.job_code_name = ui.job_ci_name + '_Build-artifact'
     ui.job_conf_name = ui.job_ci_name + '_Build-conf'
@@ -135,11 +126,86 @@ def format_user_input(request, ui):
 
     return ui
 
+def _api_get(request, uri):
+
+    # Hardcode for now
+    verify_ssl = False
+    api_protocol = 'http'
+    api_host = request.host
+
+    # This becomes the api call
+    api_url = (api_protocol
+               + '://'
+               + api_host
+               + uri)
+
+    logging.info('Requesting data from API: %s' % api_url)
+    r = requests.get(api_url, verify=verify_ssl)
+
+    if r.status_code == requests.codes.ok:
+
+        logging.info('Response data: %s' % r.json())
+        return r.json()
+
+    else:
+
+        logging.info('There was an error querying the API: '
+                      'http_status_code=%s,reason=%s,request=%s'
+                      % (r.status_code, r.reason, api_url))
+        return None
+
+
+def check_git_repo(repo_name):
+    """Check and make sure that the cond and conf repos don't
+       already exist in gerrit"""
+
+    r = requests.get('https://gerrit.ctgrd.com/projects/{0}'.format(repo_name))
+    if  r.status_code == 404:
+        log.info("repo {0} does not exist, continuing".format(repo_name))
+        r = requests.get('https://gerrit.ctgrd.com/projects/{0}-conf'.format(repo_name))
+        if  r.status_code == 404:
+            log.info("repo {0}-conf does not exist, continuing".format(repo_name))
+            return True
+        else:
+            log.info("repo {0} already exists, aborting".format(repo_name))
+    else:
+        log.info("repo {0} already exists, aborting".format(repo_name))
+
+    return None
+
+
 def create_git_repo(ui, git_job, git_token):
 
-    log.info("Creating git repos for {0}".format(ui.git_repo_name))
+    if check_git_repo(ui.git_repo_name):
+        log.info("Creating git repos for {0}".format(ui.git_repo_name))
+    
+        code_review = 'No-code-review'
+        if ui.code_review == 'true':
+            code_review = 'Code-review'
+    
+        payload = {'token': git_token,
+                   'PROJECT_TYPE': code_review,
+                   'PROJECT_NAME': ui.git_repo_name,
+                   'PROJECT_DESCRIPTION': '{0} created by SELF_SERVICE'.format(ui.project_name),
+                   'CREATE_CONFIG_REPO': 'true',
+                   'cause': 'ss_{0}'.format(ui.git_repo_name)
+        }
+        try:
+            log.info('Triggering git repo creation job: {0}/buildWithParameters params: {1}'.format(git_job, payload))
+            r = requests.get('{0}/buildWithParameters'.format(git_job), params=payload)
+        except Exception, e:
+            log.error("Failed to trigger git repo creation: {0}".format(e))
+            return None
+    
+        if r.status_code == 200:
+            # check to make sure the job succeeded
+            log.info("Checking for job success")
 
-#    /buildWithParameters?token=TOKEN_NAME&cause=Cause+Text
+            # Put this into a fucntion
+            r = requests.get('https://abs-ops.prod.cs/job/ABT_Create_Repository-test/lastBuild/api/json')
+            foo = r.json()
+            foo['description']
+            foo['number']
 
 
 @view_config(route_name='ss', permission='view', renderer='twonicornweb:templates/ss.pt')
@@ -195,8 +261,8 @@ def view_ss(request):
              ui = format_user_input(request, ui)
 
              log.info("Creating twonicorn application")
-             ca = {'application_name': ui.application_name,
-                   'nodegroup': ui.nodegroup,
+             ca = {'application_name': ui.project_name,
+                   'nodegroup': 'SELF_SERVICE',
                    'artifact_types': [ui.project_type, 'conf'],
                    'deploy_paths': [ui.dir_app, ui.dir_conf],
                    'package_names': [ui.project_name, ''],
@@ -210,17 +276,15 @@ def view_ss(request):
                    'ss': True
              }
 
-             r = create_application(**ca)
-             log.info("Successfully created application: {0}".format(r.location))
+             app = create_application(**ca)
+             if app.status_code == 302:
+                 log.info("Successfully created application: {0}".format(app.location))
+                 # Need to get deploy ids here
 
-             log.info("Creating git repos")
-             try:
-                 create_git_repo(ui)
-             except Exception, e:
-                 log.error("Failed to create git repo: {0}".format(e))
+                 if create_git_repo(ui, request.registry.settings['ss.git_job'], request.registry.settings['ss.git_token']):
 
-             log.info("Creating jenkins jobs")
-             processed = 'true'
+                     log.info("Creating jenkins jobs")
+                     processed = 'true'
 
          except Exception, e:
              log.error("Failed to create application: {0}".format(e))
