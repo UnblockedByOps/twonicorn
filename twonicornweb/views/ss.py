@@ -135,7 +135,7 @@ def format_user_input(request, ui):
 
     return ui
 
-def create_git_repo(ui):
+def create_git_repo(ui, git_job, git_token):
 
     log.info("Creating git repos for {0}".format(ui.git_repo_name))
 
