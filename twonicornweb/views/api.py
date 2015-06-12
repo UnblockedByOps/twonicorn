@@ -70,6 +70,12 @@ def view_api(request):
 
         for d in app.deploys:
             each = {}
+            # FIXME: hack to get around retrieving deploy ids without breaking deploy.py
+            if not env:
+                each['deploy_id'] = d.deploy_id
+                each['deploy_path'] = d.deploy_path
+                each['artifact_type'] = d.type.name
+
             a = d.get_assignment(env, lifecycle)
             if a:
                 try:

@@ -23,7 +23,7 @@
         $(function() {
           $(document.body).on('change', '[id^=artifact_type-]' ,function(){
             var pkg_td_idx = $(this).attr('id').split("-", 2);
-            if ($.inArray($(this).val(), ["python", "tar"]) > -1) {
+            if ($.inArray($(this).val(), ["python", "jar"]) > -1) {
                 $( "#pkg_td"+pkg_td_idx[1] ).show();
                 $( "#package_name"+pkg_td_idx[1] ).prop('required',true);
             } else {

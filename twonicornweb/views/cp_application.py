@@ -36,6 +36,11 @@ log = logging.getLogger(__name__)
 def create_application(**kwargs):
 
     try:
+        ss = kwargs['ss']
+    except:
+        ss = None
+
+    try:
         utcnow = datetime.utcnow()
         create = Application(application_name=kwargs['application_name'],
                              nodegroup=kwargs['nodegroup'],
@@ -74,7 +79,10 @@ def create_application(**kwargs):
     
         DBSession.flush()
     
-        return_url = '/deploys?application_id=%s&nodegroup=%s' % (application_id, kwargs['nodegroup'])
+        if ss:
+            return_url = '/api/application?id=%s' % (application_id)
+        else:
+            return_url = '/deploys?application_id=%s&nodegroup=%s' % (application_id, kwargs['nodegroup'])
         return HTTPFound(return_url)
     
     except Exception, e:

@@ -22,111 +22,124 @@ from twonicornweb.views import (
     site_layout,
     get_user,
     )
+from twonicornweb.views.cp_application import (
+    create_application,
+    )
 
 from twonicornweb.models import (
     DBSession,
-    Application,
-    Deploy,
     ArtifactType,
-    DeploymentTimeWindow,
     JenkinsInstance,
     )
 
 log = logging.getLogger(__name__)
 
-class SearchResult(object):
+class UserInput(object):
 
-    def __init__(self, name, cs_id, lat, lon, addr_street, addr_city, addr_state, addr_zip, phone, website):
-        self.name = name
-        self.cs_id = cs_id
-        self.lat = lat
-        self.lon = lon
-        self.addr_street = addr_street
-        self.addr_city = addr_city
-        self.addr_state = addr_state
-        self.addr_zip = addr_zip
-        self.phone = phone
-        self.website = website
+    def __init__(self, 
+                 project_type = None,
+                 project_name = None,
+                 application_name = None,
+                 nodegroup = None,
+                 code_review = None,
+                 job_server = None,
+                 job_prefix = None,
+                 git_code_repo = None,
+                 git_conf_repo = None,
+                 job_review_name = None,
+                 job_code_name = None,
+                 job_conf_name = None,
+                 job_abs = None,
+                 job_abs_name = None,
+                 dir_app = None,
+                 dir_conf = None):
+        self.project_type = project_type
+        self.project_name = project_name
+        self.application_name = application_name
+        self.nodegroup = nodegroup
+        self.code_review = code_review
+        self.job_server = job_server
+        self.job_prefix = job_prefix
+        self.git_code_repo = git_code_repo
+        self.git_conf_repo = git_conf_repo
+        self.job_review_name = job_review_name
+        self.job_code_name = job_code_name
+        self.job_conf_name = job_conf_name
+        self.job_abs = job_abs
+        self.job_abs_name = job_abs_name
+        self.dir_app = dir_app
+        self.dir_conf = dir_conf
 
-def init_results():
 
-    results = dict.fromkeys(['project_type',
-                             'project_name',
-                             'code_review',
-                             'job_server',
-                             'job_prefix',
-                             'git_conf_repo',
-                             'job_review_name',
-                             'job_code_name',
-                             'job_conf_name',
-                             'job_abs',
-                             'job_abs_name',
-                             'dir_app',
-                             'dir_conf'])
+def format_user_input(request, ui):
 
-    return results
-
-def get_results(request, results):
-
-    results['project_type'] = request.POST['project_type']
-    results['project_name'] = request.POST['project_name']
-    results['code_review'] = request.POST['code_review']
-    results['job_server'] = request.POST['job_server']
-    results['job_prefix'] = request.POST['job_prefix'].upper()
+    ui.project_type = request.POST['project_type']
+    ui.project_name = request.POST['project_name']
+    ui.application_name = request.POST['application_name']
+    ui.nodegroup = request.POST['nodegroup']
+    ui.code_review = request.POST['code_review']
+    ui.job_server = request.POST['job_server']
+    ui.job_prefix = request.POST['job_prefix'].upper()
     try:
-        results['job_abs'] = request.POST['job_abs']
+        ui.job_abs = request.POST['job_abs']
     except:
         pass
 
     # Convert camel case, spaces and dashes to underscore for job naming and dir creation.
     a = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
-    convert = a.sub(r'_\1', results['project_name']).lower()
+    convert = a.sub(r'_\1', ui.project_name).lower()
     convert = convert.replace(" ","_")
     convert = convert.replace("-","_")
 
-    if results['project_type'] == 'war':
+    if ui.project_type == 'war':
         log.info("self service project type is war")
 
-        results['dir_app'] ='/app/tomcat/webapp'
-        results['dir_conf'] ='/app/tomcat/conf'
+        ui.dir_app = '/app/tomcat/webapp'
+        ui.dir_conf = '/app/tomcat/conf'
 
-    if results['project_type'] == 'jar':
+    if ui.project_type == 'jar':
         log.info("self service project type is jar")
 
-        results['dir_app'] ='/app/{0}/lib'.format(convert)
-        results['dir_conf'] ='/app/{0}/conf'.format(convert)
+        ui.dir_app = '/app/{0}/lib'.format(convert)
+        ui.dir_conf = '/app/{0}/conf'.format(convert)
 
-    if results['project_type'] == 'python':
+    if ui.project_type == 'python':
         log.info("self service project type is python")
 
-        results['dir_app'] ='/app/{0}/venv'.format(convert)
-        results['dir_conf'] ='/app/{0}/conf'.format(convert)
+        ui.dir_app = '/app/{0}/venv'.format(convert)
+        ui.dir_conf = '/app/{0}/conf'.format(convert)
 
-    if results['project_type'] == 'tar':
+    if ui.project_type == 'tar':
         log.info("self service project type is tar")
 
-        results['dir_app'] ='/app/{0}'.format(convert)
-        results['dir_conf'] ='/app/{0}/conf'.format(convert)
+        ui.dir_app = '/app/{0}'.format(convert)
+        ui.dir_conf = '/app/{0}/conf'.format(convert)
 
     # space to dash
-    results['git_repo_name'] = results['project_name'].replace(" ","-")
+    ui.git_repo_name = ui.project_name.replace(" ","-")
     # Camel case to dash
     b = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
-    results['git_repo_name'] = b.sub(r'-\1', results['git_repo_name']).lower()
+    ui.git_repo_name = b.sub(r'-\1', ui.git_repo_name).lower()
 
-    results['git_code_repo'] = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}'.format(results['git_repo_name'])
-    results['git_conf_repo'] = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}-conf'.format(results['git_repo_name'])
-    results['job_ci_name'] = 'https://ci-{0}.prod.cs/{1}_{2}'.format(results['job_server'],results['job_prefix'],results['git_repo_name'].capitalize())
+    ui.git_code_repo = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}'.format(ui.git_repo_name)
+    ui.git_conf_repo = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}-conf'.format(ui.git_repo_name)
+    ui.job_ci_name = 'https://ci-{0}.prod.cs/{1}_{2}'.format(ui.job_server, ui.job_prefix, ui.git_repo_name.capitalize())
 
-    if results['code_review'] == 'review':
-        results['job_review_name'] = results['job_ci_name'] + '_Build-review'
-    results['job_code_name'] = results['job_ci_name'] + '_Build-artifact'
-    results['job_conf_name'] = results['job_ci_name'] + '_Build-conf'
+    if ui.code_review == 'review':
+        ui.job_review_name = ui.job_ci_name + '_Build-review'
+    ui.job_code_name = ui.job_ci_name + '_Build-artifact'
+    ui.job_conf_name = ui.job_ci_name + '_Build-conf'
 
-    if results['job_abs']:
-        results['job_abs_name'] = 'https://abs-{0}.prod.cs/{1}_{2}_Run'.format(results['job_server'],results['job_prefix'],results['git_repo_name'].capitalize())
+    if ui.job_abs:
+        ui.job_abs_name = 'https://abs-{0}.prod.cs/{1}_{2}_Run'.format(ui.job_server, ui.job_prefix, ui.git_repo_name.capitalize())
 
-    return results
+    return ui
+
+def create_git_repo(ui):
+
+    log.info("Creating git repos for {0}".format(ui.git_repo_name))
+
+#    /buildWithParameters?token=TOKEN_NAME&cause=Cause+Text
 
 
 @view_config(route_name='ss', permission='view', renderer='twonicornweb:templates/ss.pt')
@@ -149,7 +162,7 @@ def view_ss(request):
     mode = params['mode']
     confirm = params['confirm']
     processed = params['processed']
-    results = init_results()
+    ui = UserInput()
 
     # Build some lists of choices
     q = DBSession.query(ArtifactType)
@@ -163,12 +176,12 @@ def view_ss(request):
     if 'form.edit' in request.POST:
          log.info("Editing self service")
 
-         results = get_results(request, results)
+         ui = format_user_input(request, ui)
 
     if 'form.preprocess' in request.POST:
          log.info("Pre-processing self service")
 
-         results = get_results(request, results)
+         ui = format_user_input(request, ui)
 
          log.info('doing stuff: mode=%s,updated_by=%s'
                   % (mode,
@@ -178,10 +191,39 @@ def view_ss(request):
 
     if 'form.confirm' in request.POST:
          log.info("Processing self service request")
-         log.info("Creating twonicorn application")
-         log.info("Creating git repos")
-         log.info("Creating jenkins jobs")
-         processed = 'true'
+         try:
+             ui = format_user_input(request, ui)
+
+             log.info("Creating twonicorn application")
+             ca = {'application_name': ui.application_name,
+                   'nodegroup': ui.nodegroup,
+                   'artifact_types': [ui.project_type, 'conf'],
+                   'deploy_paths': [ui.dir_app, ui.dir_conf],
+                   'package_names': [ui.project_name, ''],
+                   'day_start': '1',
+                   'day_end': '4',
+                   'hour_start': '8',
+                   'minute_start': '0',
+                   'hour_end': '17',
+                   'minute_end': '0',
+                   'updated_by': user['login'],
+                   'ss': True
+             }
+
+             r = create_application(**ca)
+             log.info("Successfully created application: {0}".format(r.location))
+
+             log.info("Creating git repos")
+             try:
+                 create_git_repo(ui)
+             except Exception, e:
+                 log.error("Failed to create git repo: {0}".format(e))
+
+             log.info("Creating jenkins jobs")
+             processed = 'true'
+
+         except Exception, e:
+             log.error("Failed to create application: {0}".format(e))
 
     return {'layout': site_layout(),
             'page_title': page_title,
@@ -190,7 +232,7 @@ def view_ss(request):
             'mode': mode,
             'confirm': confirm,
             'processed': processed,
-            'results': results,
+            'ui': ui,
             'artifact_types': artifact_types,
             'jenkins_instances': jenkins_instances,
            }
