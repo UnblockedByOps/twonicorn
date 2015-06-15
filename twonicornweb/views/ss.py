@@ -16,6 +16,7 @@ from pyramid.view import view_config
 import logging
 import re
 import requests
+import time
 from twonicornweb.views import (
     site_layout,
     get_user,
@@ -174,6 +175,21 @@ def check_git_repo(repo_name):
     return None
 
 
+def check_create_git_repo(git_job, project_name):
+    """Make sure the jenkins job completed successfully"""
+
+    # It takes just under 3 seconds normally, so adding an initial sleep.
+    time.sleep(5)
+    # try the last successful build first
+    r = requests.get('{0}/lastBuild/api/json'.format(git_job))
+
+    count = 0
+    while (count < 5): 
+        last = r.json()
+        if last['description'] == project_name:
+            log.info('Found successful git creation job for: {0}'.format(project_name))
+        build_id = last['number']
+
 def create_git_repo(ui, git_job, git_token):
 
     if check_git_repo(ui.git_repo_name):
@@ -201,11 +217,11 @@ def create_git_repo(ui, git_job, git_token):
             # check to make sure the job succeeded
             log.info("Checking for job success")
 
-            # Put this into a fucntion
-            r = requests.get('https://abs-ops.prod.cs/job/ABT_Create_Repository-test/lastBuild/api/json')
-            foo = r.json()
-            foo['description']
-            foo['number']
+            if check_create_git_repo(git_job, ui.project_name):
+                log.info("Git repo creation job finished successfully")
+                return True
+            else:
+                log.erro("Failed to create git repos.")
 
 
 @view_config(route_name='ss', permission='view', renderer='twonicornweb:templates/ss.pt')
@@ -280,6 +296,8 @@ def view_ss(request):
              if app.status_code == 302:
                  log.info("Successfully created application: {0}".format(app.location))
                  # Need to get deploy ids here
+                 j = app.json()
+                 deploy_ids = {j[0]['artifact_type']: j[0]['deploy_id'], j[1]['artifact_type']: j[1]['deploy_id']}
 
                  if create_git_repo(ui, request.registry.settings['ss.git_job'], request.registry.settings['ss.git_token']):
 
