@@ -14,6 +14,7 @@
 #
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPCreated
 from pyramid.response import Response
 from datetime import datetime
 import logging
@@ -81,14 +82,13 @@ def create_application(**kwargs):
     
         if ss:
             return_url = '/api/application?id=%s' % (application_id)
+            return HTTPCreated(location=return_url)
         else:
             return_url = '/deploys?application_id=%s&nodegroup=%s' % (application_id, kwargs['nodegroup'])
         return HTTPFound(return_url)
     
     except Exception, e:
         raise
-        # FIXME not trapping correctly
-        DBSession.rollback()
         error_msg = ("Failed to create application (%s)" % (e))
         log.error(error_msg)
 

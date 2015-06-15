@@ -160,10 +160,11 @@ def check_git_repo(repo_name):
     """Check and make sure that the cond and conf repos don't
        already exist in gerrit"""
 
-    r = requests.get('https://gerrit.ctgrd.com/projects/{0}'.format(repo_name))
+    # FIXME: Make the gerrit server configurable
+    r = requests.get('https://qat.gerrit.ctgrd.com/projects/{0}'.format(repo_name), verify=False)
     if  r.status_code == 404:
         log.info("repo {0} does not exist, continuing".format(repo_name))
-        r = requests.get('https://gerrit.ctgrd.com/projects/{0}-conf'.format(repo_name))
+        r = requests.get('https://qat.gerrit.ctgrd.com/projects/{0}-conf'.format(repo_name), verify=False)
         if  r.status_code == 404:
             log.info("repo {0}-conf does not exist, continuing".format(repo_name))
             return True
@@ -175,22 +176,44 @@ def check_git_repo(repo_name):
     return None
 
 
-def check_create_git_repo(git_job, project_name):
+def get_last_build(job):
+    """get the last build number of a jenkins job"""
+
+    r = requests.get('{0}/lastBuild/api/json'.format(job))
+    last = r.json()
+    log.info('Last build id is: {0}'.format(last['number']))
+    return last['number']
+
+
+def check_create_git_repo(git_job, git_repo_name, last_id):
     """Make sure the jenkins job completed successfully"""
 
-    # It takes just under 3 seconds normally, so adding an initial sleep.
-    time.sleep(5)
-    # try the last successful build first
-    r = requests.get('{0}/lastBuild/api/json'.format(git_job))
+    check_id = last_id + 1
+    while (check_id < check_id + 5): 
+        count = 0
+        # Try each id for 30 seconds
+        while (count < 5): 
+            log.info('Checking iteration {0} of Job: {1}/{2}'.format(count, git_job, check_id))
+            # Start with the build id we got passed plus one, go up from there
+            r = requests.get('{0}/{1}/api/json'.format(git_job, check_id), verify=False)
+            if r.status_code == 200:
+                last = r.json()
+                log.info('Checking description: {0} against project name: {1} for SUCCESS'.format(last['description'], git_repo_name))
+                if last['description'] == git_repo_name and last['result'] == 'SUCCESS':
+                    log.info('Found successful git creation job for: {0}'.format(git_repo_name))
+                    return True
+            count = count + 1
+            time.sleep(5)
 
-    count = 0
-    while (count < 5): 
-        last = r.json()
-        if last['description'] == project_name:
-            log.info('Found successful git creation job for: {0}'.format(project_name))
-        build_id = last['number']
+        check_id = check_id + 1
+
+    log.error('Unable to find successful git creation job for: {0}'.format(git_repo_name))
+
 
 def create_git_repo(ui, git_job, git_token):
+
+    # Get the last id of the jenkins job to start. 
+    last_id = get_last_build(git_job)
 
     if check_git_repo(ui.git_repo_name):
         log.info("Creating git repos for {0}".format(ui.git_repo_name))
@@ -217,7 +240,7 @@ def create_git_repo(ui, git_job, git_token):
             # check to make sure the job succeeded
             log.info("Checking for job success")
 
-            if check_create_git_repo(git_job, ui.project_name):
+            if check_create_git_repo(git_job, ui.git_repo_name, int(last_id)):
                 log.info("Git repo creation job finished successfully")
                 return True
             else:
@@ -293,19 +316,24 @@ def view_ss(request):
              }
 
              app = create_application(**ca)
-             if app.status_code == 302:
+             print "HEADERS: ", app.headers
+             if app.status_code == 201:
                  log.info("Successfully created application: {0}".format(app.location))
-                 # Need to get deploy ids here
-                 j = app.json()
-                 deploy_ids = {j[0]['artifact_type']: j[0]['deploy_id'], j[1]['artifact_type']: j[1]['deploy_id']}
 
                  if create_git_repo(ui, request.registry.settings['ss.git_job'], request.registry.settings['ss.git_token']):
+
+                     url = 'http://{0}{1}'.format(request.host, app.location)
+                     log.info("Querying application: {0}".format(url))
+                     l = requests.get(url)
+                     j = l.json()
+                     deploy_ids = {j[0]['artifact_type']: j[0]['deploy_id'], j[1]['artifact_type']: j[1]['deploy_id']}
+
 
                      log.info("Creating jenkins jobs")
                      processed = 'true'
 
          except Exception, e:
-             log.error("Failed to create application: {0}".format(e))
+             log.error("Failed to complete self service: {0}".format(e))
 
     return {'layout': site_layout(),
             'page_title': page_title,
