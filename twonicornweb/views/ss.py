@@ -327,7 +327,7 @@ def view_ss(request):
                      l = requests.get(url)
                      j = l.json()
                      deploy_ids = {j[0]['artifact_type']: j[0]['deploy_id'], j[1]['artifact_type']: j[1]['deploy_id']}
-
+                     print "DEPLOY_IDS: ", deploy_ids
 
                      log.info("Creating jenkins jobs")
                      processed = 'true'

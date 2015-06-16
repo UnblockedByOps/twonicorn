@@ -18,6 +18,7 @@ from pyramid.httpexceptions import HTTPCreated
 from pyramid.response import Response
 from datetime import datetime
 import logging
+import transaction
 from twonicornweb.views import (
     site_layout,
     get_user,
@@ -79,6 +80,9 @@ def create_application(**kwargs):
             DBSession.add(create)
     
         DBSession.flush()
+        # Have to force commit transaction for self service. 
+        # For some reason returning isn't committing.
+        transaction.commit()
     
         if ss:
             return_url = '/api/application?id=%s' % (application_id)
