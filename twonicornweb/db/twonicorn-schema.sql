@@ -261,7 +261,7 @@ CREATE UNIQUE INDEX idx_deployment_time_window on deployment_time_windows (appli
 ###
 DROP TABLE IF EXISTS `jenkins_instances`;
 CREATE TABLE `jenkins_instances` (
-  `jenkins_instance_id` mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `jenkins_instance_id`       mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `instance_name`             varchar(200) NOT NULL, # this could be/become a FK
   `updated_by`                varchar(75) NOT NULL, # this could be/become a FK
   `created`                   timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -269,6 +269,22 @@ CREATE TABLE `jenkins_instances` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 CREATE UNIQUE INDEX idx_jenkins_instance_unique on jenkins_instances (instance_name);
+
+###
+### TABLE: jenkins_templates
+###   This table holds all the jenkins jobs to clone from.
+###
+DROP TABLE IF EXISTS `jenkins_templates`;
+CREATE TABLE `jenkins_templates` (
+  `jenkins_template_id`       mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `job_type`                  varchar(200) NOT NULL, # this could be/become a FK
+  `job_url`                   varchar(250) NOT NULL, # this could be/become a FK
+  `updated_by`                varchar(75) NOT NULL, # this could be/become a FK
+  `created`                   timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated`                   timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+CREATE UNIQUE INDEX idx_jenkins_job_type_unique on jenkins_templates (job_type);
 
 ### 
 ### TABLE: groups

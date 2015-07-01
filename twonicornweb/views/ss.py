@@ -246,6 +246,20 @@ def create_git_repo(ui, git_job, git_token):
             else:
                 log.erro("Failed to create git repos.")
 
+def get_deploy_ids(host, uri):
+
+    try:
+        url = 'http://{0}{1}'.format(host, uri)
+        log.info("Querying application: {0}".format(url))
+        l = requests.get(url)
+        j = l.json()
+        deploy_ids = {j[0]['artifact_type']: j[0]['deploy_id'], j[1]['artifact_type']: j[1]['deploy_id']}
+        return deploy_ids
+
+    except Exception, e:
+        log.error("Failed to retrieve deploy ids: {0}".format(e))
+        return None
+
 
 @view_config(route_name='ss', permission='view', renderer='twonicornweb:templates/ss.pt')
 def view_ss(request):
@@ -316,18 +330,15 @@ def view_ss(request):
              }
 
              app = create_application(**ca)
-             print "HEADERS: ", app.headers
              if app.status_code == 201:
                  log.info("Successfully created application: {0}".format(app.location))
 
                  if create_git_repo(ui, request.registry.settings['ss.git_job'], request.registry.settings['ss.git_token']):
 
-                     url = 'http://{0}{1}'.format(request.host, app.location)
-                     log.info("Querying application: {0}".format(url))
-                     l = requests.get(url)
-                     j = l.json()
-                     deploy_ids = {j[0]['artifact_type']: j[0]['deploy_id'], j[1]['artifact_type']: j[1]['deploy_id']}
-                     print "DEPLOY_IDS: ", deploy_ids
+                     deploy_ids = get_deploy_ids(request.host, app.location)
+                     if deploy_ids:
+                         print "DEPLOY_IDS: ", deploy_ids
+                         print "DEPLOY_ID conf: ", deploy_ids['conf']
 
                      log.info("Creating jenkins jobs")
                      processed = 'true'
