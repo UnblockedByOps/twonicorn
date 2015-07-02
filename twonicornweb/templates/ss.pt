@@ -18,6 +18,18 @@
       <script src="/static/additional-methods.min.js"></script>
       <script>
         $(function() {
+
+          // Only show autotagging option for types that support it
+          $(document.body).on('change', '[id=project_type]' ,function(){
+            if ($.inArray($(this).val(), ["war", "jar", "tar"]) > -1) {
+                $( "#auto_tag_header" ).show();
+                $( "#auto_tag_cb" ).show();
+            } else {
+                $( "#auto_tag_header" ).hide();
+                $( "#auto_tag_cb" ).hide();
+            }
+          });
+
           $.validator.addMethod("projectRegex", function(value, element) {
               return this.optional(element) || /^[a-z0-9\-\s]+$/i.test(value);
           }, "Project name must contain only letters, numbers, spaces, or dashes.");
@@ -91,6 +103,14 @@
                        tal:attributes="value ui.project_name if ui.project_name else None"
                        title="Project name must contain only letters, numbers, spaces, or dashes."/>
             </div>
+            <div id="auto_tag_header" class="hidden">
+              <h2>Auto Tagging</h2>
+            </div>
+            <div id="auto_tag_cb" class="hidden">
+                <p>Would you like to use automatic release tagging (maven projects only)? Note: this will automatically disable code review on your git repos.
+                <p>
+                  <input id="ss_cb_tag" type="checkbox" name="auto_tag" value="auto_tag" tal:attributes="checked 'True' if ui.auto_tag else None">Use maven auto tagging?</input>
+            </div>
             <div>
               <h2>Code Review?</h2>
             </div>
@@ -131,7 +151,7 @@
             <div>
                 <p>Would you like an ABS skeleton job created with the twonicorn execute shell?
                 <p>
-                  <input id="ss_cb" type="checkbox" name="job_abs" value="job_abs" tal:attributes="checked 'True' if ui.job_abs else None">Create abs skeleton job?</input>
+                  <input id="ss_cb_skel" type="checkbox" name="job_abs" value="job_abs" tal:attributes="checked 'True' if ui.job_abs else None">Create abs skeleton job?</input>
             </div>
             <div id="ss_submit">
               <input id="submit_btn" class="button" type="submit" name="submit" value="Review"/>

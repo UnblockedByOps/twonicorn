@@ -38,6 +38,7 @@ class UserInput(object):
                  project_type = None,
                  project_name = None,
                  code_review = None,
+                 auto_tag = None,
                  job_server = None,
                  job_prefix = None,
                  git_code_repo = None,
@@ -52,6 +53,7 @@ class UserInput(object):
         self.project_type = project_type
         self.project_name = project_name
         self.code_review = code_review
+        self.auto_tag = auto_tag
         self.job_server = job_server
         self.job_prefix = job_prefix
         self.git_code_repo = git_code_repo
@@ -74,6 +76,10 @@ def format_user_input(request, ui):
     ui.job_prefix = request.POST['job_prefix'].upper()
     try:
         ui.job_abs = request.POST['job_abs']
+    except:
+        pass
+    try:
+        ui.auto_tag = request.POST['auto_tag']
     except:
         pass
 
@@ -153,6 +159,26 @@ def _api_get(request, uri):
         logging.info('There was an error querying the API: '
                       'http_status_code=%s,reason=%s,request=%s'
                       % (r.status_code, r.reason, api_url))
+        return None
+
+
+def jenkins_get(url):
+
+    # Hardcode for now
+    verify_ssl = False
+
+    logging.info('Requesting data from jenkins: %s' % url)
+    r = requests.get(url, verify=verify_ssl)
+
+    if r.status_code == requests.codes.ok:
+        logging.info('Response data: %s' % r.json())
+        return r
+
+    else:
+
+        logging.info('There was an error querying Jenkins: '
+                      'http_status_code=%s,reason=%s,request=%s'
+                      % (r.status_code, r.reason, url))
         return None
 
 

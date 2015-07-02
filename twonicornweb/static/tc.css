@@ -814,7 +814,8 @@ li.exp {
 #ss_form_c {
   width: 600px;
 }
-#ss_cb {
+#ss_cb_tag,
+#ss_cb_skel {
   width: 20px;
 }
 /* END self service form */
