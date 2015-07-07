@@ -80,6 +80,7 @@ def format_user_input(request, ui):
         pass
     try:
         ui.auto_tag = request.POST['auto_tag']
+        ui.code_review = None
     except:
         pass
 
@@ -123,7 +124,7 @@ def format_user_input(request, ui):
     ui.git_conf_repo = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}-conf'.format(ui.git_repo_name)
     ui.job_ci_name = 'https://ci-{0}.prod.cs/{1}_{2}'.format(ui.job_server, ui.job_prefix, ui.git_repo_name.capitalize())
 
-    if ui.code_review == 'true':
+    if ui.code_review == 'true' and not ui.auto_tag:
         ui.job_review_name = ui.job_ci_name + '_Build-review'
     ui.job_code_name = ui.job_ci_name + '_Build-artifact'
     ui.job_conf_name = ui.job_ci_name + '_Build-conf'
@@ -132,34 +133,6 @@ def format_user_input(request, ui):
         ui.job_abs_name = 'https://abs-{0}.prod.cs/{1}_{2}_Run'.format(ui.job_server, ui.job_prefix, ui.git_repo_name.capitalize())
 
     return ui
-
-def _api_get(request, uri):
-
-    # Hardcode for now
-    verify_ssl = False
-    api_protocol = 'http'
-    api_host = request.host
-
-    # This becomes the api call
-    api_url = (api_protocol
-               + '://'
-               + api_host
-               + uri)
-
-    logging.info('Requesting data from API: %s' % api_url)
-    r = requests.get(api_url, verify=verify_ssl)
-
-    if r.status_code == requests.codes.ok:
-
-        logging.info('Response data: %s' % r.json())
-        return r.json()
-
-    else:
-
-        logging.info('There was an error querying the API: '
-                      'http_status_code=%s,reason=%s,request=%s'
-                      % (r.status_code, r.reason, api_url))
-        return None
 
 
 def jenkins_get(url):
@@ -182,8 +155,17 @@ def jenkins_get(url):
         return None
 
 
+def check_all_resources(repo_name, *jobs):
+    """Make sure that jenkins jobs and git repos don't already exist
+       before beginning"""
+    if check_git_repo(repo_name):
+        if check_jenkins_jobs(*jobs):
+            return True
+    return None
+
+
 def check_git_repo(repo_name):
-    """Check and make sure that the cond and conf repos don't
+    """Check and make sure that the code and conf repos don't
        already exist in gerrit"""
 
     # FIXME: Make the gerrit server configurable
@@ -195,11 +177,26 @@ def check_git_repo(repo_name):
             log.info("repo {0}-conf does not exist, continuing".format(repo_name))
             return True
         else:
-            log.info("repo {0} already exists, aborting".format(repo_name))
+            log.info("repo {0}-conf already exists, aborting".format(repo_name))
     else:
         log.info("repo {0} already exists, aborting".format(repo_name))
 
     return None
+
+
+def check_jenkins_jobs(jobs):
+    """Make sure that jenkins jobs don't already exist before beginning"""
+    # Hardcode for now
+    verify_ssl = False
+
+    for j in jobs:
+        logging.info('Verifying job does not already exist: %s' % j)
+        r = requests.get(j, verify=verify_ssl)
+        if r.status_code == requests.codes.ok:
+            logging.error('Jenkins job: %s already exists, aborting.' % j)
+            return None
+
+    return True
 
 
 def get_last_build(job):
@@ -215,7 +212,8 @@ def check_create_git_repo(git_job, git_repo_name, last_id):
     """Make sure the jenkins job completed successfully"""
 
     check_id = last_id + 1
-    while (check_id < check_id + 5): 
+    final_id = check_id + 4
+    while (check_id < final_id): 
         count = 0
         # Try each id for 30 seconds
         while (count < 5): 
@@ -241,36 +239,35 @@ def create_git_repo(ui, git_job, git_token):
     # Get the last id of the jenkins job to start. 
     last_id = get_last_build(git_job)
 
-    if check_git_repo(ui.git_repo_name):
-        log.info("Creating git repos for {0}".format(ui.git_repo_name))
+    log.info("Creating git repos for {0}".format(ui.git_repo_name))
     
-        code_review = 'No-code-review'
-        if ui.code_review == 'true':
-            code_review = 'Code-review'
+    code_review = 'No-code-review'
+    if ui.code_review == 'true':
+        code_review = 'Code-review'
     
-        payload = {'token': git_token,
-                   'PROJECT_TYPE': code_review,
-                   'PROJECT_NAME': ui.git_repo_name,
-                   'PROJECT_DESCRIPTION': '{0} created by SELF_SERVICE'.format(ui.project_name),
-                   'CREATE_CONFIG_REPO': 'true',
-                   'cause': 'ss_{0}'.format(ui.git_repo_name)
-        }
-        try:
-            log.info('Triggering git repo creation job: {0}/buildWithParameters params: {1}'.format(git_job, payload))
-            r = requests.get('{0}/buildWithParameters'.format(git_job), params=payload)
-        except Exception, e:
-            log.error("Failed to trigger git repo creation: {0}".format(e))
-            return None
+    payload = {'token': git_token,
+               'PROJECT_TYPE': code_review,
+               'PROJECT_NAME': ui.git_repo_name,
+               'PROJECT_DESCRIPTION': '{0} created by SELF_SERVICE'.format(ui.project_name),
+               'CREATE_CONFIG_REPO': 'true',
+               'cause': 'ss_{0}'.format(ui.git_repo_name)
+    }
+    try:
+        log.info('Triggering git repo creation job: {0}/buildWithParameters params: {1}'.format(git_job, payload))
+        r = requests.get('{0}/buildWithParameters'.format(git_job), params=payload)
+    except Exception, e:
+        log.error("Failed to trigger git repo creation: {0}".format(e))
+        return None
     
-        if r.status_code == 200:
-            # check to make sure the job succeeded
-            log.info("Checking for job success")
+    if r.status_code == 200:
+        # check to make sure the job succeeded
+        log.info("Checking for job success")
 
-            if check_create_git_repo(git_job, ui.git_repo_name, int(last_id)):
-                log.info("Git repo creation job finished successfully")
-                return True
-            else:
-                log.erro("Failed to create git repos.")
+        if check_create_git_repo(git_job, ui.git_repo_name, int(last_id)):
+            log.info("Git repo creation job finished successfully")
+            return True
+        else:
+            log.erro("Failed to create git repos.")
 
 def get_deploy_ids(host, uri):
 
@@ -359,15 +356,23 @@ def view_ss(request):
              if app.status_code == 201:
                  log.info("Successfully created application: {0}".format(app.location))
 
-                 if create_git_repo(ui, request.registry.settings['ss.git_job'], request.registry.settings['ss.git_token']):
+                 # Set up the list of jobs to check
+                 jobs = [ui.job_code_name, ui.job_conf_name]
+                 if ui.code_review == 'true' and not ui.auto_tag:
+                     jobs.append(ui.job_review_name)
 
-                     deploy_ids = get_deploy_ids(request.host, app.location)
-                     if deploy_ids:
-                         print "DEPLOY_IDS: ", deploy_ids
-                         print "DEPLOY_ID conf: ", deploy_ids['conf']
+                 if check_all_resources(ui.git_repo_name, jobs):
+                     if create_git_repo(ui, request.registry.settings['ss.git_job'], request.registry.settings['ss.git_token']):
 
-                     log.info("Creating jenkins jobs")
-                     processed = 'true'
+                         deploy_ids = get_deploy_ids(request.host, app.location)
+                         if deploy_ids:
+                             print "DEPLOY_IDS: ", deploy_ids
+                             print "DEPLOY_ID conf: ", deploy_ids['conf']
+
+                             
+                             log.info("Creating jenkins jobs")
+
+                         processed = 'true'
 
          except Exception, e:
              log.error("Failed to complete self service: {0}".format(e))

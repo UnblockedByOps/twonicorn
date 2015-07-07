@@ -103,10 +103,10 @@
                        tal:attributes="value ui.project_name if ui.project_name else None"
                        title="Project name must contain only letters, numbers, spaces, or dashes."/>
             </div>
-            <div id="auto_tag_header" class="hidden">
+            <div id="auto_tag_header" tal:attributes="class 'hidden' if ui.project_type == 'python' else ''">
               <h2>Auto Tagging</h2>
             </div>
-            <div id="auto_tag_cb" class="hidden">
+            <div id="auto_tag_cb" tal:attributes="class 'hidden' if ui.project_type == 'python' else ''">
                 <p>Would you like to use automatic release tagging (maven projects only)? Note: this will automatically disable code review on your git repos.
                 <p>
                   <input id="ss_cb_tag" type="checkbox" name="auto_tag" value="auto_tag" tal:attributes="checked 'True' if ui.auto_tag else None">Use maven auto tagging?</input>
