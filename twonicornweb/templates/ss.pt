@@ -19,14 +19,14 @@
       <script>
         $(function() {
 
-          // Only show autotagging option for types that support it
+          // Only show auto snapshotting option for types that support it
           $(document.body).on('change', '[id=project_type]' ,function(){
             if ($.inArray($(this).val(), ["war", "jar", "tar"]) > -1) {
-                $( "#auto_tag_header" ).show();
-                $( "#auto_tag_cb" ).show();
+                $( "#autosnap_header" ).show();
+                $( "#autosnap_cb" ).show();
             } else {
-                $( "#auto_tag_header" ).hide();
-                $( "#auto_tag_cb" ).hide();
+                $( "#autosnap_header" ).hide();
+                $( "#autosnap_cb" ).hide();
             }
           });
 
@@ -103,13 +103,13 @@
                        tal:attributes="value ui.project_name if ui.project_name else None"
                        title="Project name must contain only letters, numbers, spaces, or dashes."/>
             </div>
-            <div id="auto_tag_header" tal:attributes="class 'hidden' if ui.project_type == 'python' else ''">
+            <div id="autosnap_header" tal:attributes="class 'hidden' if ui.project_type == 'python' else ''">
               <h2>Auto Tagging</h2>
             </div>
-            <div id="auto_tag_cb" tal:attributes="class 'hidden' if ui.project_type == 'python' else ''">
+            <div id="autosnap_cb" tal:attributes="class 'hidden' if ui.project_type == 'python' else ''">
                 <p>Would you like to use automatic release tagging (maven projects only)? Note: this will automatically disable code review on your git repos.
                 <p>
-                  <input id="ss_cb_tag" type="checkbox" name="auto_tag" value="auto_tag" tal:attributes="checked 'True' if ui.auto_tag else None">Use maven auto tagging?</input>
+                  <input id="ss_cb_tag" type="checkbox" name="autosnap" value="true" tal:attributes="checked 'True' if ui.autosnap else None">Use maven automatic snapshotting?</input>
             </div>
             <div>
               <h2>Code Review?</h2>
@@ -188,6 +188,9 @@
                 <li tal:condition="ui.code_review == 'true'">
                   ${ui.job_review_name}
                 </li>
+                <li tal:condition="ui.autosnap == 'true'">
+                  ${ui.job_autosnap_name}
+                </li>
                 <li>
                   ${ui.job_code_name}
                 </li>
@@ -227,6 +230,7 @@
                   <input type="hidden" name="project_type" value="${ui.project_type}"/>
                   <input type="hidden" name="project_name" value="${ui.project_name}"/>
                   <input type="hidden" name="code_review" value="${ui.code_review}"/>
+                  <input type="hidden" name="autosnap" value="${ui.autosnap}"/>
                   <input type="hidden" name="job_prefix" value="${ui.job_prefix}"/>
                   <input type="hidden" name="job_server" value="${ui.job_server}"/>
                   <input type="hidden" name="job_abs" value="${ui.job_abs}"/>

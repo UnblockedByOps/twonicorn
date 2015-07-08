@@ -18,7 +18,7 @@
     <link rel="icon"
         type="image/png"
         href="/static/favico.png?v=2">
-    <title>TUI: Logout</title>
+    <title>TUI: Internal Server Error</title>
     <link href="/static/tc.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
@@ -28,11 +28,8 @@
       <img src="/static/logo_medium.gif">
       </p>
   
-      <h2 class="error" tal:condition="message" tal:content="message"/>
+      <h2 class="error" tal:content="error"/>
 
-    <div class="center">
-      <input class="button" type="submit" value="Log In Again"  onclick="window.location='/login';"/>
-    </div>
   </div>
 
   </body>

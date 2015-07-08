@@ -43,6 +43,7 @@ def create_application(**kwargs):
         ss = None
 
     try:
+#        foo = bar()
         utcnow = datetime.utcnow()
         create = Application(application_name=kwargs['application_name'],
                              nodegroup=kwargs['nodegroup'],
@@ -92,9 +93,9 @@ def create_application(**kwargs):
         return HTTPFound(return_url)
     
     except Exception, e:
-        raise
-        error_msg = ("Failed to create application (%s)" % (e))
+        error_msg = ("Failed to create application: %s" % (e))
         log.error(error_msg)
+        raise Exception(error_msg)
 
 def edit_application(**kwargs):
     # Update the app

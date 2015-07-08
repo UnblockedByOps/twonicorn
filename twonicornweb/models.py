@@ -416,3 +416,13 @@ class JenkinsInstance(Base):
     updated_by                       = Column(Text, nullable=False)
     created                          = Column(TIMESTAMP, nullable=False)
     updated                          = Column(TIMESTAMP, nullable=False)
+
+class JenkinsTemplate(Base):
+    __tablename__ = 'jenkins_templates'
+    jenkins_template_id              = Column(Integer, primary_key=True, nullable=False)
+    job_type                         = Column(Text, nullable=False)
+    job_url                          = Column(Text, nullable=False)
+    updated_by                       = Column(Text, nullable=False)
+    created                          = Column(TIMESTAMP, nullable=False)
+    updated                          = Column(TIMESTAMP, nullable=False)
+
