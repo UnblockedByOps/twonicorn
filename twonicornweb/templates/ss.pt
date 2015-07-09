@@ -19,6 +19,8 @@
       <script>
         $(function() {
 
+          $('#error_msg_p').fadeIn(1500).show();
+
           // Only show auto snapshotting option for types that support it
           $(document.body).on('change', '[id=project_type]' ,function(){
             if ($.inArray($(this).val(), ["war", "jar", "tar"]) > -1) {
@@ -79,6 +81,10 @@
       <div tal:condition="not confirm and not processed" class="center" id="ss_form_c">
         <form id="submit" class="ss_form" action="/ss" method="POST" onsubmit="return(validate());">
           <input type="hidden" name="form.preprocess"/>
+            <div tal:condition="error_msg">
+              <h2 class="error">Validation Failure</h2>
+              <p id="error_msg_p" class="hidden red">${error_msg}</p>
+            </div>
             <div>
               <h2>Project type</h2>
             </div>
@@ -186,18 +192,18 @@
                   <h2>Jenkins Jobs</h2>
                 </li>
                 <li tal:condition="ui.code_review == 'true'">
-                  ${ui.job_review_name}
+                  ${ui.job_review_url}
                 </li>
                 <li tal:condition="ui.autosnap == 'true'">
-                  ${ui.job_autosnap_name}
+                  ${ui.job_autosnap_url}
                 </li>
                 <li>
-                  ${ui.job_code_name}
+                  ${ui.job_code_url}
                 </li>
                 <li>
-                  ${ui.job_conf_name}
+                  ${ui.job_conf_url}
                 </li>
-                <li tal:condition="ui.job_abs_name" tal:content="ui.job_abs_name"></li>
+                <li tal:condition="ui.job_abs_url" tal:content="ui.job_abs_url"></li>
               </ul>
             </div>
             <div class="cp_form">
@@ -230,7 +236,7 @@
                   <input type="hidden" name="project_type" value="${ui.project_type}"/>
                   <input type="hidden" name="project_name" value="${ui.project_name}"/>
                   <input type="hidden" name="code_review" value="${ui.code_review}"/>
-                  <input type="hidden" name="autosnap" value="${ui.autosnap}"/>
+                  <input tal:condition="ui.autosnap == 'true'" type="hidden" name="autosnap" value="${ui.autosnap}"/>
                   <input type="hidden" name="job_prefix" value="${ui.job_prefix}"/>
                   <input type="hidden" name="job_server" value="${ui.job_server}"/>
                   <input type="hidden" name="job_abs" value="${ui.job_abs}"/>
@@ -241,7 +247,60 @@
       </div> <!-- confirm -->
 
       <div tal:condition="processed">
-        <p>SOON.
+        <div class="center">
+          <div>
+            <div class="center">
+              <h2>Successfully created your self service application!</h2>
+            </div>
+            <div class="cp_form">
+              <ul>
+                <li>
+                  <h2>Git Repos</h2>
+                </li>
+                <li tal:content="'Code Review: Yes' if ui.code_review == 'true' else 'Code Review: No'">
+                <li>
+                  git clone ${ui.git_code_repo}
+                </li>
+                <li>
+                  git clone ${ui.git_conf_repo}
+                </li>
+              </ul>
+            </div>
+            <div class="cp_form">
+              <ul>
+                <li>
+                  <h2>Jenkins Jobs</h2>
+                </li>
+                <li tal:condition="ui.code_review == 'true'">
+                  <a href='${ui.job_review_url}'>${ui.job_review_url}</a>
+                </li>
+                <li tal:condition="ui.autosnap == 'true'">
+                  <a href='${ui.job_autosnap_url}'>${ui.job_autosnap_url}</a>
+                </li>
+                <li>
+                  <a href='${ui.job_code_url}'>${ui.job_code_url}</a>
+                </li>
+                <li>
+                  <a href='${ui.job_conf_url}'>${ui.job_conf_url}</a>
+                </li>
+                <li tal:condition="ui.job_abs_url">
+                  <a href='${ui.job_abs_url}'>${ui.job_abs_url}</a>
+                </li>
+              </ul>
+            </div>
+            <div class="cp_form">
+              <ul>
+                <li>
+                  <h2>Twonicorn Application</h2>
+                </li>
+                <li>
+                  <a href='${ui.app_url}'>${ui.app_url}</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
       </div> <!-- processed -->
 
   </div>

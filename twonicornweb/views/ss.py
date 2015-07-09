@@ -17,6 +17,7 @@ from pyramid.httpexceptions import HTTPInternalServerError
 import logging
 import re
 import requests
+from requests.auth import HTTPBasicAuth
 import time
 from twonicornweb.views import (
     site_layout,
@@ -39,6 +40,7 @@ class UserInput(object):
     def __init__(self, 
                  project_type = None,
                  project_name = None,
+                 nodegroup = 'SELF_SERVICE',
                  code_review = None,
                  autosnap = None,
                  job_server = None,
@@ -50,15 +52,24 @@ class UserInput(object):
                  job_autosnap_name = None,
                  job_code_name = None,
                  job_conf_name = None,
-                 job_ci_name = None,
+                 job_review_url = None,
+                 job_autosnap_url = None,
+                 job_code_url = None,
+                 job_conf_url = None,
+                 job_ci_base_url = None,
                  job_abs = None,
                  job_abs_name = None,
+                 job_abs_base_url = None,
+                 job_abs_url = None,
                  deploy_id_code = None,
                  deploy_id_conf = None,
                  dir_app = None,
-                 dir_conf = None):
+                 dir_conf = None,
+                 app_id = None,
+                 app_url = None):
         self.project_type = project_type
         self.project_name = project_name
+        self.nodegroup = nodegroup
         self.code_review = code_review
         self.autosnap = autosnap
         self.job_server = job_server
@@ -70,13 +81,21 @@ class UserInput(object):
         self.job_autosnap_name = job_autosnap_name
         self.job_code_name = job_code_name
         self.job_conf_name = job_conf_name
-        self.job_ci_name = job_ci_name
+        self.job_review_url = job_review_url
+        self.job_autosnap_url = job_autosnap_url
+        self.job_code_url = job_code_url
+        self.job_conf_url = job_conf_url
+        self.job_ci_base_url = job_ci_base_url
         self.job_abs = job_abs
         self.job_abs_name = job_abs_name
+        self.job_abs_base_url = job_abs_base_url
+        self.job_abs_url = job_abs_url
         self.deploy_id_code = deploy_id_code
         self.deploy_id_conf = deploy_id_conf
         self.dir_app = dir_app
         self.dir_conf = dir_conf
+        self.app_id = app_id
+        self.app_url = app_url
 
 
 def format_user_input(request, ui):
@@ -93,6 +112,7 @@ def format_user_input(request, ui):
     try:
         ui.autosnap = request.POST['autosnap']
         ui.code_review = None
+        print "Set code review to none"
     except:
         pass
 
@@ -132,19 +152,27 @@ def format_user_input(request, ui):
     b = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
     ui.git_repo_name = b.sub(r'-\1', ui.git_repo_name).lower()
 
-    ui.git_code_repo = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}'.format(ui.git_repo_name)
-    ui.git_conf_repo = 'ssh://$USER@gerrit.ctgrd.com:29418/{0}-conf'.format(ui.git_repo_name)
-    ui.job_ci_name = 'https://ci-{0}.prod.cs/{1}_{2}'.format(ui.job_server, ui.job_prefix, ui.git_repo_name.capitalize())
+    ui.git_code_repo = 'ssh://$USER@{0}:29418/{1}'.format(gerrit_server, ui.git_repo_name)
+    ui.git_conf_repo = 'ssh://$USER@{0}:29418/{1}-conf'.format(gerrit_server, ui.git_repo_name)
+    ui.job_ci_base_url = 'https://ci-{0}.prod.cs/'.format(ui.job_server)
+
+    job_base_name = '{0}_{1}'.format(ui.job_prefix, ui.git_repo_name.capitalize())
+
+    ui.job_code_name = job_base_name + '_Build-artifact'
+    ui.job_code_url = '{0}job/{1}'.format(ui.job_ci_base_url, ui.job_code_name)
+    ui.job_conf_name = job_base_name + '_Build-conf'
+    ui.job_conf_url = '{0}job/{1}'.format(ui.job_ci_base_url, ui.job_conf_name)
 
     if ui.autosnap:
-        ui.job_autosnap_name = ui.job_ci_name + '_Build-release'
+        ui.job_autosnap_name = job_base_name + '_Build-release'
+        ui.job_autosnap_url = '{0}job/{1}'.format(ui.job_ci_base_url, ui.job_autosnap_name)
     if ui.code_review == 'true' and not ui.autosnap:
-        ui.job_review_name = ui.job_ci_name + '_Build-review'
-    ui.job_code_name = ui.job_ci_name + '_Build-artifact'
-    ui.job_conf_name = ui.job_ci_name + '_Build-conf'
-
+        ui.job_review_name = job_base_name + '_Build-review'
+        ui.job_review_url = '{0}job/{1}'.format(ui.job_ci_base_url, ui.job_review_name)
     if ui.job_abs:
-        ui.job_abs_name = 'https://abs-{0}.prod.cs/{1}_{2}_Run'.format(ui.job_server, ui.job_prefix, ui.git_repo_name.capitalize())
+        ui.job_abs_base_url = 'https://abs-{0}.dev.cs/'.format(ui.job_server)
+        ui.job_abs_name = '{0}_{1}_Run'.format(ui.job_prefix, ui.git_repo_name.capitalize())
+        ui.job_abs_url = '{0}job/{1}'.format(ui.job_abs_base_url, ui.job_abs_name)
 
     return ui
 
@@ -153,8 +181,13 @@ def check_all_resources(repo_name, jobs):
     """Make sure that jenkins jobs and git repos don't already exist
        before beginning"""
     if check_git_repo(repo_name):
-        if check_jenkins_jobs(jobs):
+        try:
+            check_jenkins_jobs(jobs)
             return True
+        except Exception, e:
+            log.error("Job validation failure: {0}".format(e))
+            raise
+
     return None
 
 
@@ -163,17 +196,21 @@ def check_git_repo(repo_name):
        already exist in gerrit"""
 
     # FIXME: Make the gerrit server configurable
-    r = requests.get('https://qat.gerrit.ctgrd.com/projects/{0}'.format(repo_name), verify=False)
+    r = requests.get('https://{0}/projects/{1}'.format(gerrit_server, repo_name), verify=False)
     if  r.status_code == 404:
         log.info("repo {0} does not exist, continuing".format(repo_name))
-        r = requests.get('https://qat.gerrit.ctgrd.com/projects/{0}-conf'.format(repo_name), verify=False)
+        r = requests.get('https://{0}/projects/{1}-conf'.format(gerrit_server, repo_name), verify=False)
         if  r.status_code == 404:
             log.info("repo {0}-conf does not exist, continuing".format(repo_name))
             return True
         else:
-            log.info("repo {0}-conf already exists, aborting".format(repo_name))
+            msg = "repo {0}-conf already exists, please choose a unique name".format(repo_name)
+            log.error(msg)
+            raise Exception(msg)
     else:
-        log.info("repo {0} already exists, aborting".format(repo_name))
+        msg = "repo {0} already exists, please choose a unique name".format(repo_name)
+        log.error(msg)
+        raise Exception(msg)
 
     return None
 
@@ -187,8 +224,9 @@ def check_jenkins_jobs(jobs):
         log.info('Verifying job does not already exist: %s' % j)
         r = requests.get(j, verify=verify_ssl)
         if r.status_code == requests.codes.ok:
-            log.error('Jenkins job: %s already exists, aborting.' % j)
-            return None
+            msg = 'Jenkins job: {0} already exists, please choose a unique name.'.format(j)
+            log.error(msg)
+            raise Exception(msg)
         else:
             log.info('Jenkins job does: %s does not already exist, continuing.' % j)
 
@@ -227,7 +265,9 @@ def check_create_git_repo(git_job, git_repo_name, last_id):
 
         check_id = check_id + 1
 
-    log.error('Unable to find successful git creation job for: {0}'.format(git_repo_name))
+    msg = 'Unable to find successful git creation job for: {0}'.format(git_repo_name)
+    log.error(msg)
+    raise Exception(msg)
 
 
 def create_git_repo(ui, git_job, git_token):
@@ -308,17 +348,16 @@ def jenkins_post(url, config_xml):
 
     log.info('Posting data to jenkins: %s' % url)
     headers = {'Content-Type': 'text/xml'}
-    r = requests.post(url, verify=verify_ssl, header=headers, data=config_xml)
+    auth = HTTPBasicAuth(jenkins_user, jenkins_pass)
+    r = requests.post(url, verify=verify_ssl, headers=headers, auth=auth, data=config_xml)
 
     if r.status_code == requests.codes.ok:
-        log.info('Response data: %s' % r.status_code)
+        log.info('Success: %s' % r.status_code)
         return r
-
     else:
-        log.info('There was an error querying Jenkins: '
-                 'http_status_code=%s,reason=%s,request=%s'
-                  % (r.status_code, r.reason, url))
-        return None
+        msg = 'There was an posting to Jenkins: http_status_code={0}s,reason={1},request={2}'.format(r.status_code, r.reason, url)
+        log.error(msg)
+        raise Exception(msg)
 
 
 def get_jenkins_template_url(job_type):
@@ -330,49 +369,124 @@ def get_jenkins_template_url(job_type):
         log.info("Tempalte job is: {0}".format(job.job_url))
         return job.job_url
     except Exception, e:
-        raise Exception('Failed to retrieve conf template from db: {0}'.format(e))
+        msg = 'Failed to retrieve conf template from db: {0}'.format(e)
+        log.error(msg)
+        raise Exception(msg)
 
 
 def create_jenkins_conf(ui):
-    log.info("Creating jenkins conf job: {0} for deploy id: {1}".format(ui.job_conf_name, ui.deploy_id_conf))
-    url = get_jenkins_template_url('conf')
-
-    r = jenkins_get(url)
-    config_xml = r.content.replace('__CHANGE_ME_DEPLOY_ID__', str(ui.deploy_id_conf))
-    config_xml = config_xml.replace('__CHANGE_ME_PROJECT__', '{0}-conf'.format(ui.git_repo_name))
-    print config_xml
-    r = jenkins_post(ui.job_conf_name, config_xml)
+    log.info("Creating jenkins conf job: {0} for deploy id: {1}".format(ui.job_conf_url, ui.deploy_id_conf))
+    try:
+        url = get_jenkins_template_url('conf')
+        r = jenkins_get(url)
+        config_xml = r.content.replace('__CHANGE_ME_DEPLOY_ID__', str(ui.deploy_id_conf))
+        config_xml = config_xml.replace('__CHANGE_ME_GIT_REPO_NAME__', '{0}-conf'.format(ui.git_repo_name))
+        config_xml = config_xml.replace('<disabled>true</disabled>', '<disabled>false</disabled>')
+        url = '{0}createItem?name={1}'.format(ui.job_ci_base_url, ui.job_conf_name)
+        if jenkins_post(url, config_xml):
+            return True
+    except Exception, e:
+        msg = 'Failed to create jenkins conf job: {0}'.format(e)
+        log.error(msg)
+        raise Exception(msg)
 
 
 def create_jenkins_artifact(ui):
-    log.info("Creating jenkins artifact job: {0} for deploy id: {1}".format(ui.job_code_name, ui.deploy_id_code))
+    log.info("Creating jenkins artifact job: {0} for deploy id: {1}".format(ui.job_code_url, ui.deploy_id_code))
 
     if ui.code_review == 'true' and not ui.autosnap:
-        log.info("Creating jenkins code review job: {0} for deploy id: {1}".format(ui.job_review_name, ui.deploy_id_code))
+        log.info("Creating jenkins code review job: {0}".format(ui.job_review_url))
         create_jenkins_review(ui)
     if ui.autosnap:
-        log.info("Creating jenkins autosnap release job: {0} for deploy id: {1}".format(ui.job_review_name, ui.deploy_id_code))
+        log.info("Creating jenkins autosnap release job: {0} for deploy id: {1}".format(ui.job_autosnap_url, ui.deploy_id_code))
         create_jenkins_autosnap(ui)
+        log.info("Creating code autosnap build job: {0} for deploy id: {1}".format(ui.job_code_url, ui.deploy_id_code))
+        url = get_jenkins_template_url('{0}_build_autosnap'.format(ui.project_type))
+    else:
+        log.info("Creating code build job: {0} for deploy id: {1}".format(ui.job_code_url, ui.deploy_id_code))
+        url = get_jenkins_template_url('{0}_build_autosnap'.format(ui.project_type))
+
+    try:
+        r = jenkins_get(url)
+        config_xml = r.content.replace('__CHANGE_ME_DEPLOY_ID__', str(ui.deploy_id_code))
+        config_xml = config_xml.replace('__CHANGE_ME_GIT_REPO_NAME__', ui.git_repo_name)
+        config_xml = config_xml.replace('__CHANGE_ME_PACKAGE_NAME__', ui.project_name)
+        config_xml = config_xml.replace('<disabled>true</disabled>', '<disabled>false</disabled>')
+        url = '{0}createItem?name={1}'.format(ui.job_ci_base_url, ui.job_code_name)
+        if jenkins_post(url, config_xml):
+            return True
+    except Exception, e:
+        msg = 'Failed to create jenkins code build job: {0}'.format(e)
+        log.error(msg)
+        raise Exception(msg)
 
 
 def create_jenkins_review(ui):
     log.info('Creating jenkins review job')
+    try:
+        url = get_jenkins_template_url('{0}_build_review'.format(ui.project_type))
+        r = jenkins_get(url)
+        config_xml = r.content.replace('__CHANGE_ME_GIT_REPO_NAME__', ui.git_repo_name)
+        config_xml = config_xml.replace('__CHANGE_ME_PACKAGE_NAME__', ui.project_name)
+        config_xml = config_xml.replace('<disabled>true</disabled>', '<disabled>false</disabled>')
+        url = '{0}createItem?name={1}'.format(ui.job_ci_base_url, ui.job_review_name)
+        if jenkins_post(url, config_xml):
+            return True
+    except Exception, e:
+        msg = 'Failed to create jenkins review job: {0}'.format(e)
+        log.error(msg)
+        raise Exception(msg)
 
 
 def create_jenkins_autosnap(ui):
-    log.info('Creating jenkins autosnap release job')
+    log.info("Creating jenkins autosnap release job: {0} for deploy id: {1}".format(ui.job_autosnap_url, ui.deploy_id_code))
+    try:
+        url = get_jenkins_template_url('{0}_autosnap_release'.format(ui.project_type))
+        r = jenkins_get(url)
+        config_xml = r.content.replace('__CHANGE_ME_DEPLOY_ID__', str(ui.deploy_id_code))
+        config_xml = config_xml.replace('__CHANGE_ME_GIT_REPO_NAME__', ui.git_repo_name)
+        config_xml = config_xml.replace('<disabled>true</disabled>', '<disabled>false</disabled>')
+        url = '{0}createItem?name={1}'.format(ui.job_ci_base_url, ui.job_conf_name)
+        if jenkins_post(url, config_xml):
+            return True
+    except Exception, e:
+        msg = 'Failed to create jenkins autosnap job: {0}'.format(e)
+        log.error(msg)
+        raise Exception(msg)
 
 
 def create_jenkins_abs(ui):
     log.info('Creating jenkins abs job')
+    try:
+        url = get_jenkins_template_url('abs')
+        r = jenkins_get(url)
+        config_xml = r.content.replace('__CHANGE_ME_APP_ID__', str(ui.app_id))
+        config_xml = config_xml.replace('<disabled>true</disabled>', '<disabled>false</disabled>')
+        url = '{0}createItem?name={1}'.format(ui.job_abs_base_url, ui.job_abs_name)
+        if jenkins_post(url, config_xml):
+            return True
+    except Exception, e:
+        msg = 'Failed to create jenkins conf job: {0}'.format(e)
+        log.error(msg)
+        raise Exception(msg)
 
 
 @view_config(route_name='ss', permission='view', renderer='twonicornweb:templates/ss.pt')
 def view_ss(request):
 
+    # Globalizing these. Otherwise will be passing them all over the
+    # place for no reason.
+    global jenkins_user
+    global jenkins_pass
+    global gerrit_server
+    jenkins_user = request.registry.settings['ss.jenkins_user']
+    jenkins_pass = request.registry.settings['ss.jenkins_pass']
+    gerrit_server = request.registry.settings['ss.gerrit_server']
+
     page_title = 'Self Service'
     subtitle = 'Add an application'
     user = get_user(request)
+    error_msg = None
 
     params = {'mode': None,
               'confirm': None,
@@ -397,76 +511,74 @@ def view_ss(request):
     q = DBSession.query(JenkinsInstance)
     jenkins_instances = q.all()
 
-
     if 'form.edit' in request.POST:
-         log.info("Editing self service")
+        log.info("Editing self service")
 
-         ui = format_user_input(request, ui)
+        ui = format_user_input(request, ui)
 
     if 'form.preprocess' in request.POST:
-         log.info("Pre-processing self service")
+        log.info("Pre-processing self service")
 
-         ui = format_user_input(request, ui)
+        ui = format_user_input(request, ui)
 
-         log.info('doing stuff: mode=%s,updated_by=%s'
-                  % (mode,
-                     user['login']))
-
-         confirm = 'true'
+        # Set up the list of jobs to check
+        jobs = [ui.job_code_url, ui.job_conf_url]
+        if ui.code_review == 'true' and not ui.autosnap:
+            jobs.append(ui.job_review_url)
+         
+        try:
+            check_all_resources(ui.git_repo_name, jobs)
+            confirm = 'true'
+        except Exception, e:
+            error_msg = e
 
     if 'form.confirm' in request.POST:
-         log.info("Processing self service request")
-         try:
-             ui = format_user_input(request, ui)
+        log.info("Processing self service request")
+        try:
+            ui = format_user_input(request, ui)
 
-             log.info("Creating twonicorn application")
-             ca = {'application_name': ui.project_name,
-                   'nodegroup': 'SELF_SERVICE',
-                   'artifact_types': [ui.project_type, 'conf'],
-                   'deploy_paths': [ui.dir_app, ui.dir_conf],
-                   'package_names': [ui.project_name, ''],
-                   'day_start': '1',
-                   'day_end': '4',
-                   'hour_start': '8',
-                   'minute_start': '0',
-                   'hour_end': '17',
-                   'minute_end': '0',
-                   'updated_by': user['login'],
-                   'ss': True
-             }
+            log.info("Creating twonicorn application")
+            ca = {'application_name': ui.project_name,
+                  'nodegroup': 'SELF_SERVICE',
+                  'artifact_types': [ui.project_type, 'conf'],
+                  'deploy_paths': [ui.dir_app, ui.dir_conf],
+                  'package_names': [ui.project_name, ''],
+                  'day_start': '1',
+                  'day_end': '4',
+                  'hour_start': '8',
+                  'minute_start': '0',
+                  'hour_end': '17',
+                  'minute_end': '0',
+                  'updated_by': user['login'],
+                  'ss': True
+            }
 
-             app = create_application(**ca)
-             if app.status_code == 201:
-                 log.info("Successfully created application: {0}".format(app.location))
+            app = create_application(**ca)
+            ui.app_id = app.location.rsplit('=', 1)[1]
+            ui.app_url = '/deploys?application_id={0}&nodegroup={1}'.format(ui.app_id, ui.nodegroup)
+            if app.status_code == 201:
+                log.info("Successfully created application: {0}".format(app.location))
 
-                 # Set up the list of jobs to check
-                 jobs = [ui.job_code_name, ui.job_conf_name]
-                 if ui.code_review == 'true' and not ui.autosnap:
-                     jobs.append(ui.job_review_name)
+#                if create_git_repo(ui, request.registry.settings['ss.git_job'], request.registry.settings['ss.git_token']):
+                if ui:
 
-                 if check_all_resources(ui.git_repo_name, jobs):
-                     if create_git_repo(ui, request.registry.settings['ss.git_job'], request.registry.settings['ss.git_token']):
+                    deploy_ids = get_deploy_ids(request.host, app.location)
+                    if deploy_ids:
+                        ui.deploy_id_conf = deploy_ids['conf']
+                        ui.deploy_id_code = deploy_ids[ui.project_type]
 
-                         deploy_ids = get_deploy_ids(request.host, app.location)
-                         if deploy_ids:
-                             print "DEPLOY_IDS: ", deploy_ids
-                             print "DEPLOY_ID conf: ", deploy_ids['conf']
-                             ui.deploy_id_conf = deploy_ids['conf']
-                             ui.deploy_id_code = deploy_ids[ui.project_type]
+                        log.info("Creating jenkins jobs")
+                        if create_jenkins_conf(ui):
+                            if create_jenkins_artifact(ui):
+                                if ui.job_abs:
+                                    create_jenkins_abs(ui)
 
-                             log.info("Creating jenkins jobs")
-                             create_jenkins_conf(ui)
-                             create_jenkins_artifact(ui)
-                             if ui.job_abs:
-                                 create_jenkins_abs(ui)
-                             
+                    processed = 'true'
 
-                         processed = 'true'
-
-         except Exception, e:
-             error_msg = "Failed to complete self service: {0}".format(e)
-             log.error(error_msg)
-             raise Exception(error_msg)
+        except Exception, e:
+            error_msg = "Failed to complete self service: {0}".format(e)
+            log.error(error_msg)
+            raise Exception(error_msg)
 
     return {'layout': site_layout(),
             'page_title': page_title,
@@ -475,6 +587,7 @@ def view_ss(request):
             'mode': mode,
             'confirm': confirm,
             'processed': processed,
+            'error_msg': error_msg,
             'ui': ui,
             'artifact_types': artifact_types,
             'jenkins_instances': jenkins_instances,

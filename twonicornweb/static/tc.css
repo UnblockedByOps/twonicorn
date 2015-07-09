@@ -274,6 +274,10 @@ tr.dev_hover:hover td {
     color: #F70000;
 }
 
+.red {
+    color: #F70000;
+}
+
 .login {
     text-align: left;
     color: #2FAACE;
