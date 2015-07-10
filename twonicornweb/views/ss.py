@@ -118,7 +118,6 @@ def format_user_input(request, ui):
     try:
         ui.autosnap = request.POST['autosnap']
         ui.code_review = None
-        print "Set code review to none"
     except:
         pass
     try:
@@ -574,8 +573,7 @@ def view_ss(request):
             if app.status_code == 201:
                 log.info("Successfully created application: {0}".format(app.location))
 
-#                if create_git_repo(ui, request.registry.settings['ss.git_job'], request.registry.settings['ss.git_token']):
-                if ui:
+                if create_git_repo(ui, request.registry.settings['ss.git_job'], request.registry.settings['ss.git_token']):
 
                     deploy_ids = get_deploy_ids(request.host, app.location)
                     if deploy_ids:
