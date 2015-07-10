@@ -229,6 +229,7 @@ def check_git_repo(repo_name):
 
 def check_jenkins_jobs(jobs):
     """Make sure that jenkins jobs don't already exist before beginning"""
+
     # FIXME: Hardcode for now
     verify_ssl = False
 
@@ -248,7 +249,10 @@ def check_jenkins_jobs(jobs):
 def get_last_build(job):
     """get the last build number of a jenkins job"""
 
-    r = requests.get('{0}/lastBuild/api/json'.format(job))
+    # FIXME: Hardcode for now
+    verify_ssl = False
+
+    r = requests.get('{0}/lastBuild/api/json'.format(job), verify=verify_ssl)
     last = r.json()
     log.info('Last build id is: {0}'.format(last['number']))
     return last['number']
@@ -284,6 +288,9 @@ def check_create_git_repo(git_job, git_repo_name, last_id):
 
 def create_git_repo(ui, git_job, git_token):
 
+    # FIXME: Hardcode for now
+    verify_ssl = False
+
     # Get the last id of the jenkins job to start. 
     last_id = get_last_build(git_job)
 
@@ -302,7 +309,7 @@ def create_git_repo(ui, git_job, git_token):
     }
     try:
         log.info('Triggering git repo creation job: {0}/buildWithParameters params: {1}'.format(git_job, payload))
-        r = requests.get('{0}/buildWithParameters'.format(git_job), params=payload)
+        r = requests.get('{0}/buildWithParameters'.format(git_job), params=payload, verify=verify_ssl)
     except Exception, e:
         log.error("Failed to trigger git repo creation: {0}".format(e))
         raise
@@ -319,10 +326,13 @@ def create_git_repo(ui, git_job, git_token):
 
 def get_deploy_ids(host, uri):
 
+    # FIXME: Hardcoded for now
+    verify_ssl = False
+
     try:
-        url = 'http://{0}{1}'.format(host, uri)
+        url = 'https://{0}{1}'.format(host, uri)
         log.info("Querying application: {0}".format(url))
-        l = requests.get(url)
+        l = requests.get(url, verify=verify_ssl)
         j = l.json()
         deploy_ids = {j[0]['artifact_type']: j[0]['deploy_id'], j[1]['artifact_type']: j[1]['deploy_id']}
         return deploy_ids
