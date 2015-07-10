@@ -21,16 +21,62 @@
 
           $('#error_msg_p').fadeIn(1500).show();
 
+          // FIXME: eliminate duplicate code.
           // Only show auto snapshotting option for types that support it
           $(document.body).on('change', '[id=project_type]' ,function(){
-            if ($.inArray($(this).val(), ["war", "jar", "tar"]) > -1) {
-                $( "#autosnap_header" ).show();
-                $( "#autosnap_cb" ).show();
+            if ($.inArray($(this).val(), ["war", "jar"]) > -1) {
+                $( "#autosnap_header" ).fadeIn(1000).show();
+                $( "#autosnap_cb" ).fadeIn(1000).show();
             } else {
-                $( "#autosnap_header" ).hide();
-                $( "#autosnap_cb" ).hide();
+                $('#ss_cb_autosnap').prop('checked', false);
+                $( "#autosnap_header" ).fadeOut(1000);
+                $( "#autosnap_cb" ).fadeOut(1000);
             }
           });
+
+          // Only show abs job option for types that support it
+          $(document.body).on('change', '[id=project_type]' ,function(){
+            if ($.inArray($(this).val(), ["python", "jar", "tar"]) > -1) {
+                $( "#abs_header" ).fadeIn(1000).show();
+                $( "#abs_cb" ).fadeIn(1000).show();
+            } else {
+                $('#ss_cb_skel').prop('checked', false);
+                $( "#abs_header" ).fadeOut(1000);
+                $( "#abs_cb" ).fadeOut(1000);
+            }
+          });
+
+          // Only show server class option for types that require it
+          $(document.body).on('change', '[id=project_type]' ,function(){
+            if ($.inArray($(this).val(), ["war"]) > -1) {
+                $( "#ct_class_header" ).fadeIn(1000).show();
+                $( "#ct_class_input" ).fadeIn(1000).show();
+            } else {
+                $( "#ct_class_header" ).fadeOut(1000);
+                $( "#ct_class_input" ).fadeOut(1000);
+            }
+          });
+
+          // These are requird for the initial load/edit pages.
+          // Hide auto snapshotting option for unsupported types
+          var pt = document.getElementById("project_type");
+          var selectedValue = pt.options[pt.selectedIndex].value;
+          if ($.inArray(selectedValue, ["", "python", "tar"]) > -1) {
+            $('#ss_cb_autosnap').prop('checked', false);
+            $( "#autosnap_header" ).hide();
+            $( "#autosnap_cb" ).hide();
+          }
+          // Hide auto abs job option for unsupported types
+          if ($.inArray(selectedValue, ["", "war"]) > -1) {
+            $('#ss_cb_skel').prop('checked', false);
+            $( "#abs_header" ).hide();
+            $( "#abs_cb" ).hide();
+          }
+          // Hide server class option for types that don't require it
+          if ($.inArray(selectedValue, ["", "jar", "tar", "python"]) > -1) {
+            $( "#ct_class_header" ).hide();
+            $( "#ct_class_input" ).hide();
+          }
 
           $.validator.addMethod("projectRegex", function(value, element) {
               return this.optional(element) || /^[a-z0-9\-\s]+$/i.test(value);
@@ -92,7 +138,7 @@
                 <p>The type of application you are developing. This will determine which Jenkins job templates to use, and how the application will be created in twonicorn.
                 <p>
                 <select id="project_type" name="project_type" title="Please select a project type.">
-                  <option value="">Select...</option>
+                  <option tal:condition=" not ui.project_type" value="" selected>Select...</option>
                   <option tal:repeat="item artifact_types" tal:attributes="value item.name; selected item.name == ui.project_type" tal:content="item.name">some_type</option>
                 </select>
             </div>
@@ -109,13 +155,13 @@
                        tal:attributes="value ui.project_name if ui.project_name else None"
                        title="Project name must contain only letters, numbers, spaces, or dashes."/>
             </div>
-            <div id="autosnap_header" tal:attributes="class 'hidden' if ui.project_type == 'python' else ''">
+            <div id="autosnap_header">
               <h2>Auto Tagging</h2>
             </div>
-            <div id="autosnap_cb" tal:attributes="class 'hidden' if ui.project_type == 'python' else ''">
+            <div id="autosnap_cb">
                 <p>Would you like to use automatic release tagging (maven projects only)? Note: this will automatically disable code review on your git repos.
                 <p>
-                  <input id="ss_cb_tag" type="checkbox" name="autosnap" value="true" tal:attributes="checked 'True' if ui.autosnap else None">Use maven automatic snapshotting?</input>
+                  <input id="ss_cb_autosnap" type="checkbox" name="autosnap" value="true" tal:attributes="checked 'True' if ui.autosnap else None">Use maven automatic snapshotting?</input>
             </div>
             <div>
               <h2>Code Review?</h2>
@@ -132,8 +178,8 @@
               <h2>Job Prefix</h2>
             </div>
             <div>
-                <p>A two to twenty character prefix to be used in the Jenkins job names.
-                <p>
+              <p>A two to twenty character prefix to be used in the Jenkins job names.
+              <p>
               <input type="text" 
                      id="job_prefix" 
                      name="job_prefix" 
@@ -147,18 +193,31 @@
                 <p>What Jenkins instances you want your build/run jobs created on.
                 <p>
                 <select id="job_server" name="job_server" title="Please select your jenkins instance.">
-                  <option value="">Select...</option>
+                  <option tal:condition=" not ui.job_server" value="" selected>Select...</option>
                   <option tal:repeat="item jenkins_instances" tal:attributes="value item.instance_name ; selected item.instance_name == ui.job_server" tal:content="item.instance_name">jenkins</option>
                 </select>
             </div>
-            <div>
+            <div id="abs_header">
               <h2>ABS Skeleton Job</h2>
             </div>
-            <div>
+            <div id="abs_cb">
                 <p>Would you like an ABS skeleton job created with the twonicorn execute shell?
                 <p>
                   <input id="ss_cb_skel" type="checkbox" name="job_abs" value="job_abs" tal:attributes="checked 'True' if ui.job_abs else None">Create abs skeleton job?</input>
             </div>
+            <div id="ct_class_header">
+              <h2>Server Class</h2>
+            </div>
+            <div id="ct_class_input">
+              <p>the three letter identifier of the server server class that this application will run on (i.e. paw, rbl, etc.). Used to tell the rolling restart job what servers to restart.
+              <p>
+              <input type="text"
+                     id="ct_class"
+                     name="ct_class"
+                     placeholder="tla" tal:attributes="value ui.ct_class if ui.ct_class else None"
+                     title="Server class must be exactly 3 letters only."/>
+            </div>
+
             <div id="ss_submit">
               <input id="submit_btn" class="button" type="submit" name="submit" value="Review"/>
             </div>
@@ -203,6 +262,7 @@
                 <li>
                   ${ui.job_conf_url}
                 </li>
+                <li tal:condition="ui.job_rolling_restart_url" tal:content="ui.job_rolling_restart_url"></li>
                 <li tal:condition="ui.job_abs_url" tal:content="ui.job_abs_url"></li>
               </ul>
             </div>
@@ -226,9 +286,11 @@
                   <input type="hidden" name="project_type" value="${ui.project_type}"/>
                   <input type="hidden" name="project_name" value="${ui.project_name}"/>
                   <input type="hidden" name="code_review" value="${ui.code_review}"/>
+                  <input tal:condition="ui.autosnap == 'true'" type="hidden" name="autosnap" value="${ui.autosnap}"/>
                   <input type="hidden" name="job_prefix" value="${ui.job_prefix}"/>
                   <input type="hidden" name="job_server" value="${ui.job_server}"/>
                   <input type="hidden" name="job_abs" value="${ui.job_abs}"/>
+                  <input type="hidden" name="ct_class" value="${ui.ct_class}"/>
                   <input class="button" type="submit" name="submit" value="Confirm"/>
                 </form>
                 <form class="cp_form" action="/ss" method="POST">
@@ -240,6 +302,7 @@
                   <input type="hidden" name="job_prefix" value="${ui.job_prefix}"/>
                   <input type="hidden" name="job_server" value="${ui.job_server}"/>
                   <input type="hidden" name="job_abs" value="${ui.job_abs}"/>
+                  <input type="hidden" name="ct_class" value="${ui.ct_class}"/>
                   <input class="button" type="submit" name="submit" value="Edit"/>
                 </form>
           </div>
@@ -250,7 +313,7 @@
         <div class="center">
           <div>
             <div class="center">
-              <h2>Successfully created your self service application!</h2>
+              <h2 class="green">Successfully created your self service application!</h2>
             </div>
             <div class="cp_form">
               <ul>
@@ -286,6 +349,9 @@
                 <li tal:condition="ui.job_abs_url">
                   <a href='${ui.job_abs_url}'>${ui.job_abs_url}</a>
                 </li>
+                <li tal:condition="ui.job_rolling_restart_url">
+                  <a href='${ui.job_rolling_restart_url}'>${ui.job_rolling_restart_url}</a>
+                </li>
               </ul>
             </div>
             <div class="cp_form">
@@ -294,7 +360,7 @@
                   <h2>Twonicorn Application</h2>
                 </li>
                 <li>
-                  <a href='${ui.app_url}'>${ui.app_url}</a>
+                  <a href='${ui.app_url}'>Take me to my app!</a>
                 </li>
               </ul>
             </div>

@@ -277,6 +277,9 @@ tr.dev_hover:hover td {
 .red {
     color: #F70000;
 }
+.green {
+    color: #28921F;
+}
 
 .login {
     text-align: left;
@@ -818,7 +821,7 @@ li.exp {
 #ss_form_c {
   width: 600px;
 }
-#ss_cb_tag,
+#ss_cb_autosnap,
 #ss_cb_skel {
   width: 20px;
 }

@@ -58,13 +58,13 @@
           <tbody tal:repeat="item applications">
           <tr class="app">
             <td><a href="/deploys?application_id=0"
-                   tal:attributes="href '/deploys?application_id=%d&nodegroup=%s' % (item.application_id,item.nodegroup)"
+                   tal:attributes="href '/deploys?application_id=%d' % (item.application_id)"
                    tal:content="item.application_id">Application ID Link</a></td>
             <td><a href="/deploys?application_id=0"
-                   tal:attributes="href '/deploys?application_id=%d&nodegroup=%s' % (item.application_id,item.nodegroup)"
+                   tal:attributes="href '/deploys?application_id=%d' % (item.application_id)"
                    tal:content="item.application_name">Application Name Link</a></td>
             <td><a href="/deploys?application_id=0"
-                   tal:attributes="href '/deploys?application_id=%d&nodegroup=%s' % (item.application_id,item.nodegroup)"
+                   tal:attributes="href '/deploys?application_id=%d' % (item.application_id)"
                    tal:content="item.nodegroup">Nodegroup Link</a></td>
             <td tal:content="item.localize_date_created">1975-01-01 00:00:00</td>
             <td tal:content="item.localize_date_updated">1975-01-01 00:00:00</td>

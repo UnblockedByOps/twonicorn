@@ -34,7 +34,7 @@
         </p>
       </div>
 
-      <div tal:condition="nodegroup">
+      <div tal:condition="application_id">
 
         <h2>Deployment summary by environment</h2>
 
@@ -47,11 +47,11 @@
           <div class="deploy_header_content">
             <div  class="deploy_header_element" tal:content="app.application_name">Some Application</div>
             <div  class="deploy_header_element" tal:content="str(app.application_id)">1</div>
-            <div  class="deploy_header_element" tal:content="nodegroup">tct</div>
+            <div  class="deploy_header_element" tal:content="app.nodegroup">tct</div>
           </div>
         </div>
 
-        <table tal:condition="(application_id or nodegroup)">
+        <table tal:condition="application_id">
           <tr>
             <th>Deploy Path</th>
             <th>Deploy ID</th>
@@ -91,18 +91,17 @@
             <td tal:condition="aa"><a href="http://code.ctgrd.com/my/awesome/artifact.war"
                    title="some description"
                    tal:attributes="href aa.pretty_url; title aa.pretty_url"
-                   tal:content="aa.artifact.location.split('/')[-1]">Artifacts By nodegroupLink</a></td>
+                   tal:content="aa.artifact.location.split('/')[-1]">Artifact Link</a></td>
             <td tal:content="aa.artifact_id if aa else 'No Data'">12345</td>
             <td tal:content="aa.artifact_assignment_id if aa else 'No Data'">12345</td>
             <td tal:content="aa.localize_date_created if aa else 'No Data'">12345</td>
             <td tal:content="aa.updated_by if aa else 'No Data'">12345</td>
             <td tal:condition="not aa">No Data</td>
             <td tal:condition="aa"><a class="button" href="http://twonicorn.ctgrd.com/deploys?history=true"
-                   tal:attributes="href '/deploys?history=true&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s' %
+                   tal:attributes="href '/deploys?history=true&deploy_id=%s&env=%s&application_id=%s' %
                                         (item.deploy_id,
                                          aa.env.name,
-                                         application_id,
-                                         nodegroup
+                                         application_id
                                         )"><input class="button" type="button" value="Show History" /></a></td>
           </tr>
           </tbody>
@@ -111,11 +110,11 @@
 
       <div tal:condition="histassignments">
         <div id="pag_hist_container">
-          <a tal:attributes="class 'pag_buttons disable' if offset == 0 else 'pag_buttons' ; href '?history=%s&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s&start=0' % (history,deploy_id,env,application_id,nodegroup)">
+          <a tal:attributes="class 'pag_buttons disable' if offset == 0 else 'pag_buttons' ; href '?history=%s&deploy_id=%s&env=%s&application_id=%s&start=0' % (history,deploy_id,env,application_id)">
             <div class="pag_buttons_c"><img src='/static/nav-le.gif' border='0'></div>
           </a>
   
-          <a tal:attributes="class 'pag_buttons disable' if offset == 0 else 'pag_buttons' ;href '?history=%s&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s&start=%d' % (history,deploy_id,env,application_id,nodegroup,offset-perpage)">
+          <a tal:attributes="class 'pag_buttons disable' if offset == 0 else 'pag_buttons' ;href '?history=%s&deploy_id=%s&env=%s&application_id=%s&start=%d' % (history,deploy_id,env,application_id,offset-perpage)">
             <div class="pag_buttons_c"><img src='/static/nav-l.gif' border='0'></div>
           </a>
           <div class="pag_content">
@@ -123,10 +122,10 @@
               11-20 of 123
             </span>
           </div>
-          <a tal:attributes="class 'pag_buttons disable' if (offset+perpage) &gt;= total else 'pag_buttons' ; href '?history=%s&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s&start=%d' % (history,deploy_id,env,application_id,nodegroup,offset+perpage)">
+          <a tal:attributes="class 'pag_buttons disable' if (offset+perpage) &gt;= total else 'pag_buttons' ; href '?history=%s&deploy_id=%s&env=%s&application_id=%s&start=%d' % (history,deploy_id,env,application_id,offset+perpage)">
             <div class="pag_buttons_c"><img src='/static/nav-r.gif' border='0'></div>
           </a>
-          <a tal:attributes="class 'pag_buttons disable' if (offset+perpage) &gt;= total else 'pag_buttons'; href '?history=%s&deploy_id=%s&env=%s&application_id=%s&nodegroup=%s&start=%d' % (history,deploy_id,env,application_id,nodegroup,(total-1)/perpage*perpage)">
+          <a tal:attributes="class 'pag_buttons disable' if (offset+perpage) &gt;= total else 'pag_buttons'; href '?history=%s&deploy_id=%s&env=%s&application_id=%s&start=%d' % (history,deploy_id,env,application_id,(total-1)/perpage*perpage)">
             <div class="pag_buttons_c"><img src='/static/nav-re.gif' border='0'></div>
           </a>
         </div>
@@ -174,7 +173,7 @@
               <td><a href="http://code.ctgrd.com/my/awesome/artifact.war"
                      title="some description"
                      tal:attributes="href item.pretty_url; title item.pretty_url"
-                     tal:content="item.artifact.location.split('/')[-1]">Artifacts By nodegroupLink</a></td>
+                     tal:content="item.artifact.location.split('/')[-1]">Artifact Link</a></td>
               <td tal:content="item.artifact_id">0</td>
               <td tal:content="item.artifact_assignment_id">12345</td>
               <td tal:content="item.localize_date_created">12345</td>
@@ -227,7 +226,7 @@
 
       <div>
         <!--! Default Behavior -->
-        <p tal:condition="not: nodegroup">
+        <p tal:condition="not: application_id">
           For now you need to select an application from the applications page in order to see deploys.
         </p>
       </div>

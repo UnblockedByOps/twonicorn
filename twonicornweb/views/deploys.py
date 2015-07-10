@@ -48,7 +48,6 @@ def view_deploys(request):
 
 
     params = {'application_id': None,
-              'nodegroup': None,
               'history': None,
               'deploy_id': None,
               'env': None,
@@ -64,7 +63,6 @@ def view_deploys(request):
             pass
 
     application_id = params['application_id']
-    nodegroup = params['nodegroup']
     deploy_id = params['deploy_id']
     env = params['env']
     to_env = params['to_env']
@@ -89,7 +87,6 @@ def view_deploys(request):
             'total': 1000, #STUB
             'app': app,
             'application_id': application_id,
-            'nodegroup': nodegroup,
             'history': None,
             'hist_list': None,
             'env': env,
