@@ -27,8 +27,6 @@
                 '</div>' +
                 '</div>';
             $(over).appendTo('body');
-            $loadingImg = $('#loading_i');
-            $loadingImg.show();
           }
 
           $("#confirm").submit(function() {
@@ -98,7 +96,7 @@
               return this.optional(element) || /^[a-z0-9\-\s]+$/i.test(value);
           }, "Project name must contain only letters, numbers, spaces, or dashes.");
       
-          $('#submit').validate({
+          $('#preProcess').validate({
               wrapper: "span",
               errorClass: "invalid",
               rules: {
@@ -131,12 +129,14 @@
                       required: "Please enter a job prefix"
                   }
               },
-              submitHandler: function(form) {  
-                  overlay();
-                  form.submit();
-              },
               errorPlacement: function(error, element) {
                   error.insertAfter(element);
+              },
+              submitHandler: function(form) {  
+                  overlay();
+                  setTimeout(function(){
+                    form.submit(); 
+                  }, 500);
               }
           });
 
@@ -145,7 +145,7 @@
       </script>
 
       <div tal:condition="not confirm and not processed" class="center" id="ss_form_c">
-        <form id="submit" class="ss_form" action="/ss" method="POST" onsubmit="return(validate());">
+        <form id="preProcess" class="ss_form" action="/ss" method="POST" onsubmit="return(validate());">
           <input type="hidden" name="form.preprocess"/>
             <div tal:condition="error_msg">
               <h2 class="error">Validation Failure</h2>
@@ -239,7 +239,7 @@
             </div>
 
             <div id="ss_submit">
-              <input id="submit_btn" class="button" type="submit" name="submit" value="Review"/>
+              <input id="submit_btn" class="button" type="submit" name="btnSubmit" value="Review"/>
             </div>
         </form>
 
@@ -311,7 +311,7 @@
                   <input type="hidden" name="job_server" value="${ui.job_server}"/>
                   <input type="hidden" name="job_abs" value="${ui.job_abs}"/>
                   <input type="hidden" name="ct_class" value="${ui.ct_class}"/>
-                  <input class="button" type="submit" name="submit" value="Confirm"/>
+                  <input class="button" type="submit" name="btnSubmit" value="Confirm"/>
                 </form>
                 <form class="cp_form" action="/ss" method="POST">
                   <input type="hidden" name="form.edit"/>
@@ -323,7 +323,7 @@
                   <input type="hidden" name="job_server" value="${ui.job_server}"/>
                   <input type="hidden" name="job_abs" value="${ui.job_abs}"/>
                   <input type="hidden" name="ct_class" value="${ui.ct_class}"/>
-                  <input class="button" type="submit" name="submit" value="Edit"/>
+                  <input class="button" type="submit" name="btnSubmit" value="Edit"/>
                 </form>
           </div>
         </div>
