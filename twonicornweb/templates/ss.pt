@@ -27,6 +27,8 @@
                 '</div>' +
                 '</div>';
             $(over).appendTo('body');
+            $loadingImg = $('#loading_i');
+            $loadingImg.show();
           }
 
           $("#confirm").submit(function() {
