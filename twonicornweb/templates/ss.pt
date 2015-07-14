@@ -23,15 +23,28 @@
             var over = '<div id="overlay">' +
                 '<div id="loading_c">' +
                 '<h1 id="loading_h">Processing Your Request</h1>' +
-                '<img id="loading_i" src="/static/loading.gif">' +
+                '<img id="loading_i" src="/static/loading.gif?' + new Date().getTime() + '">' +
                 '</div>' +
                 '</div>';
             $(over).appendTo('body');
           }
 
-          $("#confirm").submit(function() {
+          $('#btnSubmitConfirm').on('click', function(evt) {
+            evt.preventDefault();
             overlay();
+            setTimeout(function(){
+              $("#confirm").submit();
+            }, 500);
           });
+
+          $('#btnSubmitEdit').on('click', function(evt) {
+            evt.preventDefault();
+            overlay();
+            setTimeout(function(){
+              $("#edit").submit();
+            }, 500);
+          });
+
 
           $('#error_msg_p').fadeIn(1500).show();
 
@@ -239,7 +252,7 @@
             </div>
 
             <div id="ss_submit">
-              <input id="submit_btn" class="button" type="submit" name="btnSubmit" value="Review"/>
+              <input id="submit_btn" class="button" type="submit" name="btnSubmitPre" value="Review"/>
             </div>
         </form>
 
@@ -311,9 +324,9 @@
                   <input type="hidden" name="job_server" value="${ui.job_server}"/>
                   <input type="hidden" name="job_abs" value="${ui.job_abs}"/>
                   <input type="hidden" name="ct_class" value="${ui.ct_class}"/>
-                  <input class="button" type="submit" name="btnSubmit" value="Confirm"/>
+                  <input id="btnSubmitConfirm" class="button" type="submit" name="btnSubmitConfirm" value="Confirm"/>
                 </form>
-                <form class="cp_form" action="/ss" method="POST">
+                <form id="edit" class="cp_form" action="/ss" method="POST">
                   <input type="hidden" name="form.edit"/>
                   <input type="hidden" name="project_type" value="${ui.project_type}"/>
                   <input type="hidden" name="project_name" value="${ui.project_name}"/>
@@ -323,7 +336,7 @@
                   <input type="hidden" name="job_server" value="${ui.job_server}"/>
                   <input type="hidden" name="job_abs" value="${ui.job_abs}"/>
                   <input type="hidden" name="ct_class" value="${ui.ct_class}"/>
-                  <input class="button" type="submit" name="btnSubmit" value="Edit"/>
+                  <input id="btnSubmitEdit" class="button" type="submit" name="btnSubmitEdit" value="Edit"/>
                 </form>
           </div>
         </div>
