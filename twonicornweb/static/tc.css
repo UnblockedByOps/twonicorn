@@ -846,6 +846,7 @@ li.exp {
   display: table;
   margin: 0 auto;
   color: #fff;
+  border-bottom: none;
 }
 #loading_i {
   width: 220px;
