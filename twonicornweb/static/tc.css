@@ -826,3 +826,31 @@ li.exp {
   width: 20px;
 }
 /* END self service form */
+
+/* START loading overlay */
+#overlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+}
+#loading_c {
+  position: relative;
+  top: 50%;
+  padding: 20px;
+  background: #2FAACE;
+}
+#loading_h {
+  display: table;
+  margin: 0 auto;
+  color: #fff;
+}
+#loading_i {
+  width: 220px;
+  height: 19px;
+  display: table;
+  margin: 0 auto;
+}
+/* END loading overlay */

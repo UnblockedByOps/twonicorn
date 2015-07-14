@@ -19,6 +19,20 @@
       <script>
         $(function() {
 
+          function overlay() {
+            var over = '<div id="overlay">' +
+                '<div id="loading_c">' +
+                '<h1 id="loading_h">Processing Your Request</h1>' +
+                '<img id="loading_i" src="/static/loading.gif">' +
+                '</div>' +
+                '</div>';
+            $(over).appendTo('body');
+          }
+
+          $("#confirm").submit(function() {
+            overlay();
+          });
+
           $('#error_msg_p').fadeIn(1500).show();
 
           // FIXME: eliminate duplicate code.
@@ -114,6 +128,10 @@
                   "job_prefix": {
                       required: "Please enter a job prefix"
                   }
+              },
+              submitHandler: function(form) {  
+                  overlay();
+                  form.submit();
               },
               errorPlacement: function(error, element) {
                   error.insertAfter(element);
@@ -281,7 +299,7 @@
             </div>
           </div>
           <div id="ss_submit" class="center">
-                <form class="cp_form" action="/ss" method="POST">
+                <form id="confirm" class="cp_form" action="/ss" method="POST">
                   <input type="hidden" name="form.confirm"/>
                   <input type="hidden" name="project_type" value="${ui.project_type}"/>
                   <input type="hidden" name="project_name" value="${ui.project_name}"/>
