@@ -47,7 +47,9 @@ class UserInput(object):
                  job_prefix = None,
                  git_repo_name = None,
                  git_code_repo = None,
+                 git_code_repo_url = None,
                  git_conf_repo = None,
+                 git_conf_repo_url = None,
                  job_review_name = None,
                  job_autosnap_name = None,
                  job_code_name = None,
@@ -79,7 +81,9 @@ class UserInput(object):
         self.job_prefix = job_prefix
         self.git_repo_name = git_repo_name
         self.git_code_repo = git_code_repo
+        self.git_code_repo_url = git_code_repo_url
         self.git_conf_repo = git_conf_repo
+        self.git_conf_repo_url = git_conf_repo_url
         self.job_review_name = job_review_name
         self.job_autosnap_name = job_autosnap_name
         self.job_code_name = job_code_name
@@ -162,7 +166,9 @@ def format_user_input(request, ui):
     ui.git_repo_name = b.sub(r'-\1', ui.git_repo_name).lower()
 
     ui.git_code_repo = 'ssh://$USER@{0}:29418/{1}'.format(gerrit_server, ui.git_repo_name)
+    ui.git_code_repo_url = 'https://{0}/git/gitweb.cgi?p={1}.git'.format(gerrit_server, ui.git_repo_name)
     ui.git_conf_repo = 'ssh://$USER@{0}:29418/{1}-conf'.format(gerrit_server, ui.git_repo_name)
+    ui.git_conf_repo_url = 'https://{0}/git/gitweb.cgi?p={1}-conf.git'.format(gerrit_server, ui.git_repo_name)
     ui.job_ci_base_url = 'https://ci-{0}.prod.cs/'.format(ui.job_server)
 
     job_base_name = '{0}_{1}'.format(ui.job_prefix, ui.git_repo_name.capitalize())
@@ -241,7 +247,7 @@ def check_jenkins_jobs(jobs):
             log.error(msg)
             raise Exception(msg)
         else:
-            log.info('Jenkins job does: %s does not already exist, continuing.' % j)
+            log.info('Jenkins job: %s does not already exist, continuing.' % j)
 
     return True
 
@@ -324,13 +330,46 @@ def create_git_repo(ui, git_job, git_token):
         else:
             log.erro("Failed to create git repos.")
 
+
+def populate_git_conf_repo(ui, git_job, git_token):
+
+    # FIXME: Hardcode for now
+    verify_ssl = False
+
+    git_conf_project = "{0}-conf".format(ui.git_repo_name)
+    file_suffix = 'properties'
+    if ui.project_type == 'python':
+        file_suffix = 'ini'
+
+    log.info("Populating git conf repo for {0}".format(git_conf_project))
+
+    payload = {'token': git_token,
+               'PROJECT': git_conf_project,
+               'PROPERTIES_FILE': '{0}.{1}'.format(ui.git_repo_name,file_suffix),
+               'cause': 'ss_{0}'.format(git_conf_project)
+    }
+    try:
+        log.info('Triggering git conf repo population job: {0}/buildWithParameters params: {1}'.format(git_job, payload))
+        r = requests.get('{0}/buildWithParameters'.format(git_job), params=payload, verify=verify_ssl)
+    except Exception, e:
+        log.error("Failed to trigger git repo creation: {0}".format(e))
+        raise
+
+    # FIXME: not sureif we care to validate it succeeds. It's not tragic.
+    if r.status_code == 200:
+        log.info("Git repo population job triggered successfully")
+        return True
+    else:
+        log.erro("Failed to trigger git repo population.")
+
+
 def get_deploy_ids(host, uri):
 
     # FIXME: Hardcoded for now
     verify_ssl = False
 
     try:
-        url = 'https://{0}{1}'.format(host, uri)
+        url = 'http://{0}{1}'.format(host, uri)
         log.info("Querying application: {0}".format(url))
         l = requests.get(url, verify=verify_ssl)
         j = l.json()
@@ -584,6 +623,8 @@ def view_ss(request):
                 log.info("Successfully created application: {0}".format(app.location))
 
                 if create_git_repo(ui, request.registry.settings['ss.git_job'], request.registry.settings['ss.git_token']):
+
+                    populate_git_conf_repo(ui, request.registry.settings['ss.git_conf_populate_job'], request.registry.settings['ss.git_token'])
 
                     deploy_ids = get_deploy_ids(request.host, app.location)
                     if deploy_ids:

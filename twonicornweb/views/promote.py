@@ -84,18 +84,18 @@ def view_promote(request):
                 app = Application.get_app_by_deploy_id(deploy_id)
 
                 # Check on time based-users
-                if user['promote_prd_time_auth'] and not user['promote_prd_auth']:
-                    log.debug("%s has access via time based promote permission" % (user['login']))
+                if user['promote_prd_time_auth'] and not user['promote_prd_auth'] and to_env == 'prd' and to_state == '2':
+                    log.info("%s has access via time based promote permission" % (user['login']))
                     w = app.time_valid
                     fw = format_window(w)
                     if w.valid:
-                        log.debug("Promotion attempt by %s is inside the valid window: %s" % (user['login'], fw))
+                        log.info("Promotion attempt by %s is inside the valid window: %s" % (user['login'], fw))
                         valid_time = True
                     else:
                         log.error("Promotion attempt by %s is outside the valid window for %s: %s" % (user['login'], app.application_name, fw))
                 else:
                     valid_time = True
-                    log.debug("%s has access via global promote permission" % (user['login']))
+                    log.info("%s has access via global promote permission" % (user['login']))
 
                 if valid_time:
                     # Convert the env name to the id

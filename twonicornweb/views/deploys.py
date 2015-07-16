@@ -13,7 +13,7 @@
 #  limitations under the License.
 #
 from pyramid.view import view_config
-from pyramid.response import Response
+from sqlalchemy.orm.exc import NoResultFound
 import logging
 from twonicornweb.views import (
     site_layout,
@@ -75,9 +75,14 @@ def view_deploys(request):
             q = DBSession.query(Application)
             q = q.filter(Application.application_id == application_id)
             app = q.one()
+        except NoResultFound, e:
+            error_msg = "No such application id: {0} Exception: {1}".format(application_id, e)
+            log.error(error_msg)
+            raise Exception("No such application id: {0}".format(application_id))
         except Exception, e:
-            conn_err_msg = e
-            return Response(str(conn_err_msg), content_type='text/plain', status_int=500)
+            error_msg = "Error: {0}".format(e)
+            log.error(error_msg)
+            raise Exception(error_msg)
 
     return {'layout': site_layout(),
             'page_title': page_title,

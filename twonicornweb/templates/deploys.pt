@@ -179,7 +179,7 @@
               <td tal:content="item.localize_date_created">12345</td>
               <td tal:content="item.updated_by">McLovin</td>
               <td>
-                <ul tal:attributes="class 'promote'">
+                <ul tal:condition="not (histdeploy.type.name == 'conf' and (repeat.item.start))" tal:attributes="class 'promote'">
                   <li tal:attributes="class 'promote'">
                     Promote
                     <ul tal:attributes="class 'promote %s' % env">

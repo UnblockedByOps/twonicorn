@@ -159,6 +159,7 @@ def get_user(request):
 
     return (user)
 
+
 # FIXME: Ugly and repetative
 def get_group_permissions():
     """ Gets all the groups and permissions from the db, 
@@ -187,6 +188,7 @@ def get_group_permissions():
 
     return(group_perms)
 
+
 def get_all_groups():
     """ Gets all the groups that are configured in
         the db and returns a dict of everything. """
@@ -210,12 +212,14 @@ def format_user(user):
     last = last.strip('CN=')
     return(first,last)
 
+
 def format_groups(groups):
 
     formatted = []
     for g in range(len(groups)):
         formatted.append(find_between(groups[g], 'CN=', ',OU='))
     return formatted
+
 
 def format_window(w):
     days = {'1': 'Monday',
@@ -240,6 +244,7 @@ def find_between(s, first, last):
         return s[start:end]
     except ValueError:
         return ""
+
 
 def validate_username_cookie(cookieval, cookie_token):
     """ Returns the username if it validates. Otherwise throws

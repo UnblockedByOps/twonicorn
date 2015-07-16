@@ -45,6 +45,15 @@
             }, 500);
           });
 
+          $("#ss_cb_autosnap").change(function() {
+              if(this.checked) {
+                $( "#code_review_header" ).fadeOut(1000);
+                $( "#code_review_input" ).fadeOut(1000);
+              } else {
+                $( "#code_review_header" ).fadeIn(1000).show();
+                $( "#code_review_input" ).fadeIn(1000).show();
+              }
+          });
 
           $('#error_msg_p').fadeIn(1500).show();
 
@@ -196,10 +205,10 @@
                 <p>
                   <input id="ss_cb_autosnap" type="checkbox" name="autosnap" value="true" tal:attributes="checked 'True' if ui.autosnap else None">Use maven automatic snapshotting?</input>
             </div>
-            <div>
+            <div id="code_review_header" tal:attributes="class 'hidden' if ui.autosnap else None">
               <h2>Code Review?</h2>
             </div>
-            <div>
+            <div id="code_review_input" tal:attributes="class 'hidden' if ui.autosnap else None">
                 <p>Whether or not you would like Gerrit code review enabled for your project.
                 <p>
                 <select id="code_review" name="code_review" required title="Please select if you would like code review or not.">
@@ -355,10 +364,12 @@
                 </li>
                 <li tal:content="'Code Review: Yes' if ui.code_review == 'true' else 'Code Review: No'">
                 <li>
-                  git clone ${ui.git_code_repo}
+                      git clone ${ui.git_code_repo}<br>
+                      <a href='${ui.git_code_repo_url}'>${ui.git_code_repo_url}</a>
                 </li>
                 <li>
-                  git clone ${ui.git_conf_repo}
+                      git clone ${ui.git_conf_repo}<br>
+                      <a href='${ui.git_conf_repo_url}'>${ui.git_conf_repo_url}</a>
                 </li>
               </ul>
             </div>
