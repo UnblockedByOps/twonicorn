@@ -236,9 +236,6 @@ def check_git_repo(repo_name):
 def check_jenkins_jobs(jobs):
     """Make sure that jenkins jobs don't already exist before beginning"""
 
-    # FIXME: Hardcode for now
-    verify_ssl = False
-
     for j in jobs:
         log.info('Verifying job does not already exist: %s' % j)
         r = requests.get(j, verify=verify_ssl)
@@ -255,13 +252,22 @@ def check_jenkins_jobs(jobs):
 def get_last_build(job):
     """get the last build number of a jenkins job"""
 
-    # FIXME: Hardcode for now
-    verify_ssl = False
+    log.info('Retrieving last build id')
 
-    r = requests.get('{0}/lastBuild/api/json'.format(job), verify=verify_ssl)
-    last = r.json()
-    log.info('Last build id is: {0}'.format(last['number']))
-    return last['number']
+    try:
+        r = requests.get('{0}/lastBuild/api/json'.format(job), verify=verify_ssl)
+        last = r.json()
+        if r.status_code == 200:
+            log.info('Last build id is: {0}'.format(last['number']))
+            return last['number']
+        else:
+            msg = 'There was an error querying Jenkins: http_status_code=%s,reason=%s,request=%s' % (r.status_code, r.reason, url)
+            log.info(msg)
+            raise Exception(msg)
+    except:
+        msg = 'Unable to find successful git creation job for: {0}'.format(git_repo_name)
+        log.error(msg)
+        raise Exception(msg)
 
 
 def check_create_git_repo(git_job, git_repo_name, last_id):
@@ -293,9 +299,6 @@ def check_create_git_repo(git_job, git_repo_name, last_id):
 
 
 def create_git_repo(ui, git_job, git_token):
-
-    # FIXME: Hardcode for now
-    verify_ssl = False
 
     # Get the last id of the jenkins job to start. 
     last_id = get_last_build(git_job)
@@ -333,9 +336,6 @@ def create_git_repo(ui, git_job, git_token):
 
 def populate_git_conf_repo(ui, git_job, git_token):
 
-    # FIXME: Hardcode for now
-    verify_ssl = False
-
     git_conf_project = "{0}-conf".format(ui.git_repo_name)
     file_suffix = 'properties'
     if ui.project_type == 'python':
@@ -365,9 +365,6 @@ def populate_git_conf_repo(ui, git_job, git_token):
 
 def get_deploy_ids(host, uri):
 
-    # FIXME: Hardcoded for now
-    verify_ssl = False
-
     try:
         url = 'http://{0}{1}'.format(host, uri)
         log.info("Querying application: {0}".format(url))
@@ -383,9 +380,6 @@ def get_deploy_ids(host, uri):
 def jenkins_get(url):
 
     url = url + 'config.xml'
-
-    # FIXME: Hardcode for now
-    verify_ssl = False
 
     log.info('Requesting data from jenkins: %s' % url)
     r = requests.get(url, verify=verify_ssl)
@@ -406,9 +400,6 @@ def jenkins_post(url, config_xml):
 
     try:
 
-        # FIXME: Hardcode for now
-        verify_ssl = False
-    
         log.info('Posting data to jenkins: %s' % url)
         headers = {'Content-Type': 'text/xml'}
         auth = HTTPBasicAuth(jenkins_user, jenkins_pass)
@@ -541,9 +532,11 @@ def view_ss(request):
     global jenkins_user
     global jenkins_pass
     global gerrit_server
+    global verify_ssl
     jenkins_user = request.registry.settings['ss.jenkins_user']
     jenkins_pass = request.registry.settings['ss.jenkins_pass']
     gerrit_server = request.registry.settings['ss.gerrit_server']
+    verify_ssl = request.registry.settings['ss.verify_ssl']
 
     page_title = 'Self Service'
     subtitle = 'Add an application'
