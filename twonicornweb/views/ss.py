@@ -265,7 +265,7 @@ def get_last_build(job):
             log.info(msg)
             raise Exception(msg)
     except:
-        msg = 'Unable to find successful git creation job for: {0}'.format(git_repo_name)
+        msg = 'Unable to find last build id for job: {0}'.format(job)
         log.error(msg)
         raise Exception(msg)
 
