@@ -238,7 +238,7 @@ def check_jenkins_jobs(jobs):
 
     for j in jobs:
         log.info('Verifying job does not already exist: %s' % j)
-        r = requests.get(j, verify=verify_ssl)
+        r = requests.get(j, verify=False)
         if r.status_code == requests.codes.ok:
             msg = 'Jenkins job: {0} already exists, please choose a unique name.'.format(j)
             log.error(msg)
@@ -255,7 +255,7 @@ def get_last_build(job):
     log.info('Retrieving last build id')
 
     try:
-        r = requests.get('{0}/lastBuild/api/json'.format(job), verify=verify_ssl)
+        r = requests.get('{0}/lastBuild/api/json'.format(job), verify=False)
         last = r.json()
         if r.status_code == 200:
             log.info('Last build id is: {0}'.format(last['number']))
@@ -318,7 +318,7 @@ def create_git_repo(ui, git_job, git_token):
     }
     try:
         log.info('Triggering git repo creation job: {0}/buildWithParameters params: {1}'.format(git_job, payload))
-        r = requests.get('{0}/buildWithParameters'.format(git_job), params=payload, verify=verify_ssl)
+        r = requests.get('{0}/buildWithParameters'.format(git_job), params=payload, verify=False)
     except Exception, e:
         log.error("Failed to trigger git repo creation: {0}".format(e))
         raise
@@ -350,7 +350,7 @@ def populate_git_conf_repo(ui, git_job, git_token):
     }
     try:
         log.info('Triggering git conf repo population job: {0}/buildWithParameters params: {1}'.format(git_job, payload))
-        r = requests.get('{0}/buildWithParameters'.format(git_job), params=payload, verify=verify_ssl)
+        r = requests.get('{0}/buildWithParameters'.format(git_job), params=payload, verify=False)
     except Exception, e:
         log.error("Failed to trigger git repo creation: {0}".format(e))
         raise
@@ -368,7 +368,7 @@ def get_deploy_ids(host, uri):
     try:
         url = 'http://{0}{1}'.format(host, uri)
         log.info("Querying application: {0}".format(url))
-        l = requests.get(url, verify=verify_ssl)
+        l = requests.get(url, verify=False)
         j = l.json()
         deploy_ids = {j[0]['artifact_type']: j[0]['deploy_id'], j[1]['artifact_type']: j[1]['deploy_id']}
         return deploy_ids
@@ -382,7 +382,7 @@ def jenkins_get(url):
     url = url + 'config.xml'
 
     log.info('Requesting data from jenkins: %s' % url)
-    r = requests.get(url, verify=verify_ssl)
+    r = requests.get(url, verify=False)
 
     if r.status_code == requests.codes.ok:
         log.info('Response data: %s' % r.status_code)
@@ -403,7 +403,7 @@ def jenkins_post(url, config_xml):
         log.info('Posting data to jenkins: %s' % url)
         headers = {'Content-Type': 'text/xml'}
         auth = HTTPBasicAuth(jenkins_user, jenkins_pass)
-        r = requests.post(url, verify=verify_ssl, headers=headers, auth=auth, data=config_xml)
+        r = requests.post(url, verify=False, headers=headers, auth=auth, data=config_xml)
     
         if r.status_code == requests.codes.ok:
             log.info('Success: %s' % r.status_code)
