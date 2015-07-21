@@ -8,6 +8,13 @@ Wishlist
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+3.0
+~~~~~~~
+feature: Self Service tool for creating applications, git repos and jenkins jobs.
+bugfix: No longer display promote button for confs when they are already promoted.
+bugfix: Fixed issue with timed deployments denying access to promote in dev/qat outside the time window.
+bugfix: Fixed issue with editing applications where the form was not reading kwargs correctly.
+
 2.8.10
 ~~~~~~~
 bugfix: Missed the bug on editing an application.
