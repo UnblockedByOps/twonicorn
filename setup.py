@@ -45,7 +45,7 @@ dependency_links = [
     ]
 
 setup(name='TwonicornWeb',
-      version='3.0',
+      version='3.1',
       description='Twonicorn web api/ui',
       long_description=README + '\n\n' + CHANGELOG,
       classifiers=[
