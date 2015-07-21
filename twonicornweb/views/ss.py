@@ -312,7 +312,7 @@ def create_git_repo(ui, git_job, git_token):
     payload = {'token': git_token,
                'PROJECT_TYPE': code_review,
                'PROJECT_NAME': ui.git_repo_name,
-               'PROJECT_DESCRIPTION': 'SELF_SERVICE created [0]'.format(ui.project_name),
+               'PROJECT_DESCRIPTION': 'SELF_SERVICE created {0}'.format(ui.project_name),
                'CREATE_CONFIG_REPO': 'true',
                'cause': 'ss_{0}'.format(ui.git_repo_name)
     }
