@@ -331,7 +331,7 @@ def create_git_repo(ui, git_job, git_token):
             log.info("Git repo creation job finished successfully")
             return True
         else:
-            log.erro("Failed to create git repos.")
+            log.error("Failed to create git repos.")
 
 
 def populate_git_conf_repo(ui, git_job, git_token):
@@ -360,7 +360,7 @@ def populate_git_conf_repo(ui, git_job, git_token):
         log.info("Git repo population job triggered successfully")
         return True
     else:
-        log.erro("Failed to trigger git repo population.")
+        log.error("Failed to trigger git repo population.")
 
 
 def get_deploy_ids(host, uri):
