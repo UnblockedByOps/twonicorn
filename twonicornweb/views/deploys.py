@@ -94,6 +94,7 @@ def view_deploys(request):
             'application_id': application_id,
             'history': None,
             'hist_list': None,
+            'histassignments': None,
             'env': env,
             'deploy_id': deploy_id,
             'to_env': to_env,
