@@ -29,6 +29,7 @@ import tarfile
 import datetime
 import ast
 import re
+import getpass
 
 try:
     import pysvn
@@ -191,80 +192,128 @@ def parse_db_deployments(deployments):
     return db_deployments
 
 
+def check_manifest_exists(manifest_file):
+
+    logging.info('Checking for existence of manifest file: %s'
+                 % manifest_file)
+
+    if not os.path.isfile(manifest_file):
+        logging.warn('Manifest file %s does not exist, creating'
+                     % manifest_file)
+        open(manifest_file, 'a').close()
+        logging.info('Manifest file %s created'
+                     % manifest_file)
+        return False
+
+    logging.debug('Manifest file exists: %s'
+                 % manifest_file)
+    return True
+
+
+def check_manifest_empty(manifest_file):
+
+    logging.info('Checking if manifest file is empty: %s'
+                 % manifest_file)
+
+    if os.stat(manifest_file)[6] == 0:
+        logging.warn('Manifest file %s is empty. Installing the current '
+                     'version of all artifacts.'
+                     % manifest_file)
+        return False
+
+    logging.debug('Manifest file %s is not empty'
+                 % manifest_file)
+
+    return True
+
+
+def check_deployment_dirs(deployments):
+
+    logging.info('Checking for existence of deployment dirs')
+    retval = True
+
+    for k in deployments.keys():
+        logging.debug('Checking for existence of path: %s' % deployments[k]['deploy_path'])
+
+        if not os.path.isdir(deployments[k]['deploy_path']):
+            logging.warn('Path does not exist: %s Creating...' % deployments[k]['deploy_path'])
+            retval = False
+            subprocess.check_call(["/usr/bin/sudo",
+                                   "/bin/mkdir",
+                                   "-p",
+                                   deployments[k]['deploy_path']])
+            user = getpass.getuser()
+
+            logging.warn('Changing permissions of %s to user: %s' % (deployments[k]['deploy_path'],user))
+            subprocess.check_call(["/usr/bin/sudo",
+                                   "/bin/chown",
+                                   "-R",
+                                   '{0}:'.format(user),
+                                   deployments[k]['deploy_path']])
+        else:
+            logging.debug('Path exists: %s' % deployments[k]['deploy_path'])
+
+    return retval
+
+
 def check_manifest(deployments, manifest_file):
 
     deploys_todo = []
     logging.debug('Comparing versions in manifest file : %s'
                   % manifest_file)
-    if not os.path.isfile(manifest_file):
-        logging.info('Manifest file %s does not exist, creating'
-                     % manifest_file)
-        open(manifest_file, 'a').close()
-        logging.info('Manifest file %s created. Installing the current '
-                     'version of all artifacts.'
-                     % manifest_file)
-        # Nothing is installed, need to do everything
-        deploys_todo = deployments.keys()
-    elif os.stat(manifest_file)[6] == 0:
-        logging.warn('Manifest file %s is empty. Installing the current '
-                     'version of all artifacts.'
-                     % manifest_file)
-        # state is unknown, need to do everything
-        deploys_todo = deployments.keys()
-    else:
-        # read the last line
-        fileHandle = open(manifest_file, "r")
-        lineList = fileHandle.readlines()
-        fileHandle.close()
-        last_line = lineList[-1]
-        (inst_date,
-         inst_time,
-         inst_deploys) = last_line.split(' ', 2)
-        # convert the string to a dict for comparison.
-        inst_deploys = ast.literal_eval(inst_deploys)
-        logging.debug('Installed deployment:assignments: %s'
-                      % inst_deploys)
+    # read the last line
+    fileHandle = open(manifest_file, "r")
+    lineList = fileHandle.readlines()
+    fileHandle.close()
+    last_line = lineList[-1]
+    (inst_date,
+     inst_time,
+     inst_deploys) = last_line.split(' ', 2)
+    # convert the string to a dict for comparison.
+    inst_deploys = ast.literal_eval(inst_deploys)
+    logging.debug('Installed deployment:assignments: %s'
+                  % inst_deploys)
 
-        db_deployments = parse_db_deployments(deployments)
+    db_deployments = parse_db_deployments(deployments)
 
-        logging.debug('DB deployment:assignments: %s'
-                      % db_deployments)
+    logging.debug('DB deployment:assignments: %s'
+                  % db_deployments)
 
-        # Check to see if we have to do anything
-        logging.info('Checking to see what we need to do...')
-        # first check if all the keys we want to install are there
-        for key in deployments.keys():
-            if key in inst_deploys:
-                logging.debug('Deploy %s is in the manifest.'
+    # Check to see if we have to do anything
+    logging.info('Checking to see what we need to do...')
+    # first check if all the keys we want to install are there
+    for key in deployments.keys():
+        if key in inst_deploys:
+            logging.debug('Deploy %s is in the manifest.'
+                          % key)
+            # check the value to make sure it's the same
+            if (deployments[key]['artifact_assignment_id'] ==
+               inst_deploys[key]):
+                logging.debug('Artifact assignment is the same '
+                              'for deploy id %s in both sources.'
                               % key)
-                # check the value to make sure it's the same
-                if (deployments[key]['artifact_assignment_id'] ==
-                   inst_deploys[key]):
-                    logging.debug('Artifact assignment is the same '
-                                  'for deploy id %s in both sources.'
-                                  % key)
-                else:
-                    # add the deploy to the list of things to do.
-                    logging.debug('Artifact assignment is different '
-                                  'for deploy id %s. Adding to list of'
-                                  ' deploys to install.'
-                                  % key)
-                    deploys_todo.append(key)
             else:
                 # add the deploy to the list of things to do.
-                logging.debug('Deploy id %s is missing from the '
-                              'manifest. Adding to list of deploys '
-                              'to install.'
+                logging.debug('Artifact assignment is different '
+                              'for deploy id %s. Adding to list of'
+                              ' deploys to install.'
                               % key)
                 deploys_todo.append(key)
-
-        if deploys_todo:
-            logging.info('We are going to upgrade the following '
-                         'deploys : %s'
-                         % deploys_todo)
         else:
-            logging.info('Installed deployment:assignments '
-                         'match the DB. Nothing to do.')
+            # add the deploy to the list of things to do.
+            logging.debug('Deploy id %s is missing from the '
+                          'manifest. Adding to list of deploys '
+                          'to install.'
+                          % key)
+            deploys_todo.append(key)
+
+    if deploys_todo:
+        logging.info('We are going to upgrade the following '
+                     'deploys : %s'
+                     % deploys_todo)
+    else:
+        logging.info('Installed deployment:assignments '
+                     'match the DB. Nothing to do.')
 
     return deploys_todo
 
@@ -653,7 +702,20 @@ def main(argv):
 
     # Do all the things
     deployments = get_application_deploys(tcw_host, application_id, ct_env, ct_loc)
-    deploys_todo = check_manifest(deployments, manifest_file)
+    deploys_todo = None
+    if not check_manifest_exists(manifest_file):
+        deploys_todo = deployments.keys()
+
+    if not check_manifest_empty(manifest_file):
+        deploys_todo = deployments.keys()
+
+    if not check_deployment_dirs(deployments):
+        logging.warn('At least one deployment dir is missing. Installing the current '
+                     'version of all artifacts.')
+        deploys_todo = deployments.keys()
+
+    if not deploys_todo:
+        deploys_todo = check_manifest(deployments, manifest_file)
 
     # We know what we have to do, so let's go
     if deploys_todo:
