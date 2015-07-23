@@ -131,7 +131,8 @@ def format_user_input(request, ui):
 
     # Convert camel case, spaces and dashes to underscore for job naming and dir creation.
     a = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
-    convert = a.sub(r'_\1', ui.project_name).lower()
+    convert = a.sub(r' \1', ui.project_name).lower().strip()
+    convert = ' '.join(convert.split())
     convert = convert.replace(" ","_")
     convert = convert.replace("-","_")
 
@@ -159,8 +160,8 @@ def format_user_input(request, ui):
         ui.dir_app = '/app/{0}'.format(convert)
         ui.dir_conf = '/app/{0}/conf'.format(convert)
 
-    # space to dash
-    ui.git_repo_name = ui.project_name.replace(" ","-")
+    # underscore to dash
+    ui.git_repo_name = convert.replace("_","-")
     # Camel case to dash
     b = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
     ui.git_repo_name = b.sub(r'-\1', ui.git_repo_name).lower()

@@ -174,7 +174,7 @@
               <td tal:content="item.localize_date_created">12345</td>
               <td tal:content="item.updated_by">McLovin</td>
               <td>
-                <ul tal:condition="not (histdeploy.type.name == 'conf' and (repeat.item.start))" tal:attributes="class 'promote'">
+                <ul tal:condition="not (histdeploy.type.name == 'conf' and (repeat.item.start) and (item.lifecycle_id == 2))" tal:attributes="class 'promote'">
                   <li tal:attributes="class 'promote'">
                     Promote
                     <ul tal:attributes="class 'promote %s' % env">
@@ -198,7 +198,7 @@
                                            title 'Promote to qat: ' + str(item.artifact_id)"
                            tal:content="'to qat'">promote to qat</a>
                       </li>
-                      <li tal:condition="(not (env == 'prd' and repeat.item.start and offset == 0)) 
+                      <li tal:condition="(not (env == 'prd' and repeat.item.start and offset == 0 and item.lifecycle_id == 2))
                                           and (not (histdeploy.type.name == 'conf' and (env == 'dev' or env == 'qat'))) 
                                           and (user.promote_prd_auth or (user.promote_prd_time_auth and app.time_valid.valid))"
                           tal:attributes="class 'promote %s' % env">
