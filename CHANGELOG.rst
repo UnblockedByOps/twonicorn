@@ -8,6 +8,11 @@ Wishlist
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+3.1
+~~~~~~~
+feature: Making the name parsing more robust for Self Service.
+bugfix: Fixed issue where conf promote button was not showing for init artifacts.
+
 3.0
 ~~~~~~~
 feature: Self Service tool for creating applications, git repos and jenkins jobs.
