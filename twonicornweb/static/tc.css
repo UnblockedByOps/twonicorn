@@ -768,6 +768,12 @@ li.exp {
   font-size: 1.2em;
   border-radius: 0 4px 0 0;
 }
+.deploy_header_edit {
+  float: right;
+  padding: 70px 15px 0px 15px;
+  height: 25px;
+  font-size: 1.2em;
+}
 .deploy_header_element {
   padding: 3px;
 }

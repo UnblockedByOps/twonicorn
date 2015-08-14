@@ -83,6 +83,7 @@ CREATE TABLE `deploys` (
 DROP TABLE IF EXISTS `deploys_audit`;
 CREATE TABLE `deploys_audit` (
   `id`                     mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `deleted`                tinyint(1) UNSIGNED DEFAULT 0 NOT NULL,
   `deploy_id`              mediumint(9) UNSIGNED NOT NULL,
   `application_id`         mediumint(9) UNSIGNED NOT NULL,
   `artifact_type_id`       mediumint(9) UNSIGNED NOT NULL,
@@ -103,6 +104,11 @@ FOR EACH ROW BEGIN
    IF NEW.updated <> OLD.updated THEN
       INSERT INTO deploys_audit(deploy_id,application_id,artifact_type_id,package_name,deploy_path,updated_by,updated) VALUES (NEW.deploy_id,NEW.application_id,NEW.artifact_type_id,NEW.package_name,NEW.deploy_path,NEW.updated_by,NEW.updated);
    END IF;
+END //
+
+CREATE TRIGGER deploys_trigger_delete AFTER DELETE ON deploys
+FOR EACH ROW BEGIN
+   INSERT INTO deploys_audit(deleted,deploy_id,application_id,artifact_type_id,package_name,deploy_path,updated_by,updated) VALUES (1,old.deploy_id,old.application_id,old.artifact_type_id,old.package_name,old.deploy_path,old.updated_by,NOW());
 END //
 
 DELIMITER ;

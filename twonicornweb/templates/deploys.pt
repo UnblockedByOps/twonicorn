@@ -39,6 +39,11 @@
             <div class="deploy_header_element">Application ID </div>
             <div class="deploy_header_element">Nodegroup </div>
           </div>
+          <div class="deploy_header_edit" tal:condition="user.cp_auth">
+            <a class="button" href="/cp/application?mode=edit&application_id=0"
+               tal:attributes="href '/cp/application?mode=edit&application_id=%s' % application_id">
+               <input class="button" type="button" value="Edit Application" /></a>
+          </div>
           <div class="deploy_header_content">
             <div  class="deploy_header_element" tal:content="app.application_name">Some Application</div>
             <div  class="deploy_header_element" tal:content="str(app.application_id)">1</div>

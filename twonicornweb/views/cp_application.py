@@ -161,7 +161,25 @@ def edit_application(**kwargs):
             create = Deploy(application_id=kwargs['application_id'], artifact_type_id=artifact_type_id.artifact_type_id, deploy_path=kwargs['deploy_paths'][i], package_name=kwargs['package_names'][i], updated_by=kwargs['updated_by'], created=utcnow, updated=utcnow)
             DBSession.add(create)
             DBSession.flush()
+
+    # FIXME: This is broken due to the relationship with artifact assignments. Needs discussion on possible solutions.
+    # Delete deploys
+    for d in kwargs['deploy_ids_delete']:
+        try:
+            log.info('DELETE Deploy: application_id=%s,deploy_id=%s'
+                     % (kwargs['application_id'], d))
     
+            q = DBSession.query(Deploy)
+            q = q.filter(Deploy.deploy_id==d)
+            q = q.one()
+
+            DBSession.delete(q)
+            DBSession.flush()
+        except Exception as e:
+            log.error('Error DELETE Deploy: application_id=%s,deploy_id=%s,exception=%s'
+                     % (kwargs['application_id'], d, str(e)))
+
+
     return_url = '/deploys?application_id=%s' % (kwargs['application_id'])
     return HTTPFound(return_url)
 
@@ -249,6 +267,7 @@ def view_cp_application(request):
                       'nodegroup': request.POST['nodegroup'],
                       'artifact_types': request.POST.getall('artifact_type'),
                       'deploy_ids': request.POST.getall('deploy_id'),
+                      'deploy_ids_delete': request.POST.getall('deploy_id_delete'),
                       'deploy_paths': request.POST.getall('deploy_path'),
                       'package_names': request.POST.getall('package_name'),
                       'day_start': request.POST['day_start'],

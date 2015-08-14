@@ -31,6 +31,14 @@
                 $( "#package_name"+pkg_td_idx[1] ).prop('required',false);
             }
           });
+
+          // delete deploys button
+          $('.del_deploy').click(function(event){
+            event.preventDefault();
+            var deploy_id = $(this).attr("id").split("-", 2);
+            $("#addr0-" + deploy_id[1]).html('<input type="hidden" name="deploy_id_delete" value="' + deploy_id[1] +'"></input>');
+          });
+
         });
       </script>
 
@@ -284,7 +292,7 @@
               <li>
                 <table id="tab_deploy">
                   <tbody>
-                    <tr tal:condition="app" tal:repeat="item app.deploys" id='addr0'>
+                    <tr tal:condition="app" tal:repeat="item app.deploys" id='addr0-${item.deploy_id}'>
                       <td>
                         <input tal:attributes="value item.deploy_id" type="hidden" name="deploy_id"/>
                         <span for="artifact_type-0">Artifact Type:</span><br>
@@ -304,6 +312,9 @@
                         <span for="package_name0">Package Name:</span><br>
                         <input tal:attributes="value item.package_name" type="text" id="package_name0" name="package_name" placeholder="MyPythonPackage"/>
                         <span class="form_hint">Required for deploys that are deployed using a native package management tool (python (pip), rpm (yum), etc.)</span>
+                      </td>
+                      <td>
+                        <br><input id="delete_deploy-${item.deploy_id}" class="button exp del_deploy" type="button" value="Delete Deploy"/>
                       </td>
                     </tr>
                     <tr id='addr1'></tr>

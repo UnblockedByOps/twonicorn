@@ -165,16 +165,16 @@ class ArtifactType(Base):
 
 
 class Deploy(Base):
-    __tablename__ = 'deploys'
-    deploy_id        = Column(Integer, primary_key=True, nullable=False)
-    application_id   = Column(Integer, ForeignKey('applications.application_id'), nullable=False)
-    artifact_type_id = Column(Integer, ForeignKey('artifact_types.artifact_type_id'), nullable=False)
-    deploy_path      = Column(Text, nullable=False)
-    package_name     = Column(Text, nullable=True)
-    updated_by       = Column(Text, nullable=False)
-    created          = Column(TIMESTAMP, nullable=False)
-    updated          = Column(TIMESTAMP, nullable=False)
-    application      = relationship("Application", backref=backref('deploys'))
+    __tablename__        = 'deploys'
+    deploy_id            = Column(Integer, primary_key=True, nullable=False)
+    application_id       = Column(Integer, ForeignKey('applications.application_id'), nullable=False)
+    artifact_type_id     = Column(Integer, ForeignKey('artifact_types.artifact_type_id'), nullable=False)
+    deploy_path          = Column(Text, nullable=False)
+    package_name         = Column(Text, nullable=True)
+    updated_by           = Column(Text, nullable=False)
+    created              = Column(TIMESTAMP, nullable=False)
+    updated              = Column(TIMESTAMP, nullable=False)
+    application          = relationship("Application", backref=backref('deploys'))
     artifact_assignments = relationship("ArtifactAssignment", backref=backref('deploy'),
                                           order_by=ArtifactAssignment.created.desc,
                                           lazy="dynamic")
