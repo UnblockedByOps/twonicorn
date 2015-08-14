@@ -579,6 +579,10 @@ def view_ss(request):
 
         # Set up the list of jobs to check
         jobs = [ui.job_code_url, ui.job_conf_url]
+        # Optional jobs
+        for j in [ui.job_rolling_restart_url, ui.job_abs_url]:
+            if j:
+                jobs.append(j)
         if ui.code_review == 'true' and not ui.autosnap:
             jobs.append(ui.job_review_url)
          
