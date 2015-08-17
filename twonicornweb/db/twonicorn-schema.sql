@@ -150,6 +150,31 @@ CREATE TABLE `artifact_assignments` (
 
 CREATE INDEX idx_deploy_search on artifact_assignments (deploy_id, env_id, lifecycle_id);
 
+###
+### TABLE: artifact_assignments_audit
+###   This audit trail for artifact_assignments. Right now we
+###   only tracking deletes.
+###
+DROP TABLE IF EXISTS `artifact_assignments_audit`;
+CREATE TABLE `artifact_assignments_audit` (
+  `artifact_assignments_audit_id`      mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `deleted`                            tinyint(1) UNSIGNED DEFAULT 0 NOT NULL,
+  `deploy_id`                          mediumint(9) UNSIGNED NOT NULL,
+  `env_id`                             mediumint(9) UNSIGNED NOT NULL,
+  `lifecycle_id`                       mediumint(9) UNSIGNED NOT NULL,
+  `artifact_id`                        mediumint(9) UNSIGNED NOT NULL,
+  `updated_by`                         varchar(200) COLLATE utf8_bin NOT NULL,
+  `updated`                            timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+DELIMITER //
+CREATE TRIGGER artifact_assignments_trigger_delete AFTER DELETE ON artifact_assignments
+FOR EACH ROW BEGIN
+   INSERT INTO artifact_assignments_audit(deleted,deploy_id,env_id,lifecycle_id,artifact_id,updated_by,updated) VALUES (1,old.deploy_id,old.env_id,old.lifecycle_id,old.artifact_id,old.updated_by,NOW());
+END //
+
+DELIMITER ;
+
 
 ### 
 ### TABLE: artifact_notes

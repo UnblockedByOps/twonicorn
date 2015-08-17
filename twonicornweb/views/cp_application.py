@@ -29,6 +29,7 @@ from twonicornweb.models import (
     Application,
     Deploy,
     ArtifactType,
+    ArtifactAssignment,
     DeploymentTimeWindow,
     )
 
@@ -166,6 +167,16 @@ def edit_application(**kwargs):
     # Delete deploys
     for d in kwargs['deploy_ids_delete']:
         try:
+            log.info('DELETE Artifact assignents for deploy: application_id=%s,deploy_id=%s'
+                     % (kwargs['application_id'], d))
+
+            aa = DBSession.query(ArtifactAssignment)
+            aa = aa.filter(ArtifactAssignment.deploy_id==d)
+            aa = aa.all()
+
+            for a in aa:
+                DBSession.delete(a)
+
             log.info('DELETE Deploy: application_id=%s,deploy_id=%s'
                      % (kwargs['application_id'], d))
     
@@ -178,7 +189,6 @@ def edit_application(**kwargs):
         except Exception as e:
             log.error('Error DELETE Deploy: application_id=%s,deploy_id=%s,exception=%s'
                      % (kwargs['application_id'], d, str(e)))
-
 
     return_url = '/deploys?application_id=%s' % (kwargs['application_id'])
     return HTTPFound(return_url)

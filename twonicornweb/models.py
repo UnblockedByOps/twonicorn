@@ -394,6 +394,7 @@ class UserGroupAssignment(Base):
     user                    = relationship("User", backref=backref('user_group_assignments'))
     group                   = relationship("Group", backref=backref('user_group_assignments'))
 
+
 class DeploymentTimeWindow(Base):
     __tablename__ = 'deployment_time_windows'
     deployment_time_window_id        = Column(Integer, primary_key=True, nullable=False)
@@ -409,6 +410,7 @@ class DeploymentTimeWindow(Base):
     updated                          = Column(TIMESTAMP, nullable=False)
     application                      = relationship("Application", backref=backref('deployment_time_windows'))
 
+
 class JenkinsInstance(Base):
     __tablename__ = 'jenkins_instances'
     jenkins_instance_id              = Column(Integer, primary_key=True, nullable=False)
@@ -416,6 +418,7 @@ class JenkinsInstance(Base):
     updated_by                       = Column(Text, nullable=False)
     created                          = Column(TIMESTAMP, nullable=False)
     updated                          = Column(TIMESTAMP, nullable=False)
+
 
 class JenkinsTemplate(Base):
     __tablename__ = 'jenkins_templates'
@@ -425,4 +428,5 @@ class JenkinsTemplate(Base):
     updated_by                       = Column(Text, nullable=False)
     created                          = Column(TIMESTAMP, nullable=False)
     updated                          = Column(TIMESTAMP, nullable=False)
+
 

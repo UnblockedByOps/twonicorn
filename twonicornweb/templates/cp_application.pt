@@ -35,8 +35,11 @@
           // delete deploys button
           $('.del_deploy').click(function(event){
             event.preventDefault();
-            var deploy_id = $(this).attr("id").split("-", 2);
-            $("#addr0-" + deploy_id[1]).html('<input type="hidden" name="deploy_id_delete" value="' + deploy_id[1] +'"></input>');
+            var r = confirm("Are you SURE you want to delete this deploy? It will be deleted froever when you submit the form.");
+            if (r == true) {
+                var deploy_id = $(this).attr("id").split("-", 2);
+                $("#addr0-" + deploy_id[1]).html('<input type="hidden" name="deploy_id_delete" value="' + deploy_id[1] +'"></input>');
+            }
           });
 
         });
