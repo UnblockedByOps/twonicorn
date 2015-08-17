@@ -8,6 +8,12 @@ Wishlist
 * feature: Auto creation of JIRA tickets.
 * cleanup: Fix all the pylint warnings.
 
+3.2
+~~~~~~~
+feature: Adding feature to allow for deleting deploys.
+feature: "Edit Application" button on the application page if user has control panel permission.
+bigfix: Checking for existence of all jenkins jobs when self service validation occurs.
+
 3.1
 ~~~~~~~
 feature: Making the name parsing more robust for Self Service.
