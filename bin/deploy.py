@@ -155,17 +155,21 @@ def get_application_deploys(tcw_host, application_id, ct_env, ct_loc):
     for index in range(len(deployment_data)):
         deployment = deployment_data[index]
 
-        deployments[deployment['deploy_id']] = {
-            'deploy_id': deployment['deploy_id'],
-            'package_name': deployment['package_name'],
-            'artifact_assignment_id': deployment['artifact_assignment_id'],
-            'deploy_path': deployment['deploy_path'],
-            'download_url': deployment['download_url'],
-            'revision': deployment['revision'],
-            'artifact_type': deployment['artifact_type'],
-            'repo_type': deployment['repo_type'],
-            'repo_name': deployment['repo_name']
-        }
+        try:
+            deployments[deployment['deploy_id']] = {
+                'deploy_id': deployment['deploy_id'],
+                'package_name': deployment['package_name'],
+                'artifact_assignment_id': deployment['artifact_assignment_id'],
+                'deploy_path': deployment['deploy_path'],
+                'download_url': deployment['download_url'],
+                'revision': deployment['revision'],
+                'artifact_type': deployment['artifact_type'],
+                'repo_type': deployment['repo_type'],
+                'repo_name': deployment['repo_name']
+            }
+        except KeyError:
+            logging.error('Deployment data is incomplete. Did you forget to promote an artifact?')
+            sys.exit(1)
 
         logging.debug('deploy_id=%s,artifact_assignment_id=%s,'
                       'deploy_path=%s,download_url=%s,'
