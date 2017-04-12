@@ -78,4 +78,3 @@ INSERT INTO deployment_time_windows VALUES(1,1,1,4,8,00,16,00,'bandta',NOW(),NOW
 INSERT INTO deployment_time_windows VALUES(2,2,1,4,9,00,15,00,'bandta',NOW(),NOW());
 
 INSERT INTO deployment_time_windows (application_id,day_start,day_end,hour_start,minute_start,hour_end,minute_end,updated_by,created,updated) SELECT application_id,1,4,8,00,16,00,'Admin',NOW(),NOW() from applications;
-
